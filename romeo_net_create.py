@@ -121,6 +121,7 @@ def semaphore_create(place_id, transition_id, file_name):
                         ' <graphics color="0">\n',
                         ' </graphics>\n',
                         '</arc>\n\n\n', ]
+
                     file.writelines(arc)
 
     file1.close()
