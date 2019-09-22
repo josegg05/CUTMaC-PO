@@ -8,17 +8,18 @@ def semaphore_create(place_id, transition_id, file_name):
     p_id = place_id
     t_id = transition_id
 
-    p_names = ['GG_', 'DG_', 'GR_', 'mG_', 'DY_', 'EG_', 'M_', 'SM_', 'RG_', 'RR_', 'FOS_']
+    p_names = ['GG_', 'DG_', 'GR_', 'mG_', 'DY_', 'EG_', 'M_', 'SM_', 'RG_', 'RR_', 'FOS_', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8']
     p_ids_array = pd.DataFrame(columns=p_names)
     p_color = [0, 3, 0, 0, 4, 0, 0, 0, 0, 5, 0]
-    p_pos_x = [0, 75, 150, 0, 150, 0, 75, 150, 0, 150, 75]
+    p_pos_x = [0, 75, 150, 0, 150, 0, 75, 150, 0, 150, 75, 75, 75]
     p_pos_y = [0, 30, 0, 60, 60, 120, 90, 120, 180, 180, 180]
 
-    t_names = ['t1_', 't2_', 'min_', 'Yel_', 'Max_', 'FO_', 'Act_', 't3_']
+    t_names = ['t1_', 't2_', 'min_', 'Yel_', 'Max_', 'FO_', 'Act_', 't3_', 't11', 't21', 't12', 't22', 't13', 't23', 't14', 't24', 't15', 't25', 't16', 't26', 't17', 't27', 't18', 't28']
     t_ids_array = pd.DataFrame(columns=t_names)
-    t_time = [0, 0, 20, 4, 100, 0, 50, 0]
-    t_color = [0, 0, 1, 1, 1, 0, 1, 0]
-    t_pos_x = [0, 150, 0, 150, -75, 0, 75, 150]
+    all_red = 4
+    t_time = [0, 0, 20, 4, 100, 0, 50, 0, 0, all_red, 0, all_red, 0, all_red, 0, all_red, 0, all_red, 0, all_red, 0, all_red, 0, all_red ]
+    t_color = [0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
+    t_pos_x = [0, 150, 0, 150, -75, 0, 75, 150, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75]
     t_pos_y = [30, 30, 90, 90, 150, 150, 150, 150]
 
     pos_x_init = [121, 421, 721, 1021, 1321, 1621, 1921, 2221]
@@ -32,6 +33,7 @@ def semaphore_create(place_id, transition_id, file_name):
     #print(len(arcs_in))
     #print(type(arcs_out[1]))
     for x in range(len(pos_x_init)):
+        # Create Semaphore places
         a = np.zeros((len(p_names),), dtype=np.int)
         df = pd.DataFrame(data=[a], columns=p_names)
         p_ids_array = p_ids_array.append(df, ignore_index=True)
@@ -50,6 +52,7 @@ def semaphore_create(place_id, transition_id, file_name):
             file.writelines(place)
         # print(p_ids_array)
 
+        # Create Semaphore transitions
         a = np.zeros((len(t_names),), dtype=np.int)
         df = pd.DataFrame(data=[a], columns=t_names)
         t_ids_array = t_ids_array.append(df, ignore_index=True)
@@ -71,6 +74,11 @@ def semaphore_create(place_id, transition_id, file_name):
             t_ids_array.loc[x][t_names[i]] = t_id
             t_id += 1
             file.writelines(transition)
+
+        #Create Cycles change places and transitions
+        #for i in range(len(pos_x_init)):
+         #   if i != x:
+
 
         for i in range(len(t_names)):
             if isinstance(arcs_in[i], str):
@@ -110,9 +118,9 @@ def semaphore_create(place_id, transition_id, file_name):
                     '</arc>\n\n\n', ]
                 file.writelines(arc)
             elif isinstance(arcs_out[i], list):
-                arcs_in_t = arcs_out[i]
-                for j in range(len(arcs_in_t)):
-                    a_place = p_ids_array.loc[x][arcs_in_t[j]]
+                arcs_out_t = arcs_out[i]
+                for j in range(len(arcs_out_t)):
+                    a_place = p_ids_array.loc[x][arcs_out_t[j]]
                     a_transition = t_ids_array.loc[x][t_names[i]]
                     arc = [
                         '<arc place="%d" transition="%d" type="TransitionPlace" weight="1" inhibitingCondition ="">\n' % (

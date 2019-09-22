@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <romeo version="Romeo v3.6.0"> </romeo>
-<TPN name="/home/jose/Desktop/UC/InvestigaciÃ³n/PetriNets/romeo-3.6.0-linux/romeo-3.6.0/semaphore.xml">
+<TPN name="/home/jose/Desktop/UC/Investigación/PetriNets/romeo-3.6.0-linux/romeo-3.6.0/semaphore.xml">
  <place id="1" identifier="GG_0" label="GG_0" initialMarking="0" eft="0" lft="inf">
     <graphics color="0">
        <position x="121" y="4951"/>
