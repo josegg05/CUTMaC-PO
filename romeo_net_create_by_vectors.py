@@ -74,13 +74,10 @@ def net_create():
 
     # Create Cycle change places & transitions
     for x in range(len(phases)):
-        for i in range(8):
+        for i in range(len(phases)):
             if x != i:
-                t_ident = "t1" + str(x) + str(i)
-                petri_net.transitions = petri_net.transitions.append(
-                    {'name': t_ident, 'color': 0, "x_pos": 75 + pos_x_init[x],
-                     "y_pos": pos_y_init[x] - 240 - 120 * i, "time": 0, "id": t_id}, ignore_index=True)
-                t_id += 1
+                dir_start_list = phases[x]
+                dir_goal_list = phases[i]
 
                 p_ident = "C" + str(x) + str(i)
                 petri_net.places = petri_net.places.append(
@@ -88,10 +85,62 @@ def net_create():
                      "y_pos": pos_y_init[x] - 270 - 120 * i, "M0": 0, "id": p_id}, ignore_index=True)
                 p_id += 1
 
+                if dir_start_list[0] in dir_goal_list:
+                    goal = [y for y in dir_goal_list if y != dir_start_list[0]]
+                    arcs_in_1 = ["DG_"+str(dir_start_list[0]),
+                                 "RG_"+str(dir_start_list[1]),
+                                 "RR_"+str(goal[0])]
+                    arcs_out_1 = ["DG_"+str(dir_start_list[0]),
+                                  "GR_"+str(dir_start_list[1]),
+                                  p_ident]
+                    arcs_in_2 = ["DG_"+str(dir_start_list[0]),
+                                 "RR_"+str(dir_start_list[1]),
+                                 p_ident]
+                    arcs_out_2 = ["DG_" + str(dir_start_list[0]),
+                                  "RR_" + str(dir_start_list[1]),
+                                  "GG_" + str(goal[0])]
+                elif dir_start_list[1] in dir_goal_list:
+                    goal = [y for y in dir_goal_list if y != dir_start_list[0]]
+                    arcs_in_1 = ["DG_" + str(dir_start_list[1]),
+                                 "RG_" + str(dir_start_list[0]),
+                                 "RR_" + str(goal[0])]
+                    arcs_out_1 = ["DG_" + str(dir_start_list[1]),
+                                  "GR_" + str(dir_start_list[0]),
+                                  p_ident]
+                    arcs_in_2 = ["DG_" + str(dir_start_list[1]),
+                                 "RR_" + str(dir_start_list[0]),
+                                 p_ident]
+                    arcs_out_2 = ["DG_" + str(dir_start_list[1]),
+                                  "RR_" + str(dir_start_list[0]),
+                                  "GG_" + str(goal[0])]
+                else:
+                    arcs_in_1 = ["RG_" + str(dir_start_list[0]),
+                                 "RG_" + str(dir_start_list[1]),
+                                 "RR_" + str(dir_goal_list[0]),
+                                 "RR_" + str(dir_goal_list[1])]
+                    arcs_out_1 = ["GR_" + str(dir_start_list[0]),
+                                  "GR_" + str(dir_start_list[1]),
+                                  p_ident]
+                    arcs_in_2 = ["RR_" + str(dir_start_list[0]),
+                                 "RR_" + str(dir_start_list[1]),
+                                 p_ident]
+                    arcs_out_2 = ["RR_" + str(dir_start_list[0]),
+                                  "RR_" + str(dir_start_list[1]),
+                                  "GG_" + str(dir_goal_list[0]),
+                                  "GG_" + str(dir_goal_list[1])]
+                #print(arcs_in_1)
+                t_ident = "t1" + str(x) + str(i)
+                petri_net.transitions = petri_net.transitions.append(
+                    {'name': t_ident, 'color': 0, "x_pos": 75 + pos_x_init[x],
+                     "y_pos": pos_y_init[x] - 240 - 120 * i, "time": 0, "arcs_in": arcs_in_1, "arcs_out": arcs_out_1,
+                     "id": t_id}, ignore_index=True)
+                t_id += 1
+
                 t_ident = "t2" + str(x) + str(i)
                 petri_net.transitions = petri_net.transitions.append(
                     {'name': t_ident, 'color': 1, "x_pos": 75 + pos_x_init[x],
-                     "y_pos": pos_y_init[x] - 300 - 120 * i, "time": all_red, "id": t_id}, ignore_index=True)
+                     "y_pos": pos_y_init[x] - 300 - 120 * i, "time": all_red, "arcs_in": arcs_in_2, "arcs_out": arcs_out_2,
+                     "id": t_id}, ignore_index=True)
                 t_id += 1
 
     return petri_net, p_id, t_id
