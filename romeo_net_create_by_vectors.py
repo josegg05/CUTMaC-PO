@@ -37,6 +37,11 @@ def net_create():
 
     directions = [0, 1, 2, 3, 4, 5, 6, 7]
     phases = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
+    cycle_normal_select = [1, 2, 3, 4, 5, 6, 7, 0]
+    cycle_acc_a_select = [2, 2, 3, 4, 5, 2, 2, 2]
+    cycle_acc_b_select = [1, 5, 0, 0, 0, 7, 0, 0]
+    cycle_acc_c_select = [1, 3, 1, 4, 6, 1, 1, 1]
+    cycle_acc_d_select = [2, 0, 6, 0, 0, 0, 7, 0]
 
     for x in directions:
         # Create Semaphore places
@@ -72,9 +77,9 @@ def net_create():
 
             t_id += 1
 
-    # Create Cycle change places & transitions
-    for x in range(len(phases)):
-        for i in range(len(phases)):
+    # Create Cycle change procces
+    for x in range(len(phases)):#Start phase
+        for i in range(len(phases)):#Golas phase
             if x != i:
                 dir_start_list = phases[x]
                 dir_goal_list = phases[i]
@@ -89,10 +94,12 @@ def net_create():
                     goal = [y for y in dir_goal_list if y != dir_start_list[0]]
                     arcs_in_1 = ["DG_"+str(dir_start_list[0]),
                                  "RG_"+str(dir_start_list[1]),
-                                 "RR_"+str(goal[0])]
+                                 "RR_"+str(goal[0]),
+                                 "S"+str(i)]
                     arcs_out_1 = ["DG_"+str(dir_start_list[0]),
                                   "GR_"+str(dir_start_list[1]),
-                                  p_ident]
+                                  p_ident,
+                                  "ST"]
                     arcs_in_2 = ["DG_"+str(dir_start_list[0]),
                                  "RR_"+str(dir_start_list[1]),
                                  p_ident]
@@ -103,10 +110,12 @@ def net_create():
                     goal = [y for y in dir_goal_list if y != dir_start_list[0]]
                     arcs_in_1 = ["DG_" + str(dir_start_list[1]),
                                  "RG_" + str(dir_start_list[0]),
-                                 "RR_" + str(goal[0])]
+                                 "RR_" + str(goal[0]),
+                                 "S"+str(i)]
                     arcs_out_1 = ["DG_" + str(dir_start_list[1]),
                                   "GR_" + str(dir_start_list[0]),
-                                  p_ident]
+                                  p_ident,
+                                  "ST"]
                     arcs_in_2 = ["DG_" + str(dir_start_list[1]),
                                  "RR_" + str(dir_start_list[0]),
                                  p_ident]
@@ -117,10 +126,12 @@ def net_create():
                     arcs_in_1 = ["RG_" + str(dir_start_list[0]),
                                  "RG_" + str(dir_start_list[1]),
                                  "RR_" + str(dir_goal_list[0]),
-                                 "RR_" + str(dir_goal_list[1])]
+                                 "RR_" + str(dir_goal_list[1]),
+                                 "S"+str(i)]
                     arcs_out_1 = ["GR_" + str(dir_start_list[0]),
                                   "GR_" + str(dir_start_list[1]),
-                                  p_ident]
+                                  p_ident,
+                                  "ST"]
                     arcs_in_2 = ["RR_" + str(dir_start_list[0]),
                                  "RR_" + str(dir_start_list[1]),
                                  p_ident]
@@ -143,6 +154,42 @@ def net_create():
                      "id": t_id}, ignore_index=True)
                 t_id += 1
 
+        # Create Cycle change control x="2491" y="4681"
+        p_ident = "S" + str(x)
+        petri_net.places = petri_net.places.append(
+            {'name': p_ident, 'color': 0, "x_pos": 2491,
+             "y_pos": pos_y_init[x] - 270 - 120 * x, "M0": 0, "id": p_id}, ignore_index=True)
+        p_id += 1
+
+        arcs_in = ["Normal",
+                   "ST"]
+        for i in range(len(cycle_normal_select)):
+            if cycle_normal_select[i] == x:
+                for j in range(len(phases)):
+                    if j != i:
+                        arcs_in.append("C" + str(j) + str(i))
+
+        arcs_out = ["Normal",
+                    p_ident]
+        t_ident = "tn" + str(x)
+        petri_net.transitions = petri_net.transitions.append(
+            {'name': t_ident, 'color': 0, "x_pos": 2491 + 60,
+             "y_pos": pos_y_init[x] - 270 - 120 * x, "time": 0, "arcs_in": arcs_in, "arcs_out": arcs_out,
+             "id": t_id}, ignore_index=True)
+        t_id += 1
+
+    p_ident = "Normal"
+    petri_net.places = petri_net.places.append(
+        {'name': p_ident, 'color': 0, "x_pos": 2491 + 180,
+         "y_pos": pos_y_init[x] - 270 - 120 * 4, "M0": 1, "id": p_id}, ignore_index=True)
+    p_id += 1
+    p_ident = "ST"
+    petri_net.places = petri_net.places.append(
+        {'name': p_ident, 'color': 0, "x_pos": 2491 + 120,
+         "y_pos": pos_y_init[x] - 270 - 120 * 4, "M0": 0, "id": p_id}, ignore_index=True)
+    p_id += 1
+
+
     return petri_net, p_id, t_id
 
 
@@ -152,8 +199,8 @@ def net_graph(file_name, petri_net):
     petri_net.transitions.set_index("name", inplace=True)
     for i in list(petri_net.places.index.values):
         place = [
-            ' <place id="%d" identifier="%s" label="%s" initialMarking="0" eft="0" lft="inf">\n' % (
-                petri_net.places.loc[i]["id"], i, i),
+            ' <place id="%d" identifier="%s" label="%s" initialMarking="%d" eft="0" lft="inf">\n' % (
+                petri_net.places.loc[i]["id"], i, i,petri_net.places.loc[i]["M0"]),
             '    <graphics color="%d">\n' % petri_net.places.loc[i]["color"],
             '       <position x="%d" y="%d"/>\n' % (
                 petri_net.places.loc[i]["x_pos"], petri_net.places.loc[i]["y_pos"]),
