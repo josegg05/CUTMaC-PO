@@ -57,3 +57,9 @@ print(data5.loc["Jose"]["x_pos"])
 print(list(data5.index.values))
 data5.iloc[1]["x_pos"] = 1000
 print(data5.iloc[1]["x_pos"])
+
+hola = "*hola"
+print(hola)
+if "*" in hola:
+    hola = hola.replace("*", "")
+    print(hola)

@@ -38,6 +38,7 @@ def net_create():
 
     directions = [0, 1, 2, 3, 4, 5, 6, 7]
     phases = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
+    cycles_names = ["Normal", "AccA", "AccB", "AccC", "AccD"]
     cycle_normal_select = [1, 2, 3, 4, 5, 6, 7, 0]
     cycle_acc_a_select = [2, 2, 3, 4, 5, 2, 2, 2]
     cycle_acc_b_select = [1, 5, 0, 0, 0, 7, 0, 0]
@@ -75,7 +76,6 @@ def net_create():
                 for j in range(len(arcs_out_t)):
                     arcs_out_t[j] = arcs_out_t[j] + str(x)
                 petri_net.transitions.at[t_id - 1, "arcs_out"] = arcs_out_t
-
             t_id += 1
 
     # Create Cycle change procces
@@ -170,23 +170,125 @@ def net_create():
                         arcs_in = ["Normal", "ST", "C" + str(j) + str(i)]
                         arcs_out = ["Normal", p_ident, "C" + str(j) + str(i), "C" + str(j) + str(i)]
                         delay = 1  # para que ocurra la trasición que apaga el DG
-                        t_ident = "tn" + str(j) + str(x)
+                        t_ident = "tn" + str(j) + str(i) + str(x)
                         petri_net.transitions = petri_net.transitions.append(
                             {'name': t_ident, 'color': 0, "x_pos": 2491 + 60 + j,
-                             "y_pos": pos_y_init[x] - 270 - 120 * x, "time": delay, "arcs_in": arcs_in,
+                             "y_pos": pos_y_init[x] - 240 - 120 * x, "time": 1, "arcs_in": arcs_in,
                              "arcs_out": arcs_out,
                              "id": t_id}, ignore_index=True)
                         t_id += 1
 
-    p_ident = "Normal"
-    petri_net.places = petri_net.places.append(
-        {'name': p_ident, 'color': 0, "x_pos": 2491 + 180,
-         "y_pos": pos_y_init[x] - 270 - 120 * 4, "M0": 1, "id": p_id}, ignore_index=True)
-    p_id += 1
+        count = -2
+        for i in range(len(cycle_acc_a_select)):
+            if cycle_acc_a_select[i] == x:
+                count += 2
+                for j in range(len(phases)):
+                    if j != i:
+                        arcs_in = ["AccA", "ST", "C" + str(j) + str(i)]
+                        arcs_out = ["AccA", p_ident, "C" + str(j) + str(i), "C" + str(j) + str(i)]
+                        delay = 1  # para que ocurra la trasición que apaga el DG
+                        t_ident = "tacc_a" + str(j) + str(i) + str(x)
+                        petri_net.transitions = petri_net.transitions.append(
+                            {'name': t_ident, 'color': 0, "x_pos": 2491 + 60 + j,
+                             "y_pos": pos_y_init[x] - count - 255 - 120 * x, "time": 1, "arcs_in": arcs_in,
+                             "arcs_out": arcs_out,
+                             "id": t_id}, ignore_index=True)
+                        t_id += 1
+
+        count = -2
+        for i in range(len(cycle_acc_b_select)):
+            if cycle_acc_b_select[i] == x:
+                count += 2
+                for j in range(len(phases)):
+                    if j != i:
+                        arcs_in = ["AccB", "ST", "C" + str(j) + str(i)]
+                        arcs_out = ["AccB", p_ident, "C" + str(j) + str(i), "C" + str(j) + str(i)]
+                        delay = 1  # para que ocurra la trasición que apaga el DG
+                        t_ident = "tacc_b" + str(j) + str(i) + str(x)
+                        petri_net.transitions = petri_net.transitions.append(
+                            {'name': t_ident, 'color': 0, "x_pos": 2491 + 60 + j,
+                             "y_pos": pos_y_init[x] - count - 270 - 120 * x, "time": 1, "arcs_in": arcs_in,
+                             "arcs_out": arcs_out,
+                             "id": t_id}, ignore_index=True)
+                        t_id += 1
+
+        count = -2
+        for i in range(len(cycle_acc_c_select)):
+            if cycle_acc_c_select[i] == x:
+                count += 2
+                for j in range(len(phases)):
+                    if j != i:
+                        arcs_in = ["AccC", "ST", "C" + str(j) + str(i)]
+                        arcs_out = ["AccC", p_ident, "C" + str(j) + str(i), "C" + str(j) + str(i)]
+                        delay = 1  # para que ocurra la trasición que apaga el DG
+                        t_ident = "tacc_c" + str(j) + str(i) + str(x)
+                        petri_net.transitions = petri_net.transitions.append(
+                            {'name': t_ident, 'color': 0, "x_pos": 2491 + 60 + j,
+                             "y_pos": pos_y_init[x] - count - 285 - 120 * x, "time": 1, "arcs_in": arcs_in,
+                             "arcs_out": arcs_out,
+                             "id": t_id}, ignore_index=True)
+                        t_id += 1
+
+        count = -2
+        for i in range(len(cycle_acc_d_select)):
+            if cycle_acc_d_select[i] == x:
+                count += 2
+                for j in range(len(phases)):
+                    if j != i:
+                        arcs_in = ["AccD", "ST", "C" + str(j) + str(i)]
+                        arcs_out = ["AccD", p_ident, "C" + str(j) + str(i), "C" + str(j) + str(i)]
+                        delay = 1  # para que ocurra la trasición que apaga el DG
+                        t_ident = "tacc_d" + str(j) + str(i) + str(x)
+                        petri_net.transitions = petri_net.transitions.append(
+                            {'name': t_ident, 'color': 0, "x_pos": 2491 + 60 + j,
+                             "y_pos": pos_y_init[x] - count - 300 - 120 * x, "time": 1, "arcs_in": arcs_in,
+                             "arcs_out": arcs_out,
+                             "id": t_id}, ignore_index=True)
+                        t_id += 1
+    #Create Cycle types annd accident controls
+    for i in range(len(cycles_names)):
+        p_ident = cycles_names[i]
+        m0 = 0
+        if p_ident == "Normal":
+            m0 = 1
+            petri_net.places = petri_net.places.append(
+                {'name': p_ident, 'color': 0, "x_pos": 2491 + 180,
+                 "y_pos": pos_y_init[x] - 270 - 120 * i, "M0": m0, "id": p_id}, ignore_index=True)
+            p_id += 1
+        else:
+            petri_net.places = petri_net.places.append(
+                {'name': p_ident, 'color': 0, "x_pos": 2491 + 180,
+                 "y_pos": pos_y_init[x] - 270 - 120 * i, "M0": m0, "id": p_id}, ignore_index=True)
+            p_id += 1
+            p_ident2 = p_ident + "to_normal"
+            petri_net.places = petri_net.places.append(
+                {'name': p_ident2, 'color': 0, "x_pos": 2491 + 180 + 90,
+                 "y_pos": pos_y_init[x] - 210 - 120 * i, "M0": m0, "id": p_id}, ignore_index=True)
+            p_id += 1
+            p_ident3 = "normal_to" + p_ident
+            petri_net.places = petri_net.places.append(
+                {'name':p_ident3, 'color': 0, "x_pos": 2491 + 180 + 210,
+                 "y_pos": pos_y_init[x] - 210 - 120 * i, "M0": m0, "id": p_id}, ignore_index=True)
+            p_id += 1
+
+            arcs_in_control = ["*Normal", [p_ident2, p_ident], ["Normal", p_ident3], "*" +  p_ident]
+            arcs_out_control = [p_ident2, "Normal", p_ident, p_ident3]
+            t_control_names = ["t_no_"+p_ident, "tn_"+p_ident, "t"+p_ident+"_n", "t_" + p_ident]
+            for j in range(len(t_control_names)):
+                arcs_in = arcs_in_control[j]
+                arcs_out = arcs_out_control[j]
+                t_ident = t_control_names[j]
+                petri_net.transitions = petri_net.transitions.append(
+                    {'name': t_ident, 'color': 0, "x_pos": 2491 + 180 + 60 + j*60,
+                     "y_pos": pos_y_init[x] - 210 - 120 * i, "time": 0, "arcs_in": arcs_in,
+                     "arcs_out": arcs_out,
+                     "id": t_id}, ignore_index=True)
+                t_id += 1
+
     p_ident = "ST"
     petri_net.places = petri_net.places.append(
         {'name': p_ident, 'color': 0, "x_pos": 2491 + 120,
-         "y_pos": pos_y_init[x] - 270 - 120 * 4, "M0": 0, "id": p_id}, ignore_index=True)
+         "y_pos": pos_y_init[x] - 210 - 120 * 4, "M0": 0, "id": p_id}, ignore_index=True)
     p_id += 1
 
     return petri_net, p_id, t_id
@@ -231,10 +333,16 @@ def net_graph(file_name, petri_net):
         if petri_net.transitions.loc[i]["arcs_in"] != "NaN":
             a_transition = petri_net.transitions.loc[i]["id"]
             if isinstance(petri_net.transitions.loc[i]["arcs_in"], str):
-                a_place = petri_net.places.loc[petri_net.transitions.loc[i]["arcs_in"]]["id"]
+                arcs_in_t = petri_net.transitions.loc[i]["arcs_in"]
+                if "*" in arcs_in_t:
+                    arcs_in_t = arcs_in_t.replace("*", "")
+                    type = "logicalInhibitor"
+                else:
+                    type = "PlaceTransition"
+                a_place = petri_net.places.loc[arcs_in_t]["id"]
                 arc = [
-                    '<arc place="%d" transition="%d" type="PlaceTransition" weight="1" inhibitingCondition ="">\n' % (
-                        a_place, a_transition),
+                    '<arc place="%d" transition="%d" type="%s" weight="1" inhibitingCondition ="">\n' % (
+                        a_place, a_transition, type),
                     ' <nail xnail="0" ynail="0"/>\n',
                     ' <graphics color="0">\n',
                     ' </graphics>\n',
@@ -243,10 +351,15 @@ def net_graph(file_name, petri_net):
             elif isinstance(petri_net.transitions.loc[i]["arcs_in"], list):
                 arcs_in_t = list(petri_net.transitions.loc[i]["arcs_in"])
                 for j in range(len(arcs_in_t)):
+                    if "*" in arcs_in_t[j]:
+                        arcs_in_t[j] = arcs_in_t[j].replace("*", "")
+                        type = "logicalInhibitor"
+                    else:
+                        type = "PlaceTransition"
                     a_place = petri_net.places.loc[arcs_in_t[j]]["id"]
                     arc = [
-                        '<arc place="%d" transition="%d" type="PlaceTransition" weight="1" inhibitingCondition ="">\n' % (
-                            a_place, a_transition),
+                        '<arc place="%d" transition="%d" type="%s" weight="1" inhibitingCondition ="">\n' % (
+                            a_place, a_transition, type),
                         ' <nail xnail="0" ynail="0"/>\n',
                         ' <graphics color="0">\n',
                         ' </graphics>\n',
@@ -256,7 +369,7 @@ def net_graph(file_name, petri_net):
             if isinstance(petri_net.transitions.loc[i]["arcs_out"], str):
                 a_place = petri_net.places.loc[petri_net.transitions.loc[i]["arcs_out"]]["id"]
                 arc = [
-                    '<arc place="%d" transition="%d" type="TransitionPlace" weight="1" inhibitingCondition ="">\n' % (
+                    '<arc place="%d" transition="%d" type="TransitionPlace" weight="1">\n' % (
                         a_place, a_transition),
                     ' <nail xnail="0" ynail="0"/>\n',
                     ' <graphics color="0">\n',
@@ -268,7 +381,7 @@ def net_graph(file_name, petri_net):
                 for j in range(len(arcs_out_t)):
                     a_place = petri_net.places.loc[arcs_out_t[j]]["id"]
                     arc = [
-                        '<arc place="%d" transition="%d" type="TransitionPlace" weight="1" inhibitingCondition ="">\n' % (
+                        '<arc place="%d" transition="%d" type="TransitionPlace" weight="1">\n' % (
                             a_place, a_transition),
                         ' <nail xnail="0" ynail="0"/>\n',
                         ' <graphics color="0">\n',
