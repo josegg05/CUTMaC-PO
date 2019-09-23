@@ -6,7 +6,8 @@ import numpy as np
 class PetriNet:
     def __init__(self):
         self.places = pd.DataFrame(columns=["name", "color", "x_pos", "y_pos", "M0", "id"])
-        self.transitions = pd.DataFrame(columns=["name", "color", "x_pos", "y_pos", "time", "arcs_in", "arcs_out", "id"])
+        self.transitions = pd.DataFrame(
+            columns=["name", "color", "x_pos", "y_pos", "time", "arcs_in", "arcs_out", "id"])
         self.arcs = []
 
 
@@ -78,8 +79,8 @@ def net_create():
             t_id += 1
 
     # Create Cycle change procces
-    for x in range(len(phases)):#Start phase
-        for i in range(len(phases)):#Golas phase
+    for x in range(len(phases)):  # Start phase
+        for i in range(len(phases)):  # Golas phase
             if x != i:
                 dir_start_list = phases[x]
                 dir_goal_list = phases[i]
@@ -92,16 +93,16 @@ def net_create():
 
                 if dir_start_list[0] in dir_goal_list:
                     goal = [y for y in dir_goal_list if y != dir_start_list[0]]
-                    arcs_in_1 = ["DG_"+str(dir_start_list[0]),
-                                 "RG_"+str(dir_start_list[1]),
-                                 "RR_"+str(goal[0]),
-                                 "S"+str(i)]
-                    arcs_out_1 = ["DG_"+str(dir_start_list[0]),
-                                  "GR_"+str(dir_start_list[1]),
+                    arcs_in_1 = ["DG_" + str(dir_start_list[0]),
+                                 "RG_" + str(dir_start_list[1]),
+                                 "RR_" + str(goal[0]),
+                                 "S" + str(i)]
+                    arcs_out_1 = ["DG_" + str(dir_start_list[0]),
+                                  "GR_" + str(dir_start_list[1]),
                                   p_ident,
                                   "ST"]
-                    arcs_in_2 = ["DG_"+str(dir_start_list[0]),
-                                 "RR_"+str(dir_start_list[1]),
+                    arcs_in_2 = ["DG_" + str(dir_start_list[0]),
+                                 "RR_" + str(dir_start_list[1]),
                                  p_ident]
                     arcs_out_2 = ["DG_" + str(dir_start_list[0]),
                                   "RR_" + str(dir_start_list[1]),
@@ -111,7 +112,7 @@ def net_create():
                     arcs_in_1 = ["DG_" + str(dir_start_list[1]),
                                  "RG_" + str(dir_start_list[0]),
                                  "RR_" + str(goal[0]),
-                                 "S"+str(i)]
+                                 "S" + str(i)]
                     arcs_out_1 = ["DG_" + str(dir_start_list[1]),
                                   "GR_" + str(dir_start_list[0]),
                                   p_ident,
@@ -127,7 +128,7 @@ def net_create():
                                  "RG_" + str(dir_start_list[1]),
                                  "RR_" + str(dir_goal_list[0]),
                                  "RR_" + str(dir_goal_list[1]),
-                                 "S"+str(i)]
+                                 "S" + str(i)]
                     arcs_out_1 = ["GR_" + str(dir_start_list[0]),
                                   "GR_" + str(dir_start_list[1]),
                                   p_ident,
@@ -139,7 +140,7 @@ def net_create():
                                   "RR_" + str(dir_start_list[1]),
                                   "GG_" + str(dir_goal_list[0]),
                                   "GG_" + str(dir_goal_list[1])]
-                #print(arcs_in_1)
+                # print(arcs_in_1)
                 t_ident = "t1" + str(x) + str(i)
                 petri_net.transitions = petri_net.transitions.append(
                     {'name': t_ident, 'color': 0, "x_pos": 75 + pos_x_init[x],
@@ -150,7 +151,8 @@ def net_create():
                 t_ident = "t2" + str(x) + str(i)
                 petri_net.transitions = petri_net.transitions.append(
                     {'name': t_ident, 'color': 1, "x_pos": 75 + pos_x_init[x],
-                     "y_pos": pos_y_init[x] - 300 - 120 * i, "time": all_red, "arcs_in": arcs_in_2, "arcs_out": arcs_out_2,
+                     "y_pos": pos_y_init[x] - 300 - 120 * i, "time": all_red, "arcs_in": arcs_in_2,
+                     "arcs_out": arcs_out_2,
                      "id": t_id}, ignore_index=True)
                 t_id += 1
 
@@ -161,22 +163,20 @@ def net_create():
              "y_pos": pos_y_init[x] - 270 - 120 * x, "M0": 0, "id": p_id}, ignore_index=True)
         p_id += 1
 
-        arcs_in = ["Normal",
-                   "ST"]
         for i in range(len(cycle_normal_select)):
             if cycle_normal_select[i] == x:
                 for j in range(len(phases)):
                     if j != i:
-                        arcs_in.append("C" + str(j) + str(i))
-
-        arcs_out = ["Normal",
-                    p_ident]
-        t_ident = "tn" + str(x)
-        petri_net.transitions = petri_net.transitions.append(
-            {'name': t_ident, 'color': 0, "x_pos": 2491 + 60,
-             "y_pos": pos_y_init[x] - 270 - 120 * x, "time": 0, "arcs_in": arcs_in, "arcs_out": arcs_out,
-             "id": t_id}, ignore_index=True)
-        t_id += 1
+                        arcs_in = ["Normal", "ST", "C" + str(j) + str(i)]
+                        arcs_out = ["Normal", p_ident, "C" + str(j) + str(i), "C" + str(j) + str(i)]
+                        delay = 1  # para que ocurra la trasición que apaga el DG
+                        t_ident = "tn" + str(j) + str(x)
+                        petri_net.transitions = petri_net.transitions.append(
+                            {'name': t_ident, 'color': 0, "x_pos": 2491 + 60 + j,
+                             "y_pos": pos_y_init[x] - 270 - 120 * x, "time": delay, "arcs_in": arcs_in,
+                             "arcs_out": arcs_out,
+                             "id": t_id}, ignore_index=True)
+                        t_id += 1
 
     p_ident = "Normal"
     petri_net.places = petri_net.places.append(
@@ -189,7 +189,6 @@ def net_create():
          "y_pos": pos_y_init[x] - 270 - 120 * 4, "M0": 0, "id": p_id}, ignore_index=True)
     p_id += 1
 
-
     return petri_net, p_id, t_id
 
 
@@ -200,7 +199,7 @@ def net_graph(file_name, petri_net):
     for i in list(petri_net.places.index.values):
         place = [
             ' <place id="%d" identifier="%s" label="%s" initialMarking="%d" eft="0" lft="inf">\n' % (
-                petri_net.places.loc[i]["id"], i, i,petri_net.places.loc[i]["M0"]),
+                petri_net.places.loc[i]["id"], i, i, petri_net.places.loc[i]["M0"]),
             '    <graphics color="%d">\n' % petri_net.places.loc[i]["color"],
             '       <position x="%d" y="%d"/>\n' % (
                 petri_net.places.loc[i]["x_pos"], petri_net.places.loc[i]["y_pos"]),
@@ -217,7 +216,8 @@ def net_graph(file_name, petri_net):
                 petri_net.transitions.loc[i]["id"], i,
                 i, petri_net.transitions.loc[i]["time"]),
             '    <graphics color="%d">\n' % petri_net.transitions.loc[i]["color"],
-            '       <position x="%d" y="%d"/>\n' % (petri_net.transitions.loc[i]["x_pos"], petri_net.transitions.loc[i]["y_pos"]),
+            '       <position x="%d" y="%d"/>\n' % (
+            petri_net.transitions.loc[i]["x_pos"], petri_net.transitions.loc[i]["y_pos"]),
             '       <deltaLabel deltax="25" deltay="0"/>\n',
             '       <deltaGuard deltax="20" deltay="-20"/>\n',
             '       <deltaUpdate deltax="20" deltay="10"/>\n',
