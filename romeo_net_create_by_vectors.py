@@ -31,9 +31,9 @@ def net_create():
     pos_x_init = [121, 421, 721, 1021, 1321, 1621, 1921, 2221]
     pos_y_init = [4951, 4951, 4951, 4951, 4951, 4951, 4951, 4951]
 
-    arcs_in = pd.Series(data=['GG_', ['DG_', 'GR_'], 'mG_', 'DY_', 'EG_', 'EG_', 'EG_', ['M_', 'SM_']],
+    arcs_in = pd.Series(data=[['GG_'], ['DG_', 'GR_'], ['mG_'], ['DY_'], ['EG_'], ['EG_'], ['EG_'], ['M_', 'SM_']],
                         index=t_names_sem)
-    arcs_out = pd.Series(data=[['DG_', 'mG_', 'M_'], 'DY_', 'EG_', 'SM_', 'RG_', 'RG_', 'RG_', 'RR_'],
+    arcs_out = pd.Series(data=[['DG_', 'mG_', 'M_'], ['DY_'], ['EG_'], ['SM_'], ['RG_'], ['RG_'], ['RG_'], ['RR_']],
                          index=t_names_sem)
 
     directions = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -45,6 +45,7 @@ def net_create():
     cycle_acc_c_select = [1, 3, 1, 4, 6, 1, 1, 1]
     cycle_acc_d_select = [2, 0, 6, 0, 0, 0, 7, 0]
 
+    # Create Semaphore
     for x in directions:
         # Create Semaphore places
         for i in range(len(p_names_sem)):
@@ -62,20 +63,16 @@ def net_create():
                  "y_pos": pos_y_init[x] - t_pos_y_sem[i], "time": t_time_sem[i], "arcs_in": "", "arcs_out": "",
                  "id": t_id}, ignore_index=True)
 
-            if isinstance(arcs_in[i], str):
-                petri_net.transitions.at[t_id - 1, "arcs_in"] = arcs_in[i] + str(x)
-            elif isinstance(arcs_in[i], list):
-                arcs_in_t = list(arcs_in.iloc[i])
-                for j in range(len(arcs_in_t)):
-                    arcs_in_t[j] = arcs_in_t[j] + str(x)
-                petri_net.transitions.at[t_id - 1, "arcs_in"] = arcs_in_t
-            if isinstance(arcs_out[i], str):
-                petri_net.transitions.at[t_id - 1, "arcs_out"] = arcs_out[i] + str(x)
-            elif isinstance(arcs_out[i], list):
-                arcs_out_t = list(arcs_out[i])
-                for j in range(len(arcs_out_t)):
-                    arcs_out_t[j] = arcs_out_t[j] + str(x)
-                petri_net.transitions.at[t_id - 1, "arcs_out"] = arcs_out_t
+            arcs_in_t = list(arcs_in.iloc[i])
+            for j in range(len(arcs_in_t)):
+                arcs_in_t[j] = arcs_in_t[j] + str(x)
+            petri_net.transitions.at[t_id - 1, "arcs_in"] = arcs_in_t
+            # if isinstance(arcs_out[i], str):
+            arcs_out_t = list(arcs_out[i])
+            for j in range(len(arcs_out_t)):
+                arcs_out_t[j] = arcs_out_t[j] + str(x)
+            petri_net.transitions.at[t_id - 1, "arcs_out"] = arcs_out_t
+
             t_id += 1
 
     # Create Cycle change procces
@@ -271,8 +268,8 @@ def net_create():
                  "y_pos": pos_y_init[x] - 210 - 120 * i, "M0": m0, "id": p_id}, ignore_index=True)
             p_id += 1
 
-            arcs_in_control = ["*Normal", [p_ident2, p_ident], ["Normal", p_ident3], "*" +  p_ident]
-            arcs_out_control = [p_ident2, "Normal", p_ident, p_ident3]
+            arcs_in_control = [["*Normal"], [p_ident2, p_ident], ["Normal", p_ident3], ["*" +  p_ident]]
+            arcs_out_control = [[p_ident2], ["Normal"], [p_ident], [p_ident3]]
             t_control_names = ["t_no_"+p_ident, "tn_"+p_ident, "t"+p_ident+"_n", "t_" + p_ident]
             for j in range(len(t_control_names)):
                 arcs_in = arcs_in_control[j]
@@ -332,14 +329,14 @@ def net_graph(file_name, petri_net):
 
         if petri_net.transitions.loc[i]["arcs_in"] != "NaN":
             a_transition = petri_net.transitions.loc[i]["id"]
-            if isinstance(petri_net.transitions.loc[i]["arcs_in"], str):
-                arcs_in_t = petri_net.transitions.loc[i]["arcs_in"]
-                if "*" in arcs_in_t:
-                    arcs_in_t = arcs_in_t.replace("*", "")
+            arcs_in_t = list(petri_net.transitions.loc[i]["arcs_in"])
+            for j in range(len(arcs_in_t)):
+                if "*" in arcs_in_t[j]:
+                    arcs_in_t[j] = arcs_in_t[j].replace("*", "")
                     type = "logicalInhibitor"
                 else:
                     type = "PlaceTransition"
-                a_place = petri_net.places.loc[arcs_in_t]["id"]
+                a_place = petri_net.places.loc[arcs_in_t[j]]["id"]
                 arc = [
                     '<arc place="%d" transition="%d" type="%s" weight="1" inhibitingCondition ="">\n' % (
                         a_place, a_transition, type),
@@ -348,26 +345,10 @@ def net_graph(file_name, petri_net):
                     ' </graphics>\n',
                     '</arc>\n\n\n', ]
                 file.writelines(arc)
-            elif isinstance(petri_net.transitions.loc[i]["arcs_in"], list):
-                arcs_in_t = list(petri_net.transitions.loc[i]["arcs_in"])
-                for j in range(len(arcs_in_t)):
-                    if "*" in arcs_in_t[j]:
-                        arcs_in_t[j] = arcs_in_t[j].replace("*", "")
-                        type = "logicalInhibitor"
-                    else:
-                        type = "PlaceTransition"
-                    a_place = petri_net.places.loc[arcs_in_t[j]]["id"]
-                    arc = [
-                        '<arc place="%d" transition="%d" type="%s" weight="1" inhibitingCondition ="">\n' % (
-                            a_place, a_transition, type),
-                        ' <nail xnail="0" ynail="0"/>\n',
-                        ' <graphics color="0">\n',
-                        ' </graphics>\n',
-                        '</arc>\n\n\n', ]
-                    file.writelines(arc)
 
-            if isinstance(petri_net.transitions.loc[i]["arcs_out"], str):
-                a_place = petri_net.places.loc[petri_net.transitions.loc[i]["arcs_out"]]["id"]
+            arcs_out_t = list(petri_net.transitions.loc[i]["arcs_out"])
+            for j in range(len(arcs_out_t)):
+                a_place = petri_net.places.loc[arcs_out_t[j]]["id"]
                 arc = [
                     '<arc place="%d" transition="%d" type="TransitionPlace" weight="1">\n' % (
                         a_place, a_transition),
@@ -376,19 +357,7 @@ def net_graph(file_name, petri_net):
                     ' </graphics>\n',
                     '</arc>\n\n\n', ]
                 file.writelines(arc)
-            elif isinstance(petri_net.transitions.loc[i]["arcs_out"], list):
-                arcs_out_t = list(petri_net.transitions.loc[i]["arcs_out"])
-                for j in range(len(arcs_out_t)):
-                    a_place = petri_net.places.loc[arcs_out_t[j]]["id"]
-                    arc = [
-                        '<arc place="%d" transition="%d" type="TransitionPlace" weight="1">\n' % (
-                            a_place, a_transition),
-                        ' <nail xnail="0" ynail="0"/>\n',
-                        ' <graphics color="0">\n',
-                        ' </graphics>\n',
-                        '</arc>\n\n\n', ]
 
-                    file.writelines(arc)
     file.close()
     return 0
 
