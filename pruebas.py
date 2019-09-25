@@ -1,5 +1,9 @@
-import pandas as pd
 import numpy as np
+import tpn
+import pandas as pd
+import snakes.plugins
+snakes.plugins.load(tpn, "snakes.nets", "snk")
+from snk import *
 
 colum = ['X', 'Y', 'Z']
 df = pd.DataFrame(columns=colum)
@@ -63,3 +67,45 @@ print(hola)
 if "*" in hola:
     hola = hola.replace("*", "")
     print(hola)
+
+pepe = "1234"
+print(pepe[0])
+
+# ******************************************************
+# Pruebas SNAKE
+# ******************************************************
+
+n = PetriNet("stepper")
+
+for i in range(3) :
+    n.add_place(Place("p%s" % i, [dot]))
+    n.add_transition(Transition("t%s" % i, min_time=i+1, max_time=i*2+1))
+    n.add_input("p%s" % i, "t%s" % i, Value(dot))
+init = n.get_marking()
+print(init)
+n.reset()
+clock = 0.0
+for i in range(3):
+    print(" , ".join("%s[%s,%s]=%s"
+                     % (t, t.min_time, t.max_time,
+                        "#" if t.time is None else t.time)
+                     for t in n.transition()))
+    delay = n.time()
+    print("[%s]" % clock, "delay:", delay)
+    clock += delay
+    print("[%s] fire: t%s" % (clock, i))
+    n.transition("t%d" % i).fire(Substitution())
+
+print("\n")
+n.set_marking(init) # Acts like n.reset(), because each transition has a place in its pre-set whose marking is reset, just like for method reset
+clock = 0.0
+for i in range(3) :
+    print(" , ".join("%s[%s,%s]=%s" % (t, t.min_time, t.max_time,
+                                       "#" if t.time is None else t.time)
+                     for t in n.transition()))
+    for j in range(3) :
+        delay = n.time()
+        print("[%s]" % clock, "delay:", delay)
+        clock += delay
+    print("[%s] fire: t%s" % (clock, i))
+    n.transition("t%s" % i).fire(Substitution())
