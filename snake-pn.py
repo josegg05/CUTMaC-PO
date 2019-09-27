@@ -1,89 +1,67 @@
 import tpn
+import intersection
 import pandas as pd
 import snakes.plugins
+
 snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
 
 
-class PetriNetInfo:
-    def __init__(self):
-        self.places = pd.DataFrame(columns=["name", "color", "x_pos", "y_pos", "M0", "id"])
-        self.transitions = pd.DataFrame(
-            columns=["name", "color", "x_pos", "y_pos", "time", "arcs_in", "arcs_out", "id"])
-        self.arcs = []
-
-
-def petri_net_intersection_create():
-    p_id = 1
-    t_id = 1
-    petri_net = PetriNetInfo()
-
-    p_ident = ["p1", "p2"]
-    p_color_sem = [0, 1]
-    p_pos_x_sem = [30, 40]
-    p_pos_y_sem = [30, 30]
-    m0 = [[dot], []]
-
-    t_ident = ["t1"]
-    t_color_sem = [0]
-    t_pos_x_sem = [30]
-    t_pos_y_sem = [30]
-    t_time_sem = [20]
-
-    arcs_in = ["p1"]
-    arcs_out = ["p2"]
-    for x in range(len(p_ident)):
-        petri_net.places = petri_net.places.append(
-            {'name': p_ident[x], 'color': p_color_sem[x], "x_pos": p_pos_x_sem[x],
-             "y_pos": p_pos_y_sem[x], "M0": m0[x], "id": p_id}, ignore_index=True)
-        p_id += 1
-
-    petri_net.transitions = petri_net.transitions.append(
-        {'name': t_ident[0], 'color': t_color_sem[0], "x_pos": t_pos_x_sem[0],
-         "y_pos": t_pos_y_sem[0], "time": t_time_sem[0], "arcs_in": arcs_in, "arcs_out": arcs_out,
-         "id": t_id}, ignore_index=True)
-    t_id += 1
-
-    return petri_net
-
-
 def net_snakes_create(petri_net):
     petri_snake = PetriNet("CUTMaPNet")
-    petri_net.places.set_index("name", inplace=True)
-    petri_net.transitions.set_index("name", inplace=True)
+    # petri_net.places.set_index("name", inplace=True)
+    # petri_net.transitions.set_index("name", inplace=True)
     for x in list(petri_net.places.index.values):
-        petri_snake.add_place(Place(x, petri_net.places.loc[x]["M0"]))
+        m0 = []
+        for y in range(petri_net.places.loc[x]["M0"]):
+            m0.append(dot)
+        petri_snake.add_place(Place(x, m0))
     for x in list(petri_net.transitions.index.values):
-        print(x)
+        # print(x)
         petri_snake.add_transition(Transition(x, min_time=petri_net.transitions.loc[x]["time"]))
 
         if petri_net.transitions.loc[x]["arcs_in"] != "NaN":
             arcs_in_t = list(petri_net.transitions.loc[x]["arcs_in"])
             for y in range(len(arcs_in_t)):
-                petri_snake.add_input(arcs_in_t[y], x, Value(dot))
+                if "*" not in arcs_in_t[y]:
+                    petri_snake.add_input(arcs_in_t[y], x, Value(dot))
             arcs_out_t = list(petri_net.transitions.loc[x]["arcs_out"])
             for y in range(len(arcs_out_t)):
-                petri_snake.add_output(arcs_out_t[y], x, Value(dot))
+                if "*" not in arcs_out_t[y]:
+                    petri_snake.add_output(arcs_out_t[y], x, Value(dot))
     return petri_snake
 
 
-petri_net_sem = petri_net_intersection_create()
-petri_net_snake = net_snakes_create(petri_net_sem)
+# petri_net_inter = petri_net_intersection_create()
+movements = [0, 1, 2, 3, 4, 5, 6, 7]
+phases = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
+cycles = pd.Series(data=[[1, 2, 3, 4, 5, 6, 7, 0],
+                         [2, 2, 3, 4, 5, 2, 2, 2],
+                         [1, 5, 0, 0, 0, 7, 0, 0],
+                         [1, 3, 1, 4, 6, 1, 1, 1],
+                         [2, 0, 6, 0, 0, 0, 7, 0]],
+                   index=["Normal", "AccA", "AccB", "AccC", "AccD"])
+petri_net_inter, place_id, transition_id = intersection.net_create(movements, phases, cycles)
+petri_net_snake = net_snakes_create(petri_net_inter)
 
 init = petri_net_snake.get_marking()
 print(init)
 
-petri_net_snake.set_marking(init) # Acts like n.reset(), because each transition has a place in its pre-set whose marking is reset, just like for method reset
+petri_net_snake.set_marking(init)  # Acts like n.reset(), because each transition has a place in its pre-set whose marking is reset, just like for method reset
 clock = 0.0
-for i in range(3) :
+for i in range(100):
     print(" , ".join("%s[%s,%s]=%s" % (t, t.min_time, t.max_time,
                                        "#" if t.time is None else t.time)
                      for t in petri_net_snake.transition()))
-    for j in range(3) :
+    for j in range(1):
         delay = petri_net_snake.time()
         print("[%s]" % clock, "delay:", delay)
         if delay:
             clock += delay
     for t in petri_net_snake.transition():
-        print("[%s] fire: %s" % (clock, t.name))
-        petri_net_snake.transition(t.name).fire(Substitution())
+        try:
+            petri_net_snake.transition(t.name).fire(Substitution())
+            print("[%s] fire: %s" % (clock, t.name))
+        except:
+            h = 0
+            #print("Unexpected error:", sys.exc_info()[0])
