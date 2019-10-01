@@ -73,7 +73,7 @@ def net_romeo_graph(file_name, petri_net):
     return 0
 
 
-fileName = "intersection.xml"
+fileName = "intersection2.xml"
 file1 = open(fileName, "w")
 
 InitHML = ['<?xml version="1.0" encoding="UTF-8" ?>\n',
@@ -82,14 +82,19 @@ InitHML = ['<?xml version="1.0" encoding="UTF-8" ?>\n',
 file1.writelines(InitHML)
 file1.close()
 
-movements = [0, 1, 2, 3, 4, 5, 6, 7]
-phases = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
-cycles = pd.Series(data=[[1, 2, 3, 4, 5, 6, 7, 0],
-                         [2, 2, 3, 4, 5, 2, 2, 2],
-                         [1, 5, 0, 0, 0, 7, 0, 0],
-                         [1, 3, 1, 4, 6, 1, 1, 1],
-                         [2, 0, 6, 0, 0, 0, 7, 0]],
-                   index=["Normal", "AccA", "AccB", "AccC", "AccD"])
+# movements = [0, 1, 2, 3, 4, 5, 6, 7]
+# phases = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
+# cycles = pd.Series(data=[[1, 2, 3, 4, 5, 6, 7, 0],
+#                          [2, 2, 3, 4, 5, 2, 2, 2],
+#                          [1, 5, 0, 0, 0, 7, 0, 0],
+#                          [1, 3, 1, 4, 6, 1, 1, 1],
+#                          [2, 0, 6, 0, 0, 0, 7, 0]],
+#                    index=["Normal", "AccA", "AccB", "AccC", "AccD"])
+
+movements = [2, 3, 5]
+phases = [[3, 3], [5, 5], [2, 2]]
+cycles = pd.Series(data=[[1, 2, 0]],
+                   index=["Normal"])
 petri_net, place_id, transition_id = intersection.net_create(movements, phases, cycles)
 net_romeo_graph(fileName, petri_net)
 
