@@ -1,9 +1,5 @@
 import numpy as np
-import tpn
 import pandas as pd
-import snakes.plugins
-snakes.plugins.load(tpn, "snakes.nets", "snk")
-from snk import *
 
 colum = ['X', 'Y', 'Z']
 df = pd.DataFrame(columns=colum)
@@ -72,8 +68,12 @@ pepe = "1234"
 print(pepe[0])
 
 # ******************************************************
-# Pruebas SNAKE
+# Pruebas TPN with SNAKE
 # ******************************************************
+from cutmapnet.petri_nets import tpn
+import snakes.plugins
+snakes.plugins.load(tpn, "snakes.nets", "snk")
+from snk import *
 
 n = PetriNet("stepper")
 
@@ -109,3 +109,54 @@ for i in range(3) :
         clock += delay
     print("[%s] fire: t%s" % (clock, i))
     n.transition("t%s" % i).fire(Substitution())
+
+# ******************************************************
+# Pruebas graph with SNAKE
+# ******************************************************
+
+#from snakes.nets import *
+import snakes.plugins
+snakes.plugins.load("gv", "snakes.nets", "nets")
+from nets import *
+
+n = PetriNet('First net')
+n.add_place(Place('p', [0]))
+n.add_transition(Transition('t', Expression('x<5')))
+n.add_input('p', 't', Variable('x'))
+n.add_output('p', 't', Expression('x+1'))
+
+modes = n.transition('t').modes()
+print(modes)
+#n.draw("value-0.png")
+
+n.transition('t').fire(Substitution(x=0))
+state = n.get_marking()
+print(state)
+
+#for engine in ('neato', 'dot', 'circo', 'twopi', 'fdp'):
+#    n.draw(',test-gv-%s.png' % engine, engine=engine)
+
+# Draw the PN and the state graph
+n.draw("value-1.png")
+s = StateGraph(n)
+s.build()
+s.draw('test-gv-graph.png')
+
+
+# ******************************************************
+# Pruebas time
+# ******************************************************
+import time
+
+def procedure():
+   time.sleep(2.5)
+
+# measure process time
+t0 = time.perf_counter()
+procedure()
+print(time.perf_counter()), "seconds process time"
+
+# measure wall time
+t0 = time.perf_counter()
+procedure()
+print(time.perf_counter() - t0), "seconds wall time"

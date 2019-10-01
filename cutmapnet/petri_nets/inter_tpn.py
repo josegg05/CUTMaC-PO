@@ -19,7 +19,8 @@ def net_create(movements, phases, cycles):
     p_pos_x_sem = [0, 75, 150, 0, 150, 0, 75, 150, 0, 150, 75, 75, 75]
     p_pos_y_sem = [0, 30, 0, 60, 60, 120, 90, 120, 180, 180, 180]
 
-    t_names_sem = ['t1_', 't2_', 'min_', 'Yel_', 'Max_', 'FO_', 'Act_', 't3_']
+    #t_names_sem = ['t1_', 't2_', 'min_', 'Yel_', 'Max_', 'FO_', 'Act_', 't3_']
+    t_names_sem = ['Green_', 'Yel_', 'min_', 'Stop_', 'Max_', 'FO_', 'Act_', 'Red_']
     all_red = 4
     t_time_sem = [0, 0, 20, 4, 100, 0, 50, 0]
     t_color_sem = [0, 0, 1, 1, 1, 0, 1, 0]
@@ -218,12 +219,12 @@ def net_create(movements, phases, cycles):
                 {'name': p_ident, 'color': 0, "x_pos": 2491 + 180,
                  "y_pos": pos_y_init[x] - 270 - 120 * i, "M0": m0, "id": p_id}, ignore_index=True)
             p_id += 1
-            p_ident2 = p_ident + "to_normal"
+            p_ident2 = p_ident + "_to_Normal"
             petri_net.places = petri_net.places.append(
                 {'name': p_ident2, 'color': 0, "x_pos": 2491 + 180 + 90,
                  "y_pos": pos_y_init[x] - 210 - 120 * i, "M0": m0, "id": p_id}, ignore_index=True)
             p_id += 1
-            p_ident3 = "normal_to" + p_ident
+            p_ident3 = "Normal_to_" + p_ident
             petri_net.places = petri_net.places.append(
                 {'name':p_ident3, 'color': 0, "x_pos": 2491 + 180 + 210,
                  "y_pos": pos_y_init[x] - 210 - 120 * i, "M0": m0, "id": p_id}, ignore_index=True)

@@ -1,0 +1,1632 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<romeo version="Romeo v3.6.0"> </romeo>
+<TPN name="/home/jose/Desktop/UC/Investigación/PetriNets/romeo-3.6.0-linux/romeo-3.6.0/semaphore.xml">
+ <place id="1" identifier="GG_2" label="GG_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="721" y="4951"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="2" identifier="DG_2" label="DG_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="3">
+       <position x="796" y="4921"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="3" identifier="GR_2" label="GR_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="871" y="4951"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="4" identifier="mG_2" label="mG_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="721" y="4891"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="5" identifier="DY_2" label="DY_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="4">
+       <position x="871" y="4891"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="6" identifier="EG_2" label="EG_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="721" y="4831"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="7" identifier="M_2" label="M_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="796" y="4861"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="8" identifier="SM_2" label="SM_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="871" y="4831"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="9" identifier="RG_2" label="RG_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="721" y="4771"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="10" identifier="RR_2" label="RR_2" initialMarking="1" eft="0" lft="inf">
+    <graphics color="5">
+       <position x="871" y="4771"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="11" identifier="FOS_2" label="FOS_2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="796" y="4771"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="12" identifier="GG_3" label="GG_3" initialMarking="1" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1021" y="4951"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="13" identifier="DG_3" label="DG_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="3">
+       <position x="1096" y="4921"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="14" identifier="GR_3" label="GR_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1171" y="4951"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="15" identifier="mG_3" label="mG_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1021" y="4891"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="16" identifier="DY_3" label="DY_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="4">
+       <position x="1171" y="4891"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="17" identifier="EG_3" label="EG_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1021" y="4831"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="18" identifier="M_3" label="M_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1096" y="4861"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="19" identifier="SM_3" label="SM_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1171" y="4831"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="20" identifier="RG_3" label="RG_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1021" y="4771"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="21" identifier="RR_3" label="RR_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="5">
+       <position x="1171" y="4771"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="22" identifier="FOS_3" label="FOS_3" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1096" y="4771"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="23" identifier="GG_5" label="GG_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1621" y="4951"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="24" identifier="DG_5" label="DG_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="3">
+       <position x="1696" y="4921"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="25" identifier="GR_5" label="GR_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1771" y="4951"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="26" identifier="mG_5" label="mG_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1621" y="4891"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="27" identifier="DY_5" label="DY_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="4">
+       <position x="1771" y="4891"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="28" identifier="EG_5" label="EG_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1621" y="4831"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="29" identifier="M_5" label="M_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1696" y="4861"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="30" identifier="SM_5" label="SM_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1771" y="4831"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="31" identifier="RG_5" label="RG_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1621" y="4771"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="32" identifier="RR_5" label="RR_5" initialMarking="1" eft="0" lft="inf">
+    <graphics color="5">
+       <position x="1771" y="4771"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="33" identifier="FOS_5" label="FOS_5" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="1696" y="4771"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="34" identifier="C01" label="C01" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="196" y="4561"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="35" identifier="S0" label="S0" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="2491" y="4681"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="36" identifier="C12" label="C12" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="496" y="4441"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="37" identifier="S1" label="S1" initialMarking="1" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="2491" y="4561"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="38" identifier="C20" label="C20" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="796" y="4681"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="39" identifier="S2" label="S2" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="2491" y="4441"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="40" identifier="Normal" label="Normal" initialMarking="1" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="2671" y="4681"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <place id="41" identifier="ST" label="ST" initialMarking="0" eft="0" lft="inf">
+    <graphics color="0">
+       <position x="2611" y="4261"/>
+       <deltaLabel deltax="10" deltay="10"/>
+    </graphics> 
+    <scheduling gamma="0" omega="0"/> 
+ </place> ]
+
+ <transition id="1" identifier="Green_2" label="Green_2"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="721" y="4921"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="1" transition="1" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="2" transition="1" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="4" transition="1" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="7" transition="1" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="2" identifier="Yel_2" label="Yel_2"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="871" y="4921"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="2" transition="2" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="3" transition="2" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="5" transition="2" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="3" identifier="min_2" label="min_2"  eft="20" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="721" y="4861"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="4" transition="3" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="6" transition="3" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="4" identifier="Stop_2" label="Stop_2"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="871" y="4861"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="5" transition="4" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="8" transition="4" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="5" identifier="Max_2" label="Max_2"  eft="100" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="646" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="6" transition="5" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="9" transition="5" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="6" identifier="FO_2" label="FO_2"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="721" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="6" transition="6" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="9" transition="6" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="7" identifier="Act_2" label="Act_2"  eft="50" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="796" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="6" transition="7" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="9" transition="7" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="8" identifier="Red_2" label="Red_2"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="871" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="7" transition="8" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="8" transition="8" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="10" transition="8" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="9" identifier="Green_3" label="Green_3"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="1021" y="4921"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="12" transition="9" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="13" transition="9" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="15" transition="9" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="18" transition="9" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="10" identifier="Yel_3" label="Yel_3"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="1171" y="4921"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="13" transition="10" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="14" transition="10" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="16" transition="10" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="11" identifier="min_3" label="min_3"  eft="20" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="1021" y="4861"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="15" transition="11" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="17" transition="11" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="12" identifier="Stop_3" label="Stop_3"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="1171" y="4861"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="16" transition="12" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="19" transition="12" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="13" identifier="Max_3" label="Max_3"  eft="100" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="946" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="17" transition="13" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="20" transition="13" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="14" identifier="FO_3" label="FO_3"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="1021" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="17" transition="14" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="20" transition="14" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="15" identifier="Act_3" label="Act_3"  eft="50" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="1096" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="17" transition="15" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="20" transition="15" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="16" identifier="Red_3" label="Red_3"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="1171" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="18" transition="16" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="19" transition="16" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="21" transition="16" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="17" identifier="Green_5" label="Green_5"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="1621" y="4921"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="23" transition="17" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="24" transition="17" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="26" transition="17" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="29" transition="17" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="18" identifier="Yel_5" label="Yel_5"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="1771" y="4921"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="24" transition="18" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="25" transition="18" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="27" transition="18" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="19" identifier="min_5" label="min_5"  eft="20" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="1621" y="4861"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="26" transition="19" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="28" transition="19" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="20" identifier="Stop_5" label="Stop_5"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="1771" y="4861"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="27" transition="20" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="30" transition="20" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="21" identifier="Max_5" label="Max_5"  eft="100" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="1546" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="28" transition="21" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="31" transition="21" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="22" identifier="FO_5" label="FO_5"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="1621" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="28" transition="22" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="31" transition="22" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="23" identifier="Act_5" label="Act_5"  eft="50" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="1696" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="28" transition="23" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="31" transition="23" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="24" identifier="Red_5" label="Red_5"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="1771" y="4801"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="29" transition="24" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="30" transition="24" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="32" transition="24" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="25" identifier="t101" label="t101"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="196" y="4591"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="20" transition="25" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="20" transition="25" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="32" transition="25" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="32" transition="25" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="37" transition="25" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="14" transition="25" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="14" transition="25" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="34" transition="25" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="41" transition="25" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="26" identifier="t201" label="t201"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="196" y="4531"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="21" transition="26" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="21" transition="26" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="34" transition="26" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="21" transition="26" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="21" transition="26" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="23" transition="26" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="23" transition="26" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="27" identifier="tNormal120" label="tNormal120"  eft="1" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="2552" y="4711"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="40" transition="27" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="41" transition="27" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="36" transition="27" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="40" transition="27" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="35" transition="27" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="36" transition="27" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="28" identifier="t112" label="t112"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="496" y="4471"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="31" transition="28" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="31" transition="28" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="10" transition="28" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="10" transition="28" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="39" transition="28" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="25" transition="28" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="25" transition="28" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="36" transition="28" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="41" transition="28" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="29" identifier="t212" label="t212"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="496" y="4411"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="32" transition="29" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="32" transition="29" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="36" transition="29" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="32" transition="29" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="32" transition="29" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="1" transition="29" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="1" transition="29" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="30" identifier="tNormal201" label="tNormal201"  eft="1" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="2553" y="4591"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="40" transition="30" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="41" transition="30" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="38" transition="30" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="40" transition="30" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="37" transition="30" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="38" transition="30" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="31" identifier="t120" label="t120"  eft="0" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="796" y="4711"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="9" transition="31" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="9" transition="31" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="21" transition="31" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="21" transition="31" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="35" transition="31" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="3" transition="31" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="3" transition="31" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="38" transition="31" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="41" transition="31" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="32" identifier="t220" label="t220"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="1">
+       <position x="796" y="4651"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="10" transition="32" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="10" transition="32" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="38" transition="32" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="10" transition="32" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="10" transition="32" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="12" transition="32" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="12" transition="32" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <transition id="33" identifier="tNormal012" label="tNormal012"  eft="1" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+    <graphics color="0">
+       <position x="2551" y="4471"/>
+       <deltaLabel deltax="25" deltay="0"/>
+       <deltaGuard deltax="20" deltay="-20"/>
+       <deltaUpdate deltax="20" deltay="10"/>
+       <deltaSpeed deltax="-20" deltay="5"/>
+       <deltaCost deltax="-20" deltay="5"/>
+    </graphics>
+    <update><![CDATA[]]></update>
+ </transition>
+
+<arc place="40" transition="33" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="41" transition="33" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="34" transition="33" type="PlaceTransition" weight="1" inhibitingCondition ="">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="40" transition="33" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="39" transition="33" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+<arc place="34" transition="33" type="TransitionPlace" weight="1">
+ <nail xnail="0" ynail="0"/>
+ <graphics color="0">
+ </graphics>
+</arc>
+
+
+ <timedCost></timedCost>
+
+ <declaration><![CDATA[// insert here your type definitions using C-like syntax
+
+
+// insert here your function definitions
+// using C-like syntax]]></declaration>
+
+ <initialization><![CDATA[// insert here the state variables declarations
+// and possibly some code to initialize them
+// using C-like syntax
+]]></initialization>
+
+ <preferences>
+   <colorPlace  c0="SkyBlue2"  c1="gray"  c2="cyan"  c3="green"  c4="yellow"  c5="brown" />
+
+   <colorTransition  c0="yellow"  c1="gray"  c2="cyan"  c3="green"  c4="SkyBlue2"  c5="brown" />
+
+   <colorArc  c0="black"  c1="gray"  c2="blue"  c3="#beb760"  c4="#be5c7e"  c5="#46be90" />
+
+ </preferences>
+</TPN>
+
