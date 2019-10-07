@@ -1,5 +1,4 @@
 from cutmapnet.petri_nets import tpn
-import pandas as pd
 import snakes.plugins
 
 snakes.plugins.load(tpn, "snakes.nets", "snk")
@@ -9,22 +8,22 @@ def net_snakes_create(petri_net):
     petri_snake = PetriNet("CUTMaPNet")
     # petri_net.places.set_index("name", inplace=True)
     # petri_net.transitions.set_index("name", inplace=True)
-    for x in list(petri_net.places.index.values):
+    for x in range(len(petri_net.places) - 1):
         m0 = []
-        for y in range(petri_net.places.loc[x]["M0"]):
+        for y in range(petri_net.places[x+1][4]):   # "M0"
             m0.append(dot)
-        petri_snake.add_place(Place(x, m0))
-    for x in list(petri_net.transitions.index.values):
+        petri_snake.add_place(Place(petri_net.places[x+1][0], m0))
+    for x in range(len(petri_net.transitions) - 1):
         # print(x)
-        petri_snake.add_transition(Transition(x, min_time=petri_net.transitions.loc[x]["time"]))
+        petri_snake.add_transition(Transition(petri_net.transitions[x+1][0], min_time=petri_net.transitions[x+1][4]))   # "time"
 
-        if petri_net.transitions.loc[x]["arcs_in"] != "NaN":
-            arcs_in_t = list(petri_net.transitions.loc[x]["arcs_in"])
+        if petri_net.transitions[x+1][5] != "NaN":  # "arcs_in"
+            arcs_in_t = list(petri_net.transitions[x+1][5])     # "arcs_in"
             for y in range(len(arcs_in_t)):
                 if "*" not in arcs_in_t[y]:
-                    petri_snake.add_input(arcs_in_t[y], x, Value(dot))
-            arcs_out_t = list(petri_net.transitions.loc[x]["arcs_out"])
+                    petri_snake.add_input(arcs_in_t[y], petri_net.transitions[x+1][0], Value(dot))
+            arcs_out_t = list(petri_net.transitions[x+1][6])    # "arcs_out"
             for y in range(len(arcs_out_t)):
                 if "*" not in arcs_out_t[y]:
-                    petri_snake.add_output(arcs_out_t[y], x, Value(dot))
+                    petri_snake.add_output(arcs_out_t[y], petri_net.transitions[x+1][0], Value(dot))
     return petri_snake

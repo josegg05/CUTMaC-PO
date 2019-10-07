@@ -160,3 +160,13 @@ print(time.perf_counter()), "seconds process time"
 t0 = time.perf_counter()
 procedure()
 print(time.perf_counter() - t0), "seconds wall time"
+
+# pruebas listas
+lista = [["name", "color", "x_pos", "y_pos", "M0", "id"]]
+print(lista)
+lista.append([1, 2, 3, 4, 5, 6])
+lista.append([1, 2, 3, 4, ["soy", "yo"], 6])
+lista.append([1, 2, 3, 4, 5, 6])
+print(lista)
+print(lista[2][4])
+print(len(lista))
