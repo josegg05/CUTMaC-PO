@@ -70,12 +70,12 @@ def net_create(movements, phases, cycles, cycles_names):
                  pos_y_init[x] - t_pos_y_sem[i], t_time_sem[i], "", "",
                  t_id])
 
-            arcs_in_t = arcs_in[i]
+            arcs_in_t = list(arcs_in[i])
             for j in range(len(arcs_in_t)):
                 arcs_in_t[j] = arcs_in_t[j] + str(x)
             petri_net.transitions[t_id][5] = arcs_in_t  #"arcs_in"
             # if isinstance(arcs_out[i], str):
-            arcs_out_t = arcs_out[i]
+            arcs_out_t = list(arcs_out[i])
             for j in range(len(arcs_out_t)):
                 arcs_out_t[j] = arcs_out_t[j] + str(x)
             petri_net.transitions[t_id][6] = arcs_out_t #"arcs_out"
