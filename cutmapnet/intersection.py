@@ -3,6 +3,7 @@ from cutmapnet.petri_nets import inter_tpn
 from cutmapnet.petri_nets import net_snakes
 import snakes.plugins
 import time
+import paho.mqtt.client as mqtt
 
 snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
@@ -34,6 +35,40 @@ from snk import *
 
 
 # petri_net_inter = petri_net_intersection_create()
+
+def mqtt_conf() -> mqtt.Client:
+    broker_address = "192.168.5.95"   # "192.168.1.95"
+    # broker_address="iot.eclipse.org" # use external broker
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(broker_address)  # connect to broker
+    return client
+
+
+# The callback for when the client receives a CONNACK response from the server.
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code " + str(rc))
+
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe("intersection/0002/tls")
+    client.subscribe("intersection/0003/tls")
+    client.subscribe("intersection/0004/tls")
+    client.subscribe("intersection/0005/tls")
+    client.subscribe("intersection/0006/tls")
+    client.subscribe("intersection/0007/tls")
+    client.subscribe("intersection/0008/tls")
+    client.subscribe("intersection/0009/tls")
+    client.subscribe("intersection/00010/tls")
+    client.subscribe("intersection/00011/tls")
+    client.subscribe("intersection/00012/tls")
+
+
+# The callback for when a PUBLISH message is received from the server.
+def on_message(client, userdata, msg):
+    print(msg.topic + " " + str(msg.payload))
+
 def run():
     movements = [0, 1, 2, 3, 4, 5, 6, 7]
     phases = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
@@ -99,5 +134,5 @@ def run():
         if time_current == 60:
             petri_net_snake.place("AccB_to_Normal").add(dot)
 
-
+client: mqtt.Client = mqtt_conf()
 run()
