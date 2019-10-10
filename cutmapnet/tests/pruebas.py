@@ -170,3 +170,11 @@ lista.append([1, 2, 3, 4, 5, 6])
 print(lista)
 print(lista[2][4])
 print(len(lista))
+
+
+# prueba 2 listas con los mismos elementos
+pepe = [1, 2]
+if set(pepe) == set([2, 1]):
+    print("hola pepe")
+else:
+    pepe.append(5)

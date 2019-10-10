@@ -5,4 +5,3 @@ python-dateutil==2.8.0
 pytz==2019.2
 six==1.12.0
 SNAKES==0.9.26
-wincertstore==0.2

@@ -17,4 +17,4 @@ SNAKES = "==0.9.26"
 paho-mqtt = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"

@@ -1,5 +1,5 @@
 # Program writes the Intersection html for ROMEO simulator
-from cutmapnet.petri_nets import inter_tpn
+from cutmapnet.petri_nets import inter_tpn_pandas
 from cutmapnet.petri_nets import romeo_graph
 import pandas as pd
 
@@ -74,7 +74,7 @@ import pandas as pd
 #     return 0
 
 
-fileName = "results/intersection2.xml"
+fileName = "results/intersection4.xml"
 file1 = open(fileName, "w")
 
 InitHML = ['<?xml version="1.0" encoding="UTF-8" ?>\n',
@@ -92,11 +92,15 @@ file1.close()
 #                          [2, 0, 6, 0, 0, 0, 7, 0]],
 #                    index=["Normal", "AccA", "AccB", "AccC", "AccD"])
 
-movements = [2, 3, 5]
-phases = [[3, 3], [5, 5], [2, 2]]
-cycles = pd.Series(data=[[1, 2, 0]],
-                   index=["Normal"])
-petri_net, place_id, transition_id = inter_tpn.net_create(movements, phases, cycles)
+movements = [0, 1, 3, 4, 5, 7]
+phases = [[3, 7], [0, 5], [0, 4], [1, 5]]
+lights = [["rrrGGGG", "rrryyyy"], ["GGGrrrr", "yyyrrrr"], ["rrGrrrr", "rryrrrr"], ["GGrrrrr", "yyrrrrr"]]
+cycles = pd.Series(data=[[3, 0, 0, 0],
+                         [1, 0, 0, 0],
+                         [2, 0, 0, 0]],
+                   index=["Normal", "AccA", "AccB"])
+
+petri_net, place_id, transition_id = inter_tpn_pandas.net_create(movements, phases, cycles)
 romeo_graph.net_romeo_graph(fileName, petri_net)
 
 print("palceID = " + str(place_id) + "\ntransitionID = " + str(transition_id))

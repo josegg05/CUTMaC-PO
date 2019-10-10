@@ -40,7 +40,8 @@ def net_create(movements, phases, cycles, cycles_names):
     #                          [2, 0, 6, 0, 0, 0, 7, 0]],
     #                    index=["Normal", "AccA", "AccB", "AccC", "AccD"])
     #m0_places = ["GG_0", "RR_1", "RR_2", "RR_3", "GG_4", "RR_5", "RR_6", "RR_7", "S1", "Normal"]
-    m0_places = ["S1", "Normal"]
+    #m0_places = ["S1", "Normal"]
+    m0_places = ["S" + str(cycles[0][0]), "Normal"]
     for x in movements:
         if x in phases[0]:
             m_temp = "GG_" + str(x)

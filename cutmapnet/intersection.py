@@ -10,7 +10,7 @@ from snk import *
 
 
 # def net_snakes_create(petri_net):
-#     petri_snake = PetriNet("CUTMaPNet")
+#     petri_snake = PetriNet("CUTMaPNet")pip
 #     # petri_net.places.set_index("name", inplace=True)
 #     # petri_net.transitions.set_index("name", inplace=True)
 #     for x in list(petri_net.places.index.values):
@@ -134,5 +134,6 @@ def run():
         if time_current == 60:
             petri_net_snake.place("AccB_to_Normal").add(dot)
 
-client: mqtt.Client = mqtt_conf()
+
+# client: mqtt.Client = mqtt_conf()
 run()
