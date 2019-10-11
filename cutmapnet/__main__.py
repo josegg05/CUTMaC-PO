@@ -1,6 +1,7 @@
 from cutmapnet.petri_nets import tpn
 from cutmapnet.petri_nets import inter_tpn
 from cutmapnet.petri_nets import net_snakes
+from cutmapnet.petri_nets import intersections_info
 import snakes.plugins
 import time
 import paho.mqtt.client as mqtt
@@ -36,35 +37,33 @@ def on_message(client, userdata, msg):
 
 
 def run():
-    # movements = [0, 1, 2, 3, 4, 5, 6, 7]
-    # phases = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
-    # cycles = [[1, 2, 3, 4, 5, 6, 7, 0],
-    #           [2, 2, 3, 4, 5, 2, 2, 2],
-    #           [1, 5, 0, 0, 0, 7, 0, 0],
-    #           [1, 3, 1, 4, 6, 1, 1, 1],
-    #           [2, 0, 6, 0, 0, 0, 7, 0]]
-    # cycles_names = ["Normal", "AccA", "AccB", "AccC", "AccD"]
+
+    # tlsID = "intersection/0002/tls"
+    # movements = [0, 1, 3, 4, 5, 7]
+    # m_lights = [[2], [], [], [3, 4, 5, 6], [], [0, 1], [], []]  # Lights associated with every movement
+    # phases = [[3, 7], [0, 5], [0, 4], [1, 5]]
+    # # lights = [["rrrGGGG", "rrryyyy"], ["GGGrrrr", "yyyrrrr"], ["rrGrrrr", "rryrrrr"], ["GGrrrrr", "yyrrrrr"], ["rrrrrrr"]]
+    # lights = list("rrrrrrr")
+    # cycles = [[1, 0, 0, 0],
+    #           [2, 0, 0, 0],
+    #           [3, 0, 0, 0]]
+    # cycles_names = ["Normal", "AccA", "AccB"]
 
     # Setup of the intersection
-    tlsID = "intersection/0002/tls"
-    movements = [0, 1, 3, 4, 5, 7]
-    m_lights = [[2], [], [], [3, 4, 5, 6], [], [0, 1], [], []]  # Lights associated with every movement
-    phases = [[3, 7], [0, 5], [0, 4], [1, 5]]
-    # lights = [["rrrGGGG", "rrryyyy"], ["GGGrrrr", "yyyrrrr"], ["rrGrrrr", "rryrrrr"], ["GGrrrrr", "yyrrrrr"], ["rrrrrrr"]]
-    lights = list("rrrrrrr")
-    cycles = [[1, 0, 0, 0],
-              [2, 0, 0, 0],
-              [3, 0, 0, 0]]
-    cycles_names = ["Normal", "AccA", "AccB"]
+    inter_id = 2
+    inter_info = intersections_info.Intersection(inter_id)
+    inter_info.config()
 
-    petri_net_inter, place_id, transition_id = inter_tpn.net_create(movements, phases, cycles, cycles_names)
+    petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
+                                                                    inter_info.cycles, inter_info.cycles_names)
     petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
 
     init = petri_net_snake.get_marking()
     print(init)
 
-    petri_net_snake.set_marking(init)  # Acts like n.reset(), because each transition has a place in its pre-set whose marking is reset,
-    # just like for method reset
+    # "petri_net_snake.set_marking(init)" Acts like n.reset(), because each transition has a place in its pre-set whose
+    # marking is reset, just like for method reset
+    petri_net_snake.set_marking(init)
     time_0 = time.perf_counter()
     time_current = 0.0
     delay = 0.0
@@ -111,33 +110,33 @@ def run():
                 except:
                     pass
 
-        #print(transitions_fire)
+        # print(transitions_fire)
         for i in transitions_fire:
             if "Green" in i:
                 print("Voy a poner en GREEN el Movimiento %s" % i[-1])
                 l_change = True
-                for j in m_lights[int(i[-1])]:
-                    lights[j] = "G"
+                for j in inter_info.m_lights[int(i[-1])]:
+                    inter_info.lights[j] = "G"
             elif "Yel" in i:
                 print("Voy a poner en YELLOW el Movimiento %s" % i[-1])
                 l_change = True
-                for j in m_lights[int(i[-1])]:
-                    lights[j] = "y"
+                for j in inter_info.m_lights[int(i[-1])]:
+                    inter_info.lights[j] = "y"
             elif "Red" in i:
                 print("Voy a poner en RED el Movimiento %s" % i[-1])
                 l_change = True
-                for j in m_lights[int(i[-1])]:
-                    lights[j] = "r"
+                for j in inter_info.m_lights[int(i[-1])]:
+                    inter_info.lights[j] = "r"
 
         # Send control msg to simulation
         if l_change:
             control_msg = {
-                "tlsID": tlsID,
+                "tlsID": inter_info.tlsID,
                 "command": "setPhase",
-                "data": "".join(lights)
+                "data": "".join(inter_info.lights)
             }
 
-            client_intersection.publish(tlsID, json.dumps(control_msg))
+            #client_intersection.publish(inter_info.tlsID, json.dumps(control_msg))
             print("send: " + json.dumps(control_msg))
 
         # if not green and g_current:
@@ -172,15 +171,14 @@ def run():
         # Update the network time
         delay = petri_net_snake.time(step)
 
-        # Add accident in B at t = 30
-        if time_current == 30:
-            petri_net_snake.place("Normal_to_AccB").add(dot)
-        # Remove accident in B at t = 60
-        if time_current == 60:
-            petri_net_snake.place("AccB_to_Normal").add(dot)
+        # # Add accident in B at t = 30
+        # if time_current == 30:
+        #     petri_net_snake.place("Normal_to_AccB").add(dot)
+        # # Remove accident in B at t = 60
+        # if time_current == 60:
+        #     petri_net_snake.place("AccB_to_Normal").add(dot)
 
 
 if __name__ == '__main__':
-    client_intersection: mqtt.Client = mqtt_conf()
+    #client_intersection: mqtt.Client = mqtt_conf()
     run()
-
