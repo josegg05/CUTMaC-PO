@@ -4,6 +4,7 @@ from cutmapnet.petri_nets import net_snakes
 import snakes.plugins
 import time
 import paho.mqtt.client as mqtt
+import json
 
 snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
@@ -45,6 +46,7 @@ def run():
     # cycles_names = ["Normal", "AccA", "AccB", "AccC", "AccD"]
 
     # Setup of the intersection
+    tlsID = "intersection/0002/tls"
     movements = [0, 1, 3, 4, 5, 7]
     m_lights = [[2], [], [], [3, 4, 5, 6], [], [0, 1], [], []]  # Lights associated with every movement
     phases = [[3, 7], [0, 5], [0, 4], [1, 5]]
@@ -61,8 +63,7 @@ def run():
     init = petri_net_snake.get_marking()
     print(init)
 
-    petri_net_snake.set_marking(
-        init)  # Acts like n.reset(), because each transition has a place in its pre-set whose marking is reset,
+    petri_net_snake.set_marking(init)  # Acts like n.reset(), because each transition has a place in its pre-set whose marking is reset,
     # just like for method reset
     time_0 = time.perf_counter()
     time_current = 0.0
@@ -75,9 +76,10 @@ def run():
 
     print("\n\nStart the Intersection Petri Net:")
     while True:
-        g_current = []
-        y_current = []
-        r_current = []
+        # g_current = []
+        # y_current = []
+        # r_current = []
+
         # initialize variables for semaphore msg configuration
         l_change = False
         transitions_fire = []
@@ -90,25 +92,21 @@ def run():
         count_fire = 0
         while p_fire:
             p_fire = False
-            # if count_fire == 0:
-            #     print(" , ".join("%s[%s,%s]=%s" % (t, t.min_time, t.max_time,
-            #                                        "#" if t.time is None else t.time)
-            #                      for t in petri_net_snake.transition()))
             for t in petri_net_snake.transition():
                 try:
                     petri_net_snake.transition(t.name).fire(Substitution())
                     p_fire = True
                     count_fire += 1
                     transitions_fire.append(str(t.name))
-                    if "Green" in t.name:
-                        print("Voy a poner en GREEN el Movimiento %s" % t.name[-1])
-                        g_current.append(t.name[-1])
-                    elif "Yel" in t.name:
-                        print("Voy a poner en YELLOW el Movimiento %s" % t.name[-1])
-                        y_current.append(t.name[-1])
-                    elif "Red" in t.name:
-                        print("Voy a poner en RED el Movimiento %s" % t.name[-1])
-                        r_current.append(t.name[-1])
+                    # if "Green" in t.name:
+                    #     print("Voy a poner en GREEN el Movimiento %s" % t.name[-1])
+                    #     g_current.append(t.name[-1])
+                    # elif "Yel" in t.name:
+                    #     print("Voy a poner en YELLOW el Movimiento %s" % t.name[-1])
+                    #     y_current.append(t.name[-1])
+                    # elif "Red" in t.name:
+                    #     print("Voy a poner en RED el Movimiento %s" % t.name[-1])
+                    #     r_current.append(t.name[-1])
                     print("[%s] fire: %s, count_fire: %s" % (time_current, t.name, count_fire))
                 except:
                     pass
@@ -116,20 +114,31 @@ def run():
         #print(transitions_fire)
         for i in transitions_fire:
             if "Green" in i:
+                print("Voy a poner en GREEN el Movimiento %s" % i[-1])
                 l_change = True
                 for j in m_lights[int(i[-1])]:
                     lights[j] = "G"
             elif "Yel" in i:
+                print("Voy a poner en YELLOW el Movimiento %s" % i[-1])
                 l_change = True
                 for j in m_lights[int(i[-1])]:
                     lights[j] = "y"
             elif "Red" in i:
+                print("Voy a poner en RED el Movimiento %s" % i[-1])
                 l_change = True
                 for j in m_lights[int(i[-1])]:
                     lights[j] = "r"
 
+        # Send control msg to simulation
         if l_change:
-            print("send: " + "".join(lights))
+            control_msg = {
+                "tlsID": tlsID,
+                "command": "setPhase",
+                "data": "".join(lights)
+            }
+
+            client_intersection.publish(tlsID, json.dumps(control_msg))
+            print("send: " + json.dumps(control_msg))
 
         # if not green and g_current:
         #     green = g_current
@@ -172,6 +181,6 @@ def run():
 
 
 if __name__ == '__main__':
-    # client_intersection: mqtt.Client = mqtt_conf()
-    # intersection.run()
+    client_intersection: mqtt.Client = mqtt_conf()
     run()
+
