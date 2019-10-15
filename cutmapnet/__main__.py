@@ -11,7 +11,22 @@ snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
 
 
-# from cutmapnet import intersection
+# The callback for when the client receives a CONNACK response from the server.
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code " + str(rc))
+
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe("intersection/0002/e2det/n")
+    client.subscribe("intersection/0002/e2det/e")
+    client.subscribe("intersection/0002/e2det/s")
+    client.subscribe("intersection/0002/e2det/w")
+
+
+# The callback for when a PUBLISH message is received from the server.
+def on_message(client, userdata, msg):
+    print(msg.topic + " " + str(msg.payload))
+
 
 def mqtt_conf() -> mqtt.Client:
     broker_address = "192.168.5.95"  # "192.168.1.95"
@@ -22,32 +37,7 @@ def mqtt_conf() -> mqtt.Client:
     return client
 
 
-# The callback for when the client receives a CONNACK response from the server.
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code " + str(rc))
-
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    client.subscribe("intersection/0002/tls")
-
-
-# The callback for when a PUBLISH message is received from the server.
-def on_message(client, userdata, msg):
-    print(msg.topic + " " + str(msg.payload))
-
-
 def run():
-
-    # tlsID = "intersection/0002/tls"
-    # movements = [0, 1, 3, 4, 5, 7]
-    # m_lights = [[2], [], [], [3, 4, 5, 6], [], [0, 1], [], []]  # Lights associated with every movement
-    # phases = [[3, 7], [0, 5], [0, 4], [1, 5]]
-    # # lights = [["rrrGGGG", "rrryyyy"], ["GGGrrrr", "yyyrrrr"], ["rrGrrrr", "rryrrrr"], ["GGrrrrr", "yyrrrrr"], ["rrrrrrr"]]
-    # lights = list("rrrrrrr")
-    # cycles = [[1, 0, 0, 0],
-    #           [2, 0, 0, 0],
-    #           [3, 0, 0, 0]]
-    # cycles_names = ["Normal", "AccA", "AccB"]
 
     # Setup of the intersection
     inter_id = 2
@@ -136,7 +126,7 @@ def run():
                 "data": "".join(inter_info.lights)
             }
 
-            #client_intersection.publish(inter_info.tlsID, json.dumps(control_msg))
+            client_intersection.publish(inter_info.tlsID, json.dumps(control_msg))
             print("send: " + json.dumps(control_msg))
 
         # if not green and g_current:
@@ -180,5 +170,6 @@ def run():
 
 
 if __name__ == '__main__':
-    #client_intersection: mqtt.Client = mqtt_conf()
+    client_intersection: mqtt.Client = mqtt_conf()
+    client_intersection.loop_start()    # Necessary to maintain connection
     run()
