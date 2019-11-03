@@ -26,6 +26,8 @@ def on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     print(msg.topic + " " + str(msg.payload))
+    # TODO: deal with sensor and other intersections msgs received
+    #   Remember that intersection msgs of accidents will change the state of the actual cycle phase
 
 
 def mqtt_conf() -> mqtt.Client:
@@ -105,17 +107,17 @@ def run():
             if "Green" in i:
                 print("Voy a poner en GREEN el Movimiento %s" % i[-1])
                 l_change = True
-                for j in inter_info.m_lights[int(i[-1])]:
+                for j in inter_info.m_lights[0][int(i[-1])]:
                     inter_info.lights[j] = "G"
             elif "Yel" in i:
                 print("Voy a poner en YELLOW el Movimiento %s" % i[-1])
                 l_change = True
-                for j in inter_info.m_lights[int(i[-1])]:
+                for j in inter_info.m_lights[0][int(i[-1])]:
                     inter_info.lights[j] = "y"
             elif "Red" in i:
                 print("Voy a poner en RED el Movimiento %s" % i[-1])
                 l_change = True
-                for j in inter_info.m_lights[int(i[-1])]:
+                for j in inter_info.m_lights[0][int(i[-1])]:
                     inter_info.lights[j] = "r"
 
         # Send control msg to simulation
