@@ -23,8 +23,17 @@ class Intersection:
                 "cycles": [[1, 2, 0, 0, 0, 0, 0],
                            [2, 2, 3, 4, 2, 2, 2],
                            [1, 5, 1, 1, 1, 1, 1],
-                           [6, 0, 0, 0, 0, 0, 0]],
-                "cycles_names": ["Normal", "AccB", "AccC", "AccD"]
+                           [6, 0, 0, 0, 0, 0, 0],
+                           [1, 0, 0, 0, 0, 0, 0],
+                           [2, 0, 0, 0, 0, 0, 0],
+                           [2, 2, 4, 2, 2, 2, 2]],
+                "cycles_names": ["Normal", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccWI"],
+                "neighbors": {
+                    "south": "0005",
+                    "east": "",
+                    "north": "",
+                    "west": ""
+                }
             },
             3: {
                 "tlsID": "intersection/0003/tls",
@@ -38,8 +47,17 @@ class Intersection:
                 "cycles": [[1, 2, 0, 0, 0, 0, 0],
                            [1, 3, 1, 1, 1, 1, 1],
                            [4, 0, 0, 0, 0, 0, 0],
-                           [2, 2, 5, 2, 2, 6, 2]],
-                "cycles_names": ["Normal", "AccA", "AccB", "AccD"]
+                           [2, 2, 5, 2, 2, 6, 2],
+                           [2, 2, 6, 2, 2, 2, 2],
+                           [1, 0, 0, 0, 0, 0, 0],
+                           [2, 0, 0, 0, 0, 0, 0]],
+                "cycles_names": ["Normal", "AccSO", "AccEO", "AccWO", "AccEI", "AccNI", "AccWI"],
+                "neighbors": {
+                    "south": "0008",
+                    "east": "",
+                    "north": "",
+                    "west": ""
+                }
             },
             4: {
                 "tlsID": "intersection/0004/tls",
@@ -51,8 +69,16 @@ class Intersection:
                 "lights": list("rrrrrrrrr"),
                 "cycles": [[1, 0, 0, 0],
                            [1, 2, 1, 1],  # Problem 3
-                           [1, 3, 1, 1]],
-                "cycles_names": ["Normal", "AccA", "AccD"]
+                           [1, 3, 1, 1],
+                           [1, 1, 1, 1],
+                           [0, 0, 0, 0]],
+                "cycles_names": ["Normal", "AccSO", "AccWO", "AccEI", "AccNI"],
+                "neighbors": {
+                    "south": "",
+                    "east": "0005",
+                    "north": "",
+                    "west": ""
+                }
             },
             5: {
                 "tlsID": "intersection/0005/tls",
@@ -64,8 +90,16 @@ class Intersection:
                 "lights": list("rrrrrrrrrrrr"),
                 "cycles": [[1, 0, 0, 0],
                            [2, 0, 0, 0],
-                           [3, 0, 0, 0]],  # Problem 3
-                "cycles_names": ["Normal", "AccA", "AccB"]
+                           [3, 0, 0, 0],  # Problem 3
+                           [0, 0, 0, 0],
+                           [1, 1, 1, 1]],
+                "cycles_names": ["Normal", "AccSO", "AccEO", "AccSI", "AccEI"],
+                "neighbors": {
+                    "south": "0009",
+                    "east": "0006",
+                    "north": "0002",
+                    "west": "0004"
+                }
             },
             6: {
                 "tlsID": "intersection/0006/tls",
@@ -79,8 +113,17 @@ class Intersection:
                 "cycles": [[1, 2, 0, 0, 0, 0, 0],
                            [1, 3, 1, 1, 1, 1, 1],
                            [4, 0, 0, 0, 5, 0, 0],
-                           [2, 2, 6, 2, 2, 2, 2]],
-                "cycles_names": ["Normal", "AccA", "AccC", "AccD"]
+                           [2, 2, 6, 2, 2, 2, 2],
+                           [5, 0, 0, 0, 0, 0, 0],
+                           [1, 2, 1, 1, 1, 1, 1],
+                           [1, 0, 0, 0, 0, 0, 0]],
+                "cycles_names": ["Normal", "AccSO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI"],
+                "neighbors": {
+                    "south": "0010",
+                    "east": "0007",
+                    "north": "",
+                    "west": "0005"
+                }
             },
             7: {
                 "tlsID": "intersection/0007/tls",
@@ -92,8 +135,16 @@ class Intersection:
                 "lights": list("rrrrrrr"),
                 "cycles": [[1, 0, 0, 0],
                            [2, 0, 0, 0],
-                           [3, 0, 0, 0]],  # Problem 3
-                "cycles_names": ["Normal", "AccC", "AccD"]
+                           [3, 0, 0, 0],  # Problem 3
+                           [0, 0, 0, 0],
+                           [1, 1, 1, 1]],
+                "cycles_names": ["Normal", "AccSO", "AccWO", "AccSI", "AccEI"],
+                "neighbors": {
+                    "south": "0011",
+                    "east": "0008",
+                    "north": "",
+                    "west": "0006"
+                }
             },
             8: {
                 "tlsID": "intersection/0008/tls",
@@ -105,8 +156,16 @@ class Intersection:
                 "lights": list("rrrrrrrrr"),
                 "cycles": [[1, 0, 0, 0],
                            [1, 2, 1, 1],  # Problem 3
-                           [1, 3, 1, 1]],
-                "cycles_names": ["Normal", "AccA", "AccD"]
+                           [1, 3, 1, 1],
+                           [1, 1, 1, 1],
+                           [0, 0, 0, 0]],
+                "cycles_names": ["Normal", "AccSO", "AccWO", "AccEI", "AccNI"],
+                "neighbors": {
+                    "south": "0002",
+                    "east": "",
+                    "north": "0003",
+                    "west": "0007"
+                }
             },
             9: {
                 "tlsID": "intersection/0009/tls",
@@ -118,8 +177,16 @@ class Intersection:
                 "lights": list("rrrrrrrrrr"),
                 "cycles": [[1, 0, 0, 0],
                            [1, 2, 1, 1],
-                           [1, 3, 1, 1]],  # Problem 3
-                "cycles_names": ["Normal", "AccB", "AccC"]
+                           [1, 3, 1, 1],  # Problem 3
+                           [0, 0, 0, 0],
+                           [1, 1, 1, 1]],
+                "cycles_names": ["Normal", "AccEO", "AccNO", "AccSI", "AccWI"],
+                "neighbors": {
+                    "south": "",
+                    "east": "0010",
+                    "north": "0005",
+                    "west": ""
+                }
             },
             10: {
                 "tlsID": "intersection/0010/tls",
@@ -131,8 +198,16 @@ class Intersection:
                 "lights": list("rrrrrrr"),
                 "cycles": [[1, 0, 0, 0],
                            [2, 2, 2, 2],  # Problem 3 No se puede resolver
-                           [1, 3, 1, 1]],
-                "cycles_names": ["Normal", "AccB", "AccC"]
+                           [1, 3, 1, 1],
+                           [0, 0, 0, 0],
+                           [1, 1, 1, 1]],
+                "cycles_names": ["Normal", "AccEO", "AccNO", "AccNI", "AccWI"],
+                "neighbors": {
+                    "south": "",
+                    "east": "0011",
+                    "north": "0006",
+                    "west": "0009"
+                }
             },
             11: {
                 "tlsID": "intersection/0011/tls",
@@ -144,8 +219,16 @@ class Intersection:
                 "lights": list("rrrrrrrr"),
                 "cycles": [[1, 0, 0, 0],
                            [1, 2, 1, 1],
-                           [1, 3, 1, 1]],  # Problem 3
-                "cycles_names": ["Normal", "AccB", "AccC"]
+                           [1, 3, 1, 1],  # Problem 3
+                           [0, 0, 0, 0],
+                           [1, 1, 1, 1]],
+                "cycles_names": ["Normal", "AccEO", "AccNO", "AccSI", "AccWI"],
+                "neighbors": {
+                    "south": "",
+                    "east": "0012",
+                    "north": "0007",
+                    "west": "0010"
+                }
             },
             12: {
                 "tlsID": "intersection/0002/tls",
@@ -157,8 +240,16 @@ class Intersection:
                 "lights": list("rrrrrrrrr"),
                 "cycles": [[1, 0, 0, 0],
                            [2, 0, 0, 0],
-                           [3, 0, 0, 0]],  # Problem 3
-                "cycles_names": ["Normal", "AccA", "AccB"]
+                           [3, 0, 0, 0],  # Problem 3
+                           [0, 0, 0, 0],
+                           [1, 1, 1, 1]],
+                "cycles_names": ["Normal", "AccSO", "AccEO", "AccNI", "AccWI"],
+                "neighbors": {
+                    "south": "",
+                    "east": "",
+                    "north": "0008",
+                    "west": "0011"
+                }
             }
         }
 

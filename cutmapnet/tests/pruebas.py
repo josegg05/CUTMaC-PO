@@ -186,3 +186,14 @@ m_lights = [[[], [2], [], [], [5], [], [], [0, 1]],
             [[], [4], [], [], [5], [], [], [0, 1]],
             [[], [5], [], [], [5], [], [], [0, 1]]]
 print(m_lights[3][1][0])
+
+# Dictionary of dictionaries of dictionaries
+dic = {
+    1: {
+        "neighbors": {
+            "NORTH": "0005"
+        }
+    }
+}
+
+print(dic[1]["neighbors"]["NORTH"])

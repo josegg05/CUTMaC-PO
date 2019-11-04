@@ -128,7 +128,7 @@ def run():
                 "data": "".join(inter_info.lights)
             }
 
-            client_intersection.publish(inter_info.tlsID, json.dumps(control_msg))
+            #client_intersection.publish(inter_info.tlsID, json.dumps(control_msg))
             print("send: " + json.dumps(control_msg))
 
         # if not green and g_current:
@@ -163,15 +163,15 @@ def run():
         # Update the network time
         delay = petri_net_snake.time(step)
 
-        # # Add accident in B at t = 30
-        # if time_current == 30:
-        #     petri_net_snake.place("Normal_to_AccB").add(dot)
-        # # Remove accident in B at t = 60
-        # if time_current == 60:
-        #     petri_net_snake.place("AccB_to_Normal").add(dot)
+        # Add accident in B at t = 30
+        if time_current == 30:
+            petri_net_snake.place("Normal_to_AccEO").add(dot)
+        # Remove accident in B at t = 60
+        if time_current == 60:
+            petri_net_snake.place("AccEO_to_Normal").add(dot)
 
 
 if __name__ == '__main__':
-    client_intersection: mqtt.Client = mqtt_conf()
-    client_intersection.loop_start()    # Necessary to maintain connection
+    #client_intersection: mqtt.Client = mqtt_conf()
+    #client_intersection.loop_start()    # Necessary to maintain connection
     run()
