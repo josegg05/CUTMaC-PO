@@ -10,6 +10,13 @@ import json
 snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
 
+# Define the global variable of command_received
+my_detector_change = False
+my_accident_change = False
+neighbor_flow_change = False
+neighbor_accident_change = False
+msg_dic = []
+
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -26,8 +33,34 @@ def on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     print(msg.topic + " " + str(msg.payload))
-    # TODO: deal with sensor and other intersections msgs received
-    #   Remember that intersection msgs of accidents will change the state of the actual cycle phase
+    msg_type = str(json.loads(msg.payload)["type"])
+
+    if "e2det" in msg.topic:
+        if msg_type == "TrafficFlowObserved":
+            global msg_dic
+            global my_detector_change
+            msg_dic.append(json.loads(msg.payload))
+            my_detector_change = True
+            print(f"Detector value changed lane {msg_dic['laneId']}")
+        elif msg_type == "AccidentObserved":
+            global msg_dic
+            global my_accident_change
+            msg_dic.append(json.loads(msg.payload))
+            my_accident_change = True
+            print(f"Accident status changes on street {msg_dic['id']}")
+    elif "state" in msg.topic:
+        if msg_type == "TrafficFlowObserved":
+            global msg_dic
+            global neighbor_flow_change
+            msg_dic.append(json.loads(msg.payload))
+            neighbor_flow_change = True
+            print(f"Flow status changes on neighbor {msg_dic['id']}")
+        elif msg_type == "AccidentObserved":
+            global msg_dic
+            global neighbor_accident_change
+            msg_dic.append(json.loads(msg.payload))
+            neighbor_accident_change = True
+            print(f"Accident status changes on neighbor {msg_dic['id']}")
 
 
 def mqtt_conf() -> mqtt.Client:
@@ -39,12 +72,65 @@ def mqtt_conf() -> mqtt.Client:
     return client
 
 
+def subscribe_neighbors(neighbors):
+    for x in neighbors.values():
+        if x is not "":
+            client.subscribe("intersection/" + x + "/state")
+            print("Subscribed to: 'intersection/" + x + "/state'")
+    return
+
+
+def manage_accidents(petri_net_snake, neighbors):
+    # TODO: deal with accidents
+    #   Remember that intersection msgs of accidents will change the state of the actual cycle phase
+
+    global neighbor_accident_change
+    global my_accident_change
+    global msg_dic
+
+    if my_accident_change:
+        my_accident_change = False
+        direction = msg_dic['id'][-1]
+        if msg_dic["accidentOnLane"]:
+            place_name = f"Normal_to_Acc{direction.capitalize()}I"
+        else:
+            place_name = f"Acc{direction.capitalize()}I_to_Normal"
+
+        # TODO: Send the State Change msg for the accident
+
+    if neighbor_accident_change:
+        neighbor_accident_change = False
+        direction = ""
+        accident_neighbor = msg_dic["id"][22:25]
+        for dir, neigh in neighbors.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
+            if neigh == accident_neighbor:
+                direction = dir
+                print(direction)
+
+        if msg_dic["accidentOnLane"]:
+            place_name = f"Normal_to_Acc{direction}O"
+        else:
+            place_name = f"Acc{direction}O_to_Normal"
+
+    if direction is not "":
+        petri_net_snake.place(place_name).add(dot)
+    else:
+        print(f"Error. Neighbor {accident_neighbor} not found")
+    return
+
+
+def split_control():
+    # TODO: deal with sensor and other intersections msgs received
+    return
+
+
 def run():
 
     # Setup of the intersection
     inter_id = 2
     inter_info = intersections_info.Intersection(inter_id)
     inter_info.config()
+    subscribe_neighbors(inter_info.neighbors)
 
     petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
                                                                     inter_info.cycles, inter_info.cycles_names)
@@ -124,6 +210,7 @@ def run():
         if l_change:
             control_msg = {
                 "tlsID": inter_info.tlsID,
+                "type": "tlsControl",
                 "command": "setPhase",
                 "data": "".join(inter_info.lights)
             }

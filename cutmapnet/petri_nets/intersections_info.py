@@ -29,10 +29,10 @@ class Intersection:
                            [2, 2, 4, 2, 2, 2, 2]],
                 "cycles_names": ["Normal", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccWI"],
                 "neighbors": {
-                    "south": "0005",
-                    "east": "",
-                    "north": "",
-                    "west": ""
+                    "S": "0005",
+                    "E": "",
+                    "N": "",
+                    "W": ""
                 }
             },
             3: {
@@ -53,10 +53,10 @@ class Intersection:
                            [2, 0, 0, 0, 0, 0, 0]],
                 "cycles_names": ["Normal", "AccSO", "AccEO", "AccWO", "AccEI", "AccNI", "AccWI"],
                 "neighbors": {
-                    "south": "0008",
-                    "east": "",
-                    "north": "",
-                    "west": ""
+                    "S": "0008",
+                    "E": "",
+                    "N": "",
+                    "W": ""
                 }
             },
             4: {
@@ -74,10 +74,10 @@ class Intersection:
                            [0, 0, 0, 0]],
                 "cycles_names": ["Normal", "AccSO", "AccWO", "AccEI", "AccNI"],
                 "neighbors": {
-                    "south": "",
-                    "east": "0005",
-                    "north": "",
-                    "west": ""
+                    "S": "",
+                    "E": "0005",
+                    "N": "",
+                    "W": ""
                 }
             },
             5: {
@@ -95,10 +95,10 @@ class Intersection:
                            [1, 1, 1, 1]],
                 "cycles_names": ["Normal", "AccSO", "AccEO", "AccSI", "AccEI"],
                 "neighbors": {
-                    "south": "0009",
-                    "east": "0006",
-                    "north": "0002",
-                    "west": "0004"
+                    "S": "0009",
+                    "E": "0006",
+                    "N": "0002",
+                    "W": "0004"
                 }
             },
             6: {
@@ -119,10 +119,10 @@ class Intersection:
                            [1, 0, 0, 0, 0, 0, 0]],
                 "cycles_names": ["Normal", "AccSO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI"],
                 "neighbors": {
-                    "south": "0010",
-                    "east": "0007",
-                    "north": "",
-                    "west": "0005"
+                    "S": "0010",
+                    "E": "0007",
+                    "N": "",
+                    "W": "0005"
                 }
             },
             7: {
@@ -140,10 +140,10 @@ class Intersection:
                            [1, 1, 1, 1]],
                 "cycles_names": ["Normal", "AccSO", "AccWO", "AccSI", "AccEI"],
                 "neighbors": {
-                    "south": "0011",
-                    "east": "0008",
-                    "north": "",
-                    "west": "0006"
+                    "S": "0011",
+                    "E": "0008",
+                    "N": "",
+                    "W": "0006"
                 }
             },
             8: {
@@ -161,10 +161,10 @@ class Intersection:
                            [0, 0, 0, 0]],
                 "cycles_names": ["Normal", "AccSO", "AccWO", "AccEI", "AccNI"],
                 "neighbors": {
-                    "south": "0002",
-                    "east": "",
-                    "north": "0003",
-                    "west": "0007"
+                    "S": "0002",
+                    "E": "",
+                    "N": "0003",
+                    "W": "0007"
                 }
             },
             9: {
@@ -182,10 +182,10 @@ class Intersection:
                            [1, 1, 1, 1]],
                 "cycles_names": ["Normal", "AccEO", "AccNO", "AccSI", "AccWI"],
                 "neighbors": {
-                    "south": "",
-                    "east": "0010",
-                    "north": "0005",
-                    "west": ""
+                    "S": "",
+                    "E": "0010",
+                    "N": "0005",
+                    "W": ""
                 }
             },
             10: {
@@ -203,10 +203,10 @@ class Intersection:
                            [1, 1, 1, 1]],
                 "cycles_names": ["Normal", "AccEO", "AccNO", "AccNI", "AccWI"],
                 "neighbors": {
-                    "south": "",
-                    "east": "0011",
-                    "north": "0006",
-                    "west": "0009"
+                    "S": "",
+                    "E": "0011",
+                    "N": "0006",
+                    "W": "0009"
                 }
             },
             11: {
@@ -224,10 +224,10 @@ class Intersection:
                            [1, 1, 1, 1]],
                 "cycles_names": ["Normal", "AccEO", "AccNO", "AccSI", "AccWI"],
                 "neighbors": {
-                    "south": "",
-                    "east": "0012",
-                    "north": "0007",
-                    "west": "0010"
+                    "S": "",
+                    "E": "0012",
+                    "N": "0007",
+                    "W": "0010"
                 }
             },
             12: {
@@ -245,10 +245,10 @@ class Intersection:
                            [1, 1, 1, 1]],
                 "cycles_names": ["Normal", "AccSO", "AccEO", "AccNI", "AccWI"],
                 "neighbors": {
-                    "south": "",
-                    "east": "",
-                    "north": "0008",
-                    "west": "0011"
+                    "S": "",
+                    "E": "",
+                    "N": "0008",
+                    "W": "0011"
                 }
             }
         }

@@ -197,3 +197,18 @@ dic = {
 }
 
 print(dic[1]["neighbors"]["NORTH"])
+
+
+# If x is not None
+variable = "hi"
+if variable is not "":
+    print("Is not ''. It : " + variable)
+else:
+    print("It is ''")
+
+
+# String in a string
+string = "hola/soy/Jose"
+if "Jose" in string:
+    print(f"Jose is in string {string}")
+
