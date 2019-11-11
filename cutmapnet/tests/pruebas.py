@@ -212,3 +212,7 @@ string = "hola/soy/Jose"
 if "Jose" in string:
     print(f"Jose is in string {string}")
 
+
+# 'f"{}"' string format
+direction = "n"
+print(f"Acc{direction.capitalize()}I_to_Normal")

@@ -6,6 +6,7 @@ import snakes.plugins
 import time
 import paho.mqtt.client as mqtt
 import json
+import datetime
 
 snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
@@ -34,29 +35,26 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print(msg.topic + " " + str(msg.payload))
     msg_type = str(json.loads(msg.payload)["type"])
+    global msg_dic
 
     if "e2det" in msg.topic:
         if msg_type == "TrafficFlowObserved":
-            global msg_dic
             global my_detector_change
             msg_dic.append(json.loads(msg.payload))
             my_detector_change = True
             print(f"Detector value changed lane {msg_dic['laneId']}")
         elif msg_type == "AccidentObserved":
-            global msg_dic
             global my_accident_change
             msg_dic.append(json.loads(msg.payload))
             my_accident_change = True
             print(f"Accident status changes on street {msg_dic['id']}")
     elif "state" in msg.topic:
         if msg_type == "TrafficFlowObserved":
-            global msg_dic
             global neighbor_flow_change
             msg_dic.append(json.loads(msg.payload))
             neighbor_flow_change = True
             print(f"Flow status changes on neighbor {msg_dic['id']}")
         elif msg_type == "AccidentObserved":
-            global msg_dic
             global neighbor_accident_change
             msg_dic.append(json.loads(msg.payload))
             neighbor_accident_change = True
@@ -64,7 +62,7 @@ def on_message(client, userdata, msg):
 
 
 def mqtt_conf() -> mqtt.Client:
-    broker_address = "192.168.5.95"  # "192.168.1.95"
+    broker_address = "192.168.0.95"  # "192.168.1.95"
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -75,42 +73,56 @@ def mqtt_conf() -> mqtt.Client:
 def subscribe_neighbors(neighbors):
     for x in neighbors.values():
         if x is not "":
-            client.subscribe("intersection/" + x + "/state")
+            client_intersection.subscribe("intersection/" + x + "/state")
             print("Subscribed to: 'intersection/" + x + "/state'")
     return
 
 
-def manage_accidents(petri_net_snake, neighbors):
-    # TODO: deal with accidents
-    #   Remember that intersection msgs of accidents will change the state of the actual cycle phase
-
+def manage_accidents(petri_net_snake, neighbors, accident_lanes):
     global neighbor_accident_change
     global my_accident_change
     global msg_dic
+    direction = ""
 
     if my_accident_change:
         my_accident_change = False
-        direction = msg_dic['id'][-1]
+        direction = msg_dic['id'][24]
         if msg_dic["accidentOnLane"]:
             place_name = f"Normal_to_Acc{direction.capitalize()}I"
+            accident_lanes.append(msg_dic['id'])
         else:
             place_name = f"Acc{direction.capitalize()}I_to_Normal"
+            accident_lanes.remove(msg_dic['id'])
 
-        # TODO: Send the State Change msg for the accident
+        msg = {
+            "id": msg_dic['id'],
+            "type": "AccidentObserved",
+            "laneId": msg_dic['laneId'],
+            "location": msg_dic['location'],
+            "dateObserved": datetime.datetime.utcnow().isoformat(),
+            "accidentOnLane": msg_dic["accidentOnLane"],  # It has to be configured
+            "laneDirection": msg_dic['laneDirection']
+        }
+        client_intersection.publish(msg_dic['id'][0:18] + "state", json.dumps(msg))
 
     if neighbor_accident_change:
         neighbor_accident_change = False
-        direction = ""
-        accident_neighbor = msg_dic["id"][22:25]
+        accident_neighbor = msg_dic['id'][13:17]
         for dir, neigh in neighbors.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
             if neigh == accident_neighbor:
-                direction = dir
-                print(direction)
+                if (dir == "S" and msg_dic['id'][24] == "n") or \
+                   (dir == "E" and msg_dic['id'][24] == "w") or \
+                   (dir == "N" and msg_dic['id'][24] == "s") or \
+                   (dir == "W" and msg_dic['id'][24] == "e"):
+                    direction = dir
+                    print(direction)
 
         if msg_dic["accidentOnLane"]:
             place_name = f"Normal_to_Acc{direction}O"
+            accident_lanes.append(msg_dic['id'])
         else:
             place_name = f"Acc{direction}O_to_Normal"
+            accident_lanes.remove(msg_dic['id'])
 
     if direction is not "":
         petri_net_snake.place(place_name).add(dot)
@@ -125,6 +137,11 @@ def split_control():
 
 
 def run():
+    global my_detector_change
+    global my_accident_change
+    global neighbor_flow_change
+    global neighbor_accident_change
+    accident_lanes = []
 
     # Setup of the intersection
     inter_id = 2
@@ -147,15 +164,8 @@ def run():
     delay = 0.0
     step = 1.0
 
-    # green = []
-    # yellow = []
-    # red = []
-
     print("\n\nStart the Intersection Petri Net:")
     while True:
-        # g_current = []
-        # y_current = []
-        # r_current = []
 
         # initialize variables for semaphore msg configuration
         l_change = False
@@ -175,15 +185,6 @@ def run():
                     p_fire = True
                     count_fire += 1
                     transitions_fire.append(str(t.name))
-                    # if "Green" in t.name:
-                    #     print("Voy a poner en GREEN el Movimiento %s" % t.name[-1])
-                    #     g_current.append(t.name[-1])
-                    # elif "Yel" in t.name:
-                    #     print("Voy a poner en YELLOW el Movimiento %s" % t.name[-1])
-                    #     y_current.append(t.name[-1])
-                    # elif "Red" in t.name:
-                    #     print("Voy a poner en RED el Movimiento %s" % t.name[-1])
-                    #     r_current.append(t.name[-1])
                     print("[%s] fire: %s, count_fire: %s" % (time_current, t.name, count_fire))
                 except:
                     pass
@@ -215,33 +216,45 @@ def run():
                 "data": "".join(inter_info.lights)
             }
 
-            #client_intersection.publish(inter_info.tlsID, json.dumps(control_msg))
+            client_intersection.publish(inter_info.tlsID, json.dumps(control_msg))
             print("send: " + json.dumps(control_msg))
 
-        # if not green and g_current:
-        #     green = g_current
-        # if not yellow and y_current:
-        #     yellow = y_current
-        # if not red and r_current:
-        #     red = r_current
-        #
-        # if len(g_current) or len(y_current) or len(r_current) > 2:
-        #     print("error en la net!!! SALIR")
-        # elif len(g_current) == 1:
-        #     print()
-        # elif len(g_current) == 2:
-        #     green = g_current
-        #     print()
-        # elif len(y_current) == 1:
-        #     print()
-        # elif len(y_current) == 2:
-        #     yellow = y_current
-        #     print()
-        # elif len(r_current) == 1:
-        #     print()
-        # elif len(r_current) == 2:
-        #     red = r_current
-        #     print()
+        # # Add accident in B at t = 30
+        # if time_current == 30:
+        #     petri_net_snake.place("Normal_to_AccEO").add(dot)
+        # # Remove accident in B at t = 60
+        # if time_current == 60:
+        #     petri_net_snake.place("AccEO_to_Normal").add(dot)
+
+        # Add accident in B at t = 30
+        if time_current == 30:
+            global msg_dic
+            my_accident_change = True
+            msg_dic = {
+                "id": "intersection/0002/e2det/s03",
+                "type": "AccidentObserved",
+                "laneId": "436291016#3_3",
+                "location": "here",
+                "dateObserved": datetime.datetime.utcnow().isoformat(),
+                "accidentOnLane": True,
+                "laneDirection": "s-_wn_"
+            }
+        # Remove accident in B at t = 60
+        if time_current == 300:
+            my_accident_change = True
+            msg_dic = {
+                "id": "intersection/0002/e2det/s03",
+                "type": "AccidentObserved",
+                "laneId": "436291016#3_3",
+                "location": "here",
+                "dateObserved": datetime.datetime.utcnow().isoformat(),
+                "accidentOnLane": False,
+                "laneDirection": "s-_wn_"
+            }
+
+        # Mange accidents
+        if my_accident_change or neighbor_accident_change:
+            manage_accidents(petri_net_snake, inter_info.neighbors, accident_lanes)
 
         # Wait for a second to transit
         time_current += 1.0
@@ -250,15 +263,8 @@ def run():
         # Update the network time
         delay = petri_net_snake.time(step)
 
-        # Add accident in B at t = 30
-        if time_current == 30:
-            petri_net_snake.place("Normal_to_AccEO").add(dot)
-        # Remove accident in B at t = 60
-        if time_current == 60:
-            petri_net_snake.place("AccEO_to_Normal").add(dot)
-
 
 if __name__ == '__main__':
-    #client_intersection: mqtt.Client = mqtt_conf()
-    #client_intersection.loop_start()    # Necessary to maintain connection
+    client_intersection: mqtt.Client = mqtt_conf()
+    client_intersection.loop_start()    # Necessary to maintain connection
     run()

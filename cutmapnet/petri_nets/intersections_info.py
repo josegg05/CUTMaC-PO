@@ -8,6 +8,7 @@ class Intersection:
         self.lights = []
         self.cycles = []
         self.cycles_names = []
+        self.neighbors = {}
 
     def config(self):
         inter_config = {
@@ -260,3 +261,4 @@ class Intersection:
         self.lights = inter_config[self.intersection_id]["lights"]
         self.cycles = inter_config[self.intersection_id]["cycles"]
         self.cycles_names = inter_config[self.intersection_id]["cycles_names"]
+        self.neighbors = inter_config[self.intersection_id]["neighbors"]

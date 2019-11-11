@@ -227,7 +227,7 @@ def net_create(movements, phases, cycles, cycles_names):
 
             arcs_in_control = [["*Normal"], [p_ident2, p_ident], ["Normal", p_ident3], ["*" + p_ident]]
             arcs_out_control = [[p_ident2], ["Normal"], [p_ident], [p_ident3]]
-            t_control_names = ["t_no_" + p_ident, "tn_" + p_ident, "t" + p_ident + "_n", "t_" + p_ident]
+            t_control_names = ["t_no_" + p_ident, "t" + p_ident + "_n", "tn_" + p_ident, "t_" + p_ident]
             for j in range(len(t_control_names)):
                 arcs_in = arcs_in_control[j]
                 arcs_out = arcs_out_control[j]
