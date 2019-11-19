@@ -7,6 +7,9 @@ import time
 import paho.mqtt.client as mqtt
 import json
 import datetime
+import numpy as np
+import skfuzzy as fuzz
+from skfuzzy import control as ctrl
 
 snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
@@ -62,7 +65,7 @@ def on_message(client, userdata, msg):
 
 
 def mqtt_conf() -> mqtt.Client:
-    broker_address = "192.168.0.95"  # "192.168.1.95"
+    broker_address = "192.168.0.196"  # "192.168.1.95"
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -131,8 +134,63 @@ def manage_accidents(petri_net_snake, neighbors, accident_lanes):
     return
 
 
-def split_control():
+def congestion_estimator_conf():
+    # Antecedent/Consequent and universe definition variables
+    jamLengthVehicle = ctrl.Antecedent(np.arange(0, 21, 1), 'jamLengthVehicle')
+    occupancy = ctrl.Antecedent(np.arange(0, 101, 1), 'occupancy')
+    meanSpeed = ctrl.Antecedent(np.arange(0, 61, 1), 'meanSpeed')
+    vehicleNumber = ctrl.Antecedent(np.arange(0, 21, 1), 'vehicleNumber')
+    congestion = ctrl.Consequent(np.arange(0, 101, 1), 'congestion')
+
+    # Membership Functions definition
+    jamLengthVehicle.automf(3, 'quant')
+    occupancy.automf(3, 'quant')
+    meanSpeed.automf(3, 'quant')
+    vehicleNumber.automf(3, 'quant')
+    congestion.automf(5, 'quant')
+
+    # Graph the Membership Functions
+    # jamLengthVehicle.view()
+    # occupancy.view()
+    # meanSpeed.view()
+    # vehicleNumber.view()
+    # congestion.view()
+
+    # TODO: Define the real rules to measure Intersection Congestion
+    # Define the Expert Rules
+    rules = [
+        ctrl.Rule((jamLengthVehicle['high'] | occupancy['high']) & meanSpeed['low'], congestion['higher']),
+        ctrl.Rule((jamLengthVehicle['high'] | occupancy['high']) & meanSpeed['average'], congestion['high']),
+        ctrl.Rule((jamLengthVehicle['high'] | occupancy['high']) & meanSpeed['high'], congestion['high']),
+        ctrl.Rule((jamLengthVehicle['average'] | occupancy['average']) & meanSpeed['average'], congestion['average']),
+        ctrl.Rule((jamLengthVehicle['low'] | occupancy['low']) & meanSpeed['low'], congestion['low']),
+        ctrl.Rule((jamLengthVehicle['low'] | occupancy['low']) & meanSpeed['average'], congestion['low']),
+        ctrl.Rule((jamLengthVehicle['low'] | occupancy['low']) & meanSpeed['high'], congestion['lower'])
+    ]
+
+    # Controller definition
+    congestion_estimator = ctrl.ControlSystem(rules)
+    congestion_measure = ctrl.ControlSystemSimulation(congestion_estimator)
+
+    return congestion_measure, congestion
+
+
+def controller_configuration():
+    # TODO: configure the controller for the split
+    return
+
+
+def split_control(congestion_measure, congestion):
     # TODO: deal with sensor and other intersections msgs received
+    # Example
+    congestion_measure.input['jamLengthVehicle'] = 15
+    congestion_measure.input['occupancy'] = 75
+    congestion_measure.input['meanSpeed'] = 50
+    # Crunch the numbers
+    congestion_measure.compute()
+    print(congestion_measure.output['congestion'])
+    # congestion.view(sim=congestion_measure)
+
     return
 
 
@@ -142,6 +200,10 @@ def run():
     global neighbor_flow_change
     global neighbor_accident_change
     accident_lanes = []
+
+    # Setup the controller
+    congestion_measure, congestion = congestion_estimator_conf()
+    split_control(congestion_measure, congestion)
 
     # Setup of the intersection
     inter_id = 2
@@ -252,7 +314,9 @@ def run():
                 "laneDirection": "s-_wn_"
             }
 
-        # Mange accidents
+        # Manage Split
+
+        # Manage accidents
         if my_accident_change or neighbor_accident_change:
             manage_accidents(petri_net_snake, inter_info.neighbors, accident_lanes)
 
