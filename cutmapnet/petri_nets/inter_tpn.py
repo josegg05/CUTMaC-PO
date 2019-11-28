@@ -30,16 +30,6 @@ def net_create(movements, phases, cycles, cycles_names):
     arcs_in = [['GG_'], ['DG_', 'GR_'], ['mG_'], ['DY_'], ['EG_'], ['EG_'], ['EG_'], ['M_', 'SM_']]
     arcs_out = [['DG_', 'mG_', 'M_'], ['DY_'], ['EG_'], ['SM_'], ['RG_'], ['RG_'], ['RG_'], ['RR_']]
 
-    # movements = [0, 1, 2, 3, 4, 5, 6, 7]
-    # phases = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
-    # cycles = pd.Series(data=[[1, 2, 3, 4, 5, 6, 7, 0],
-    #                          [2, 2, 3, 4, 5, 2, 2, 2],
-    #                          [1, 5, 0, 0, 0, 7, 0, 0],
-    #                          [1, 3, 1, 4, 6, 1, 1, 1],
-    #                          [2, 0, 6, 0, 0, 0, 7, 0]],
-    #                    index=["Normal", "AccA", "AccB", "AccC", "AccD"])
-    # m0_places = ["GG_0", "RR_1", "RR_2", "RR_3", "GG_4", "RR_5", "RR_6", "RR_7", "S1", "Normal"]
-    # m0_places = ["S1", "Normal"]
     m0_places = ["S" + str(cycles[0][0]), "Normal"]
     for x in movements:
         if x in phases[0]:
@@ -89,7 +79,7 @@ def net_create(movements, phases, cycles, cycles_names):
                 phase_changes.append("C" + str(x) + str(cycles[i][x]))
 
     print("Move Changes: " + str(phase_changes))
-    # Create Cycle change procces
+    # Create Cycle change process
     for x in range(len(phases)):  # Start phase
         for i in range(len(phases)):  # Golas phase
             # if x != i:
@@ -171,7 +161,7 @@ def net_create(movements, phases, cycles, cycles_names):
                      t_id])
                 t_id += 1
 
-        # Create Cycle change control x="2491" y="4681"
+        # Create Phases change control. (x="2491" y="4681")
         p_ident = "S" + str(x)
         m0 = 0
         if p_ident in m0_places:
@@ -181,6 +171,7 @@ def net_create(movements, phases, cycles, cycles_names):
              pos_y_init[x] - 270 - 120 * x, m0, p_id])
         p_id += 1
 
+        # Create Phases change transitions
         count = -2
         for i in range(len(phases)):
             for y in range(len(cycles)):

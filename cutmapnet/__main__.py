@@ -15,31 +15,43 @@ snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
 
 # Define the global variable of command_received
+intersection_id = "0002"
+start_flag = False
 msg_dic = []
 
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
+    global intersection_id
     print("Connected with result code " + str(rc))
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("intersection/0002/e2det/n")
-    client.subscribe("intersection/0002/e2det/e")
-    client.subscribe("intersection/0002/e2det/s")
-    client.subscribe("intersection/0002/e2det/w")
+    client.subscribe("intersection/%s/e2det/n" % intersection_id)
+    client.subscribe("intersection/%s/e2det/e" % intersection_id)
+    client.subscribe("intersection/%s/e2det/s" % intersection_id)
+    client.subscribe("intersection/%s/e2det/w" % intersection_id)
+    client.subscribe("intersection/all/start")
 
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     global msg_dic
-    msg_dic.append(json.loads(msg.payload))
-    print("message arrive from topic: ", msg.topic)
-    print(msg.topic + " " + str(msg.payload))
+    global start_flag
+    if msg.topic == "intersection/all/start":
+        print("Message %s" % str(msg.payload))
+        if "start" in str(msg.payload):
+            start_flag = True
+        elif "stop" in str(msg.payload):
+            start_flag = False
+    else:
+        msg_dic.append(json.loads(msg.payload))
+        print("message arrive from topic: ", msg.topic)
+        print(msg.topic + " " + str(msg.payload))
 
 
 def mqtt_conf() -> mqtt.Client:
-    broker_address = "192.168.0.196"  # "192.168.1.95"
+    broker_address = "192.168.0.196"  # PC Office: "192.168.0.196"; PC Lab: "192.168.1.95"
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -203,7 +215,7 @@ def congestion_measure(congestion_measuring_sim, movement, congestionLevel):
           "; occupancy = ", movement.get_occupancy(),
           "; meanSpeed = ", movement.get_mean_speed(),
           ": vehicleNumber = ", movement.get_vehicle_number())
-    congestionLevel.view(sim=congestion_measuring_sim)
+    # congestionLevel.view(sim=congestion_measuring_sim)
 
     return congestion
 
@@ -308,7 +320,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
     print("my_congestion_level = ", movement.congestionLevel,
           "; in_congestion_level = ", in_congestion_level,
           "; out_congestion_level = ", out_congestion_level)
-    split.view(sim=split_measuring_sim)
+    # split.view(sim=split_measuring_sim)
 
     return split_measuring_sim.output['split']
 
@@ -356,143 +368,155 @@ def set_tls_lights(transitions_fire, inter_info, moves_green):
 
 
 def run():
+    global intersection_id
+    global start_flag
     global msg_dic
-    accident_lanes = []
-    movements = {}  # dictionary of movements
-    neighbors = {}  # dictionary of neighbors
-    moves_green = []
 
     # Setup of the intersection
-    inter_id = 2
-    inter_info = intersections_classes.Intersection(inter_id)
-    inter_info.config()
+    inter_info = intersections_classes.Intersection(intersection_id)
+
     # Define my_topic
     my_topic = inter_info.state_topic
     # Subscribe to neighbors state topics
     subscribe_neighbors(inter_info.neighbors_ids)
 
     # Setup the congestion model and split controller
-    congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed, inter_info.m_max_vehicle_number)
+    congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed,
+                                                                      inter_info.m_max_vehicle_number)
     split_measuring_sim, split = split_model_conf()
 
-    # Create intersection Movements
-    for i in range(len(inter_info.movements)):
-        if (i == 0) or (inter_info.movements[i] > inter_info.movements[i - 1]):
-            movements[inter_info.movements[i]] = intersections_classes.Movement(inter_info.movements[i], inter_info)
-    print("Intersection Movements: ", movements)
-
-    # Create intersection neighbors
-    for i in inter_info.neighbors_ids:
-        if inter_info.neighbors_ids[i] != "":
-            neighbors[i] = intersections_classes.Neighbor(inter_info.neighbors_ids[i], i)
-    print("Intersection Neighbors: ", neighbors)
-
-    # Set the definition vectors of the Timed Petri Net
-    petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
-                                                                    inter_info.cycles, inter_info.cycles_names)
-    # Create de SNAKE Petri Net
-    petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
-    init = petri_net_snake.get_marking()
-    print(init)
-
-    # "petri_net_snake.set_marking(init)" Acts like n.reset(), because each transition has a place in its pre-set whose
-    # marking is reset, just like for method reset
-    petri_net_snake.set_marking(init)
-    time_0 = time.perf_counter()
-    time_current = 0.0
-    delay = 0.0
-    step = 1.0
-
-    # Start the Intersection Petri Net
-    print("\n\nStart the Intersection Petri Net:")
+    # Reset Loop
     while True:
-        transitions_fire = []
+        accident_lanes = []
+        movements = {}  # dictionary of movements
+        neighbors = {}  # dictionary of neighbors
+        moves_green = []
 
-        # Print the current time and delay
-        print("Time:[%s] " % time_current, "delay:", delay)
+        # Create intersection Movements
+        for i in range(len(inter_info.movements)):
+            if (i == 0) or (inter_info.movements[i] > inter_info.movements[i - 1]):
+                movements[inter_info.movements[i]] = intersections_classes.Movement(inter_info.movements[i], inter_info)
+        print("Intersection Movements: ", movements)
 
-        # Fires all the fireable transitions
-        p_fire = True
-        count_fire = 0
-        while p_fire:
-            p_fire = False
-            for t in petri_net_snake.transition():
-                try:
-                    petri_net_snake.transition(t.name).fire(Substitution())
-                    p_fire = True
-                    count_fire += 1
-                    transitions_fire.append(str(t.name))
-                    print("[%s] fire: %s, count_fire: %s" % (time_current, t.name, count_fire))
-                except:
-                    pass
-        # print(transitions_fire)
+        # Create intersection neighbors
+        for i in inter_info.neighbors_ids:
+            if inter_info.neighbors_ids[i] != "":
+                neighbors[i] = intersections_classes.Neighbor(inter_info.neighbors_ids[i], i)
+        print("Intersection Neighbors: ", neighbors)
 
-        # Set the TLS lights
-        set_tls_lights(transitions_fire, inter_info, moves_green)
-        # print("Moves in Green: ", moves_green)
-
-        # Measure congestion and split of correspondent Movement
-        for i in transitions_fire:
-            if (("tNormal" in i) or ("tAcc" in i)) and (i[-1] not in ["n", "I", "O"]):
-                print("Measure congestion and split of the Movement of the next Phase --> %s" % i[-2])
-                for j in inter_info.phases[int(i[-2])]:
-                    movements[j].congestionLevel = congestion_measure(congestion_measuring_sim, movements[j], congestionLevel)
-                    movements[j].split = split_measure(split_measuring_sim, movements[j], neighbors, split)
-                    config_mov_split(petri_net_snake, movements[j])
-                send_state(my_topic, movements)
-
-        # # Add accident in B at t = 30
-        # if time_current == 30:
-        #     my_accident_change = True
-        #     msg_dic.append({
-        #         "id": "intersection/0002/e2det/s03",
-        #         "type": "AccidentObserved",
-        #         "laneId": "436291016#3_3",
-        #         "location": "here",
-        #         "dateObserved": datetime.datetime.utcnow().isoformat(),
-        #         "accidentOnLane": True,
-        #         "laneDirection": "s-_wn_"
-        #     })
-        # # Remove accident in B at t = 300
-        # if time_current == 300:
-        #     my_accident_change = True
-        #     msg_dic.append({
-        #         "id": "intersection/0002/e2det/s03",
-        #         "type": "AccidentObserved",
-        #         "laneId": "436291016#3_3",
-        #         "location": "here",
-        #         "dateObserved": datetime.datetime.utcnow().isoformat(),
-        #         "accidentOnLane": False,
-        #         "laneDirection": "s-_wn_"
-        #     })
-
-        # Manage msgs received
-        if msg_dic:
-            msg_in = msg_dic[0]
-            msg_dic.pop(0)
-            msg_id = msg_in['id']
-            msg_type = msg_in['type']
-            if ("e2det" in msg_id) or ("state" in msg_id):
-                if msg_type == "TrafficFlowObserved":
-                    manage_flow(msg_in, movements, moves_green, inter_info.m_detectors, neighbors)
-                elif msg_type == "AccidentObserved":
-                    manage_accidents(msg_in, petri_net_snake, inter_info.neighbors_ids, accident_lanes)
+        # Set the definition vectors of the Timed Petri Net
+        petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
+                                                                        inter_info.cycles, inter_info.cycles_names)
 
 
-        # # Manage Split
-        # if my_detector_change or neighbor_flow_change:
-        #     manage_flow(movements, moves_green, inter_info.m_detectors, neighbors)
-        #
-        # # Manage accidents
-        # if my_accident_change or neighbor_accident_change:
-        #     manage_accidents(petri_net_snake, inter_info.neighbors_ids, accident_lanes)
+        # Create de SNAKE Petri Net
+        petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
+        init = petri_net_snake.get_marking()
+        # "petri_net_snake.set_marking(init)" Acts like n.reset(), because each transition has a place in its pre-set whose
+        # marking is reset, just like for method reset
+        petri_net_snake.set_marking(init)
+        print(init)
 
-        # Wait for a second to transit
-        time_current += 1.0
-        while time.perf_counter() < time_0 + time_current:
-            pass
-        # Update the network time
-        delay = petri_net_snake.time(step)
+        print("Intersection '%s' READY:" % intersection_id)
+        while not start_flag:
+            pass  # Do nothing waiting for the start signal
+
+        # Set Petri Net Time, delay and step variables initial values to start
+        time_0 = time.perf_counter()
+        time_current = 0.0
+        delay = 0.0
+        step = 1.0
+
+        # Start the Intersection Petri Net
+        print("\n\nStart the Intersection Petri Net:")
+        while start_flag:
+            transitions_fire = []
+
+            # Print the current time and delay
+            print("Time:[%s] " % time_current, "delay:", delay)
+
+            # Fires all the fireable transitions
+            p_fire = True
+            count_fire = 0
+            while p_fire:
+                p_fire = False
+                for t in petri_net_snake.transition():
+                    try:
+                        petri_net_snake.transition(t.name).fire(Substitution())
+                        p_fire = True
+                        count_fire += 1
+                        transitions_fire.append(str(t.name))
+                        print("[%s] fire: %s, count_fire: %s" % (time_current, t.name, count_fire))
+                    except:
+                        pass
+            # print(transitions_fire)
+
+            # Set the TLS lights
+            set_tls_lights(transitions_fire, inter_info, moves_green)
+            # print("Moves in Green: ", moves_green)
+
+            # Measure congestion and split of correspondent Movement
+            for i in transitions_fire:
+                if (("tNormal" in i) or ("tAcc" in i)) and (i[-1] not in ["l", "I", "O"]):
+                    print("Measure congestion and split of the Movement of the next Phase --> %s" % i[-2])
+                    for j in inter_info.phases[int(i[-2])]:
+                        movements[j].congestionLevel = congestion_measure(congestion_measuring_sim, movements[j],
+                                                                          congestionLevel)
+                        movements[j].split = split_measure(split_measuring_sim, movements[j], neighbors, split)
+                        config_mov_split(petri_net_snake, movements[j])
+                    send_state(my_topic, movements)
+
+            # # Add accident in B at t = 30
+            # if time_current == 30:
+            #     my_accident_change = True
+            #     msg_dic.append({
+            #         "id": "intersection/0002/e2det/s03",
+            #         "type": "AccidentObserved",
+            #         "laneId": "436291016#3_3",
+            #         "location": "here",
+            #         "dateObserved": datetime.datetime.utcnow().isoformat(),
+            #         "accidentOnLane": True,
+            #         "laneDirection": "s-_wn_"
+            #     })
+            # # Remove accident in B at t = 300
+            # if time_current == 300:
+            #     my_accident_change = True
+            #     msg_dic.append({
+            #         "id": "intersection/0002/e2det/s03",
+            #         "type": "AccidentObserved",
+            #         "laneId": "436291016#3_3",
+            #         "location": "here",
+            #         "dateObserved": datetime.datetime.utcnow().isoformat(),
+            #         "accidentOnLane": False,
+            #         "laneDirection": "s-_wn_"
+            #     })
+
+            # Manage msgs received
+            if msg_dic:
+                msg_in = msg_dic[0]
+                msg_dic.pop(0)
+                msg_id = msg_in['id']
+                msg_type = msg_in['type']
+                if ("e2det" in msg_id) or ("state" in msg_id):
+                    if msg_type == "TrafficFlowObserved":
+                        manage_flow(msg_in, movements, moves_green, inter_info.m_detectors, neighbors)
+                    elif msg_type == "AccidentObserved":
+                        manage_accidents(msg_in, petri_net_snake, inter_info.neighbors_ids, accident_lanes)
+
+            # # Manage Split
+            # if my_detector_change or neighbor_flow_change:
+            #     manage_flow(movements, moves_green, inter_info.m_detectors, neighbors)
+            #
+            # # Manage accidents
+            # if my_accident_change or neighbor_accident_change:
+            #     manage_accidents(petri_net_snake, inter_info.neighbors_ids, accident_lanes)
+
+            # Wait for a second to transit
+            time_current += 1.0
+            while time.perf_counter() < time_0 + time_current:
+                pass
+            # Update the network time
+            delay = petri_net_snake.time(step)
 
 
 if __name__ == '__main__':
