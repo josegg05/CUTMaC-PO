@@ -216,3 +216,57 @@ if "Jose" in string:
 # 'f"{}"' string format
 direction = "n"
 print(f"Acc{direction.capitalize()}I_to_Normal")
+
+
+# prueba np.sum
+import numpy as np
+vehicleNumber = []
+vehicleNumber.append(2)
+vehicleNumber.append(5)
+vehicleNumber.append(3)
+vehiNum = np.sum(vehicleNumber)
+print(vehicleNumber)
+print(vehiNum)
+
+# del from list
+moves = []
+moves.append(1)
+moves. append(5)
+moves. append(7)
+print(moves)
+moves.remove(5)
+print(moves)
+
+# IF with OR, AND and IN:
+hola = "tn_AccSI"
+if (("tNormal" in hola) or ("tAcc" in hola)) and (hola[-1] not in ["n", "I", "O"]):
+    print(hola)
+hola = "tAccSI_n"
+if (("tNormal" in hola) or ("tAcc" in hola)) and (hola[-1] not in ["n", "I", "O"]):
+    print(hola)
+hola = "tNormal012"
+if (("tNormal" in hola) or ("tAcc" in hola)) and (hola[-1] not in ["n", "I", "O"]):
+    print(hola)
+hola = "tAccSI101"
+if (("tNormal" in hola) or ("tAcc" in hola)) and (hola[-1] not in ["n", "I", "O"]):
+    print(hola)
+
+# copy()
+moves_green = [1, 2]
+MG = moves_green.copy()
+MG.remove(1)
+print(moves_green, MG)
+
+# index
+idx_list = ["Jose", "Jesi", "Mari"]
+print(idx_list.index("Mar"))
+
+# indexing dictionaries keys
+ages = {"Jose": 29,
+        "Jesi": 27,
+        "Mari": 13}
+print(list(ages.keys())[1])
+
+
+for i in range(1,6):
+    print(i)

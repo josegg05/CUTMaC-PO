@@ -1,4 +1,4 @@
-# Program writes the Intersection html for ROMEO simulator
+# Program creates all vectors of a intersection timed petri net
 
 
 class PetriNetInfo:
@@ -17,10 +17,9 @@ def net_create(movements, phases, cycles, cycles_names):
     p_pos_x_sem = [0, 75, 150, 0, 150, 0, 75, 150, 0, 150, 75, 75, 75]
     p_pos_y_sem = [0, 30, 0, 60, 60, 120, 90, 120, 180, 180, 180]
 
-    # t_names_sem = ['t1_', 't2_', 'min_', 'Yel_', 'Max_', 'FO_', 'Act_', 't3_']
     t_names_sem = ['Green_', 'Yel_', 'min_', 'Stop_', 'Max_', 'FO_', 'Act_', 'Red_']
     all_red = 4
-    t_time_sem = [0, 0, 20, 4, 100, 0, 50, 0]
+    t_time_sem = [0, 0, 10, 4, 100, 200, 0, 0]
     t_color_sem = [0, 0, 1, 1, 1, 0, 1, 0]
     t_pos_x_sem = [0, 150, 0, 150, -75, 0, 75, 150]
     t_pos_y_sem = [30, 30, 90, 90, 150, 150, 150, 150]
@@ -227,7 +226,7 @@ def net_create(movements, phases, cycles, cycles_names):
 
             arcs_in_control = [["*Normal"], [p_ident2, p_ident], ["Normal", p_ident3], ["*" + p_ident]]
             arcs_out_control = [[p_ident2], ["Normal"], [p_ident], [p_ident3]]
-            t_control_names = ["t_no_" + p_ident, "t" + p_ident + "_n", "tn_" + p_ident, "t_" + p_ident]
+            t_control_names = ["t_no_" + p_ident, "t" + p_ident + "_Normal", "tNormal_" + p_ident, "t_" + p_ident]
             for j in range(len(t_control_names)):
                 arcs_in = arcs_in_control[j]
                 arcs_out = arcs_out_control[j]

@@ -1,7 +1,7 @@
 from cutmapnet.petri_nets import tpn
 from cutmapnet.petri_nets import inter_tpn
 from cutmapnet.petri_nets import net_snakes
-from cutmapnet.petri_nets import intersections_info
+from cutmapnet.petri_nets import intersections_classes
 import snakes.plugins
 import time
 import paho.mqtt.client as mqtt
@@ -15,10 +15,6 @@ snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
 
 # Define the global variable of command_received
-my_detector_change = False
-my_accident_change = False
-neighbor_flow_change = False
-neighbor_accident_change = False
 msg_dic = []
 
 
@@ -36,32 +32,10 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print(msg.topic + " " + str(msg.payload))
-    msg_type = str(json.loads(msg.payload)["type"])
     global msg_dic
-
-    if "e2det" in msg.topic:
-        if msg_type == "TrafficFlowObserved":
-            global my_detector_change
-            msg_dic.append(json.loads(msg.payload))
-            my_detector_change = True
-            print(f"Detector value changed lane {msg_dic['laneId']}")
-        elif msg_type == "AccidentObserved":
-            global my_accident_change
-            msg_dic.append(json.loads(msg.payload))
-            my_accident_change = True
-            print(f"Accident status changes on street {msg_dic['id']}")
-    elif "state" in msg.topic:
-        if msg_type == "TrafficFlowObserved":
-            global neighbor_flow_change
-            msg_dic.append(json.loads(msg.payload))
-            neighbor_flow_change = True
-            print(f"Flow status changes on neighbor {msg_dic['id']}")
-        elif msg_type == "AccidentObserved":
-            global neighbor_accident_change
-            msg_dic.append(json.loads(msg.payload))
-            neighbor_accident_change = True
-            print(f"Accident status changes on neighbor {msg_dic['id']}")
+    msg_dic.append(json.loads(msg.payload))
+    print("message arrive from topic: ", msg.topic)
+    print(msg.topic + " " + str(msg.payload))
 
 
 def mqtt_conf() -> mqtt.Client:
@@ -81,140 +55,343 @@ def subscribe_neighbors(neighbors):
     return
 
 
-def manage_accidents(petri_net_snake, neighbors, accident_lanes):
-    global neighbor_accident_change
-    global my_accident_change
-    global msg_dic
-    direction = ""
+def manage_flow(msg_in, movements, moves_green, moves_detectors, neighbors):
+    # Function that saves the detectors and neighbor congestion info
+    detector_id = msg_in["id"][-3:]
+    msg_id = msg_in["id"]
+    print("detector_id: ", detector_id)
+    mov_ids = []
+    if "e2det" in msg_id:  # My Flow Change
+        print("Detector value changed in lane " + msg_in['laneId'])
+        for mov in range(8):  # 8 movements
+            if detector_id in moves_detectors[mov]:
+                mov_ids.append(mov)
+        print("Moves affected: ", mov_ids)
+        for mov in mov_ids:
+            if mov in moves_green:
+                movements[mov].set_jam_length_vehicle(detector_id, msg_in["jamLengthVehicle"])
+                movements[mov].set_mean_speed(detector_id, msg_in["meanSpeed"])
+            movements[mov].set_occupancy(detector_id, msg_in["occupancy"])
+            movements[mov].set_vehicle_number(detector_id, msg_in["vehicleNumber"])
 
-    if my_accident_change:
-        my_accident_change = False
-        direction = msg_dic['id'][24]
-        if msg_dic["accidentOnLane"]:
-            place_name = f"Normal_to_Acc{direction.capitalize()}I"
-            accident_lanes.append(msg_dic['id'])
-        else:
-            place_name = f"Acc{direction.capitalize()}I_to_Normal"
-            accident_lanes.remove(msg_dic['id'])
+    elif "state" in msg_id:  # Neighbor Flow Changes
+        print("Flow status changes on neighbor " + msg_in['id'])
+        for i in neighbors:
+            if neighbors[i].id == msg_in["id"][13:17]:
+                neighbors[i].mov_congestion = msg_in["mov_congestion"]
 
-        msg = {
-            "id": msg_dic['id'],
-            "type": "AccidentObserved",
-            "laneId": msg_dic['laneId'],
-            "location": msg_dic['location'],
-            "dateObserved": datetime.datetime.utcnow().isoformat(),
-            "accidentOnLane": msg_dic["accidentOnLane"],  # It has to be configured
-            "laneDirection": msg_dic['laneDirection']
-        }
-        client_intersection.publish(msg_dic['id'][0:18] + "state", json.dumps(msg))
-
-    if neighbor_accident_change:
-        neighbor_accident_change = False
-        accident_neighbor = msg_dic['id'][13:17]
-        for dir, neigh in neighbors.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
-            if neigh == accident_neighbor:
-                if (dir == "S" and msg_dic['id'][24] == "n") or \
-                   (dir == "E" and msg_dic['id'][24] == "w") or \
-                   (dir == "N" and msg_dic['id'][24] == "s") or \
-                   (dir == "W" and msg_dic['id'][24] == "e"):
-                    direction = dir
-                    print(direction)
-
-        if msg_dic["accidentOnLane"]:
-            place_name = f"Normal_to_Acc{direction}O"
-            accident_lanes.append(msg_dic['id'])
-        else:
-            place_name = f"Acc{direction}O_to_Normal"
-            accident_lanes.remove(msg_dic['id'])
-
-    if direction is not "":
-        petri_net_snake.place(place_name).add(dot)
-    else:
-        print(f"Error. Neighbor {accident_neighbor} not found")
     return
 
 
-def congestion_estimator_conf():
+def manage_accidents(msg_in, petri_net_snake, neighbors_ids, accident_lanes):
+    direction_IO = ""
+    msg_id = msg_in["id"]
+
+    if "e2det" in msg_id:  # My Accident
+        print("Accident status changes on street " + msg_in['laneId'])
+        direction_IO = msg_in['id'][24]
+        if msg_in["accidentOnLane"]:
+            place_name = "Normal_to_Acc" + direction_IO.capitalize() + "I"
+            accident_lanes.append(msg_in['id'])
+        else:
+            place_name = "Acc" + direction_IO.capitalize() + "I_to_Normal"
+            accident_lanes.remove(msg_in['id'])
+
+        msg = {
+            "id": msg_in['id'],
+            "type": "AccidentObserved",
+            "laneId": msg_in['laneId'],
+            "location": msg_in['location'],
+            "dateObserved": datetime.datetime.utcnow().isoformat(),
+            "accidentOnLane": msg_in["accidentOnLane"],  # It has to be configured
+            "laneDirection": msg_in['laneDirection']
+        }
+        client_intersection.publish(msg_in['id'][0:18] + "state", json.dumps(msg))
+
+    elif "state" in msg_id:  # Neighbor Accident
+        print("Accident status changes on neighbor " + msg_in['id'])
+        accident_neighbor_id = msg_in['id'][13:17]
+        for dir, neigh_id in neighbors_ids.items():
+            if neigh_id == accident_neighbor_id:
+                if (dir == "S" and msg_in['id'][24] == "n") or \
+                        (dir == "E" and msg_in['id'][24] == "w") or \
+                        (dir == "N" and msg_in['id'][24] == "s") or \
+                        (dir == "W" and msg_in['id'][24] == "e"):
+                    direction_IO = dir
+                    print(direction_IO)
+
+        if msg_in["accidentOnLane"]:
+            place_name = "Normal_to_Acc" + direction_IO + "O"
+            accident_lanes.append(msg_in['id'])
+        else:
+            place_name = "Acc" + direction_IO + "O_to_Normal"
+            accident_lanes.remove(msg_in['id'])
+
+    if direction_IO is not "":
+        petri_net_snake.place(place_name).add(dot)
+    else:
+        print(f"Error. Neighbor {accident_neighbor} not found")
+
+    return
+
+
+def congestion_model_conf(max_speed, max_vehicle_number):
     # Antecedent/Consequent and universe definition variables
-    jamLengthVehicle = ctrl.Antecedent(np.arange(0, 21, 1), 'jamLengthVehicle')
+    jamLengthVehicle = ctrl.Antecedent(np.arange(0, max_vehicle_number + 2, 1), 'jamLengthVehicle')
     occupancy = ctrl.Antecedent(np.arange(0, 101, 1), 'occupancy')
-    meanSpeed = ctrl.Antecedent(np.arange(0, 61, 1), 'meanSpeed')
-    vehicleNumber = ctrl.Antecedent(np.arange(0, 21, 1), 'vehicleNumber')
-    congestion = ctrl.Consequent(np.arange(0, 101, 1), 'congestion')
+    meanSpeed = ctrl.Antecedent(np.arange(0, max_speed + 1, 1), 'meanSpeed')
+    vehicleNumber = ctrl.Antecedent(np.arange(0, max_vehicle_number + 2, 1), 'vehicleNumber')
+    congestionLevel = ctrl.Consequent(np.arange(0, 101, 1), 'congestionLevel')
 
     # Membership Functions definition
     jamLengthVehicle.automf(3, 'quant')
     occupancy.automf(3, 'quant')
     meanSpeed.automf(3, 'quant')
     vehicleNumber.automf(3, 'quant')
-    congestion.automf(5, 'quant')
+    congestionLevel.automf(5, 'quant')
 
     # Graph the Membership Functions
     # jamLengthVehicle.view()
     # occupancy.view()
     # meanSpeed.view()
     # vehicleNumber.view()
-    # congestion.view()
+    # congestionLevel.view()
 
-    # TODO: Define the real rules to measure Intersection Congestion
     # Define the Expert Rules
     rules = [
-        ctrl.Rule((jamLengthVehicle['high'] | occupancy['high']) & meanSpeed['low'], congestion['higher']),
-        ctrl.Rule((jamLengthVehicle['high'] | occupancy['high']) & meanSpeed['average'], congestion['high']),
-        ctrl.Rule((jamLengthVehicle['high'] | occupancy['high']) & meanSpeed['high'], congestion['high']),
-        ctrl.Rule((jamLengthVehicle['average'] | occupancy['average']) & meanSpeed['average'], congestion['average']),
-        ctrl.Rule((jamLengthVehicle['low'] | occupancy['low']) & meanSpeed['low'], congestion['low']),
-        ctrl.Rule((jamLengthVehicle['low'] | occupancy['low']) & meanSpeed['average'], congestion['low']),
-        ctrl.Rule((jamLengthVehicle['low'] | occupancy['low']) & meanSpeed['high'], congestion['lower'])
+        ctrl.Rule((vehicleNumber['high'] | occupancy['high']) & (jamLengthVehicle['high'] | meanSpeed['low']),
+                  congestionLevel['higher']),
+        ctrl.Rule((vehicleNumber['high'] | occupancy['high']) & (jamLengthVehicle['average'] | meanSpeed['average']),
+                  congestionLevel['high']),
+        ctrl.Rule((vehicleNumber['high'] | occupancy['high']) & (jamLengthVehicle['low'] | meanSpeed['high']),
+                  congestionLevel['average']),
+        ctrl.Rule((vehicleNumber['average'] | occupancy['average']) & (jamLengthVehicle['high'] | meanSpeed['low']),
+                  congestionLevel['high']),
+        ctrl.Rule(
+            (vehicleNumber['average'] | occupancy['average']) & (jamLengthVehicle['average'] | meanSpeed['average']),
+            congestionLevel['average']),
+        ctrl.Rule((vehicleNumber['average'] | occupancy['average']) & (jamLengthVehicle['low'] | meanSpeed['high']),
+                  congestionLevel['low']),
+        ctrl.Rule((vehicleNumber['low'] | occupancy['low']) & (jamLengthVehicle['high'] | meanSpeed['low']),
+                  congestionLevel['average']),
+        ctrl.Rule((vehicleNumber['low'] | occupancy['low']) & (jamLengthVehicle['average'] | meanSpeed['average']),
+                  congestionLevel['low']),
+        ctrl.Rule((vehicleNumber['low'] | occupancy['low']) & (jamLengthVehicle['low'] | meanSpeed['high']),
+                  congestionLevel['lower']),
     ]
 
     # Controller definition
-    congestion_estimator = ctrl.ControlSystem(rules)
-    congestion_measure = ctrl.ControlSystemSimulation(congestion_estimator)
+    congestion_model = ctrl.ControlSystem(rules)
+    congestion_measuring_sim = ctrl.ControlSystemSimulation(congestion_model)
 
-    return congestion_measure, congestion
+    return congestion_measuring_sim, congestionLevel
 
 
-def controller_configuration():
-    # TODO: configure the controller for the split
+def congestion_measure(congestion_measuring_sim, movement, congestionLevel):
+    congestion = 0
+    if movement.get_vehicle_number() != 0:
+        congestion_measuring_sim.input['jamLengthVehicle'] = movement.get_jam_length_vehicle()
+        congestion_measuring_sim.input['occupancy'] = movement.get_occupancy()
+        congestion_measuring_sim.input['meanSpeed'] = movement.get_mean_speed()
+        congestion_measuring_sim.input['vehicleNumber'] = movement.get_vehicle_number()
+        # Crunch the numbers
+        congestion_measuring_sim.compute()
+        congestion = congestion_measuring_sim.output['congestionLevel']
+
+    print("Congestion of movement ", movement.id, "= ", congestion)
+    print("jamLengthVehicle = ", movement.get_jam_length_vehicle(),
+          "; occupancy = ", movement.get_occupancy(),
+          "; meanSpeed = ", movement.get_mean_speed(),
+          ": vehicleNumber = ", movement.get_vehicle_number())
+    congestionLevel.view(sim=congestion_measuring_sim)
+
+    return congestion
+
+
+def send_state(my_topic, movements):
+    mov_congestion = []
+    for mov in range(8):
+        if mov in movements:
+            mov_congestion.append(movements[mov].congestionLevel)
+        else:
+            mov_congestion.append(0)
+    msg = {
+        "id": my_topic,
+        "type": "TrafficFlowObserved",
+        "dateObserved": datetime.datetime.utcnow().isoformat(),
+        "mov_congestion": mov_congestion
+    }
+    client_intersection.publish(my_topic, json.dumps(msg))
     return
 
 
-def split_control(congestion_measure, congestion):
-    # TODO: deal with sensor and other intersections msgs received
-    # Example
-    congestion_measure.input['jamLengthVehicle'] = 15
-    congestion_measure.input['occupancy'] = 75
-    congestion_measure.input['meanSpeed'] = 50
+def set_five_quant_label(level):
+    label = ""
+    if level <= 1:
+        label = "lower"
+    elif level == 2:
+        label = "low"
+    elif level == 3:
+        label = "average"
+    elif level == 4:
+        label = "high"
+    elif level >= 5:
+        label = "higher"
+    return label
+
+
+def split_model_conf():
+    my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')
+    in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')
+    out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')
+    split = ctrl.Consequent(np.arange(-10, 11, 1), 'split')
+
+    # Membership Functions definition
+    my_congestion_level.automf(5, 'quant')
+    in_congestion_level.automf(5, 'quant')
+    out_congestion_level.automf(5, 'quant')
+    split.automf(5, 'quant')
+
+    # Graph the Membership Functions
+    # my_congestion_level.view()
+    # in_congestion_level.view()
+    # out_congestion_level.view()
+    # split.view()
+
+    # Define the Expert Rules
+    split_values_vector = [1, 1, 2, 2, 3, 4, 4, 5, 5]
+    rules = []
+    for my_cong in range(5):
+        for in_cong in range(5):
+            for out_cong in range(5):
+                my_label = set_five_quant_label(my_cong + 1)
+                in_label = set_five_quant_label(in_cong + 1)
+                out_label = set_five_quant_label(5 - out_cong)
+                split_label = set_five_quant_label(split_values_vector[in_cong + out_cong] - 2 + my_cong)
+                rules.append(ctrl.Rule(my_congestion_level[my_label] &
+                                       in_congestion_level[in_label] &
+                                       out_congestion_level[out_label],
+                                       split[split_label]))
+
+    # print(rules)
+    split_model = ctrl.ControlSystem(rules)
+    split_measuring_sim = ctrl.ControlSystemSimulation(split_model)
+
+    return split_measuring_sim, split
+
+
+def split_measure(split_measuring_sim, movement, neighbors, split):
+    # print("Movement to measure Split: ", movement.id)
+    split_measuring_sim.input['my_congestion_level'] = movement.congestionLevel
+
+    # print("In Neighbor: ", movement.in_neighbors[1])
+    if movement.in_neighbors[1] in neighbors.keys():
+        in_congestion_level = (neighbors[movement.in_neighbors[1]].mov_congestion[movement.in_neighbors[0][0]] +
+                               neighbors[movement.in_neighbors[1]].mov_congestion[movement.in_neighbors[0][1]]) / 2
+        # print("in_congestion_level", in_congestion_level)
+    else:
+        in_congestion_level = 0
+    split_measuring_sim.input['in_congestion_level'] = in_congestion_level
+
+    # print("Out Neighbor: ", movement.out_neighbors[1])
+    if movement.out_neighbors[1] in neighbors.keys():
+        out_congestion_level = (neighbors[movement.out_neighbors[1]].mov_congestion[movement.out_neighbors[0][0]] +
+                                neighbors[movement.out_neighbors[1]].mov_congestion[movement.out_neighbors[0][1]]) / 2
+        # print("out_congestion_level: ", out_congestion_level)
+    else:
+        out_congestion_level = 0
+    split_measuring_sim.input['out_congestion_level'] = out_congestion_level
+
     # Crunch the numbers
-    congestion_measure.compute()
-    print(congestion_measure.output['congestion'])
-    # congestion.view(sim=congestion_measure)
+    split_measuring_sim.compute()
+    print("Split of movement ", movement.id, ": ", split_measuring_sim.output['split'])
+    print("my_congestion_level = ", movement.congestionLevel,
+          "; in_congestion_level = ", in_congestion_level,
+          "; out_congestion_level = ", out_congestion_level)
+    split.view(sim=split_measuring_sim)
 
+    return split_measuring_sim.output['split']
+
+
+def config_mov_split(petri_net_snake, movement):
+    transition_name = "Act_" + str(movement.id)
+    petri_net_snake.transition(transition_name).min_time = 10 + int(movement.split)
     return
+
+
+def set_tls_lights(transitions_fire, inter_info, moves_green):
+    l_change = False
+    for i in transitions_fire:
+        if "Green" in i:
+            print("Voy a poner en GREEN el Movimiento %s" % i[-1])
+            l_change = True
+            moves_green.append(int(i[-1]))
+            for j in inter_info.m_lights[0][int(i[-1])]:
+                inter_info.lights[j] = "G"
+        elif "Yel" in i:
+            print("Voy a poner en YELLOW el Movimiento %s" % i[-1])
+            l_change = True
+            moves_green.remove(int(i[-1]))
+            for j in inter_info.m_lights[0][int(i[-1])]:
+                inter_info.lights[j] = "y"
+        elif "Red" in i:
+            print("Voy a poner en RED el Movimiento %s" % i[-1])
+            l_change = True
+            for j in inter_info.m_lights[0][int(i[-1])]:
+                inter_info.lights[j] = "r"
+
+    # Send control msg to simulation
+    if l_change:
+        control_msg = {
+            "tls_id": inter_info.tls_id,
+            "type": "tlsControl",
+            "command": "setPhase",
+            "data": "".join(inter_info.lights)
+        }
+
+        client_intersection.publish(inter_info.tls_id, json.dumps(control_msg))
+        print("send: " + json.dumps(control_msg))
+
+        return
 
 
 def run():
-    global my_detector_change
-    global my_accident_change
-    global neighbor_flow_change
-    global neighbor_accident_change
+    global msg_dic
     accident_lanes = []
-
-    # Setup the controller
-    congestion_measure, congestion = congestion_estimator_conf()
-    split_control(congestion_measure, congestion)
+    movements = {}  # dictionary of movements
+    neighbors = {}  # dictionary of neighbors
+    moves_green = []
 
     # Setup of the intersection
     inter_id = 2
-    inter_info = intersections_info.Intersection(inter_id)
+    inter_info = intersections_classes.Intersection(inter_id)
     inter_info.config()
-    subscribe_neighbors(inter_info.neighbors)
+    # Define my_topic
+    my_topic = inter_info.state_topic
+    # Subscribe to neighbors state topics
+    subscribe_neighbors(inter_info.neighbors_ids)
 
+    # Setup the congestion model and split controller
+    congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed, inter_info.m_max_vehicle_number)
+    split_measuring_sim, split = split_model_conf()
+
+    # Create intersection Movements
+    for i in range(len(inter_info.movements)):
+        if (i == 0) or (inter_info.movements[i] > inter_info.movements[i - 1]):
+            movements[inter_info.movements[i]] = intersections_classes.Movement(inter_info.movements[i], inter_info)
+    print("Intersection Movements: ", movements)
+
+    # Create intersection neighbors
+    for i in inter_info.neighbors_ids:
+        if inter_info.neighbors_ids[i] != "":
+            neighbors[i] = intersections_classes.Neighbor(inter_info.neighbors_ids[i], i)
+    print("Intersection Neighbors: ", neighbors)
+
+    # Set the definition vectors of the Timed Petri Net
     petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
                                                                     inter_info.cycles, inter_info.cycles_names)
+    # Create de SNAKE Petri Net
     petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
-
     init = petri_net_snake.get_marking()
     print(init)
 
@@ -226,11 +403,9 @@ def run():
     delay = 0.0
     step = 1.0
 
+    # Start the Intersection Petri Net
     print("\n\nStart the Intersection Petri Net:")
     while True:
-
-        # initialize variables for semaphore msg configuration
-        l_change = False
         transitions_fire = []
 
         # Print the current time and delay
@@ -250,75 +425,67 @@ def run():
                     print("[%s] fire: %s, count_fire: %s" % (time_current, t.name, count_fire))
                 except:
                     pass
-
         # print(transitions_fire)
+
+        # Set the TLS lights
+        set_tls_lights(transitions_fire, inter_info, moves_green)
+        # print("Moves in Green: ", moves_green)
+
+        # Measure congestion and split of correspondent Movement
         for i in transitions_fire:
-            if "Green" in i:
-                print("Voy a poner en GREEN el Movimiento %s" % i[-1])
-                l_change = True
-                for j in inter_info.m_lights[0][int(i[-1])]:
-                    inter_info.lights[j] = "G"
-            elif "Yel" in i:
-                print("Voy a poner en YELLOW el Movimiento %s" % i[-1])
-                l_change = True
-                for j in inter_info.m_lights[0][int(i[-1])]:
-                    inter_info.lights[j] = "y"
-            elif "Red" in i:
-                print("Voy a poner en RED el Movimiento %s" % i[-1])
-                l_change = True
-                for j in inter_info.m_lights[0][int(i[-1])]:
-                    inter_info.lights[j] = "r"
-
-        # Send control msg to simulation
-        if l_change:
-            control_msg = {
-                "tlsID": inter_info.tlsID,
-                "type": "tlsControl",
-                "command": "setPhase",
-                "data": "".join(inter_info.lights)
-            }
-
-            client_intersection.publish(inter_info.tlsID, json.dumps(control_msg))
-            print("send: " + json.dumps(control_msg))
+            if (("tNormal" in i) or ("tAcc" in i)) and (i[-1] not in ["n", "I", "O"]):
+                print("Measure congestion and split of the Movement of the next Phase --> %s" % i[-2])
+                for j in inter_info.phases[int(i[-2])]:
+                    movements[j].congestionLevel = congestion_measure(congestion_measuring_sim, movements[j], congestionLevel)
+                    movements[j].split = split_measure(split_measuring_sim, movements[j], neighbors, split)
+                    config_mov_split(petri_net_snake, movements[j])
+                send_state(my_topic, movements)
 
         # # Add accident in B at t = 30
         # if time_current == 30:
-        #     petri_net_snake.place("Normal_to_AccEO").add(dot)
-        # # Remove accident in B at t = 60
-        # if time_current == 60:
-        #     petri_net_snake.place("AccEO_to_Normal").add(dot)
+        #     my_accident_change = True
+        #     msg_dic.append({
+        #         "id": "intersection/0002/e2det/s03",
+        #         "type": "AccidentObserved",
+        #         "laneId": "436291016#3_3",
+        #         "location": "here",
+        #         "dateObserved": datetime.datetime.utcnow().isoformat(),
+        #         "accidentOnLane": True,
+        #         "laneDirection": "s-_wn_"
+        #     })
+        # # Remove accident in B at t = 300
+        # if time_current == 300:
+        #     my_accident_change = True
+        #     msg_dic.append({
+        #         "id": "intersection/0002/e2det/s03",
+        #         "type": "AccidentObserved",
+        #         "laneId": "436291016#3_3",
+        #         "location": "here",
+        #         "dateObserved": datetime.datetime.utcnow().isoformat(),
+        #         "accidentOnLane": False,
+        #         "laneDirection": "s-_wn_"
+        #     })
 
-        # Add accident in B at t = 30
-        if time_current == 30:
-            global msg_dic
-            my_accident_change = True
-            msg_dic = {
-                "id": "intersection/0002/e2det/s03",
-                "type": "AccidentObserved",
-                "laneId": "436291016#3_3",
-                "location": "here",
-                "dateObserved": datetime.datetime.utcnow().isoformat(),
-                "accidentOnLane": True,
-                "laneDirection": "s-_wn_"
-            }
-        # Remove accident in B at t = 60
-        if time_current == 300:
-            my_accident_change = True
-            msg_dic = {
-                "id": "intersection/0002/e2det/s03",
-                "type": "AccidentObserved",
-                "laneId": "436291016#3_3",
-                "location": "here",
-                "dateObserved": datetime.datetime.utcnow().isoformat(),
-                "accidentOnLane": False,
-                "laneDirection": "s-_wn_"
-            }
+        # Manage msgs received
+        if msg_dic:
+            msg_in = msg_dic[0]
+            msg_dic.pop(0)
+            msg_id = msg_in['id']
+            msg_type = msg_in['type']
+            if ("e2det" in msg_id) or ("state" in msg_id):
+                if msg_type == "TrafficFlowObserved":
+                    manage_flow(msg_in, movements, moves_green, inter_info.m_detectors, neighbors)
+                elif msg_type == "AccidentObserved":
+                    manage_accidents(msg_in, petri_net_snake, inter_info.neighbors_ids, accident_lanes)
 
-        # Manage Split
 
-        # Manage accidents
-        if my_accident_change or neighbor_accident_change:
-            manage_accidents(petri_net_snake, inter_info.neighbors, accident_lanes)
+        # # Manage Split
+        # if my_detector_change or neighbor_flow_change:
+        #     manage_flow(movements, moves_green, inter_info.m_detectors, neighbors)
+        #
+        # # Manage accidents
+        # if my_accident_change or neighbor_accident_change:
+        #     manage_accidents(petri_net_snake, inter_info.neighbors_ids, accident_lanes)
 
         # Wait for a second to transit
         time_current += 1.0
@@ -330,5 +497,5 @@ def run():
 
 if __name__ == '__main__':
     client_intersection: mqtt.Client = mqtt_conf()
-    client_intersection.loop_start()    # Necessary to maintain connection
+    client_intersection.loop_start()  # Necessary to maintain connection
     run()

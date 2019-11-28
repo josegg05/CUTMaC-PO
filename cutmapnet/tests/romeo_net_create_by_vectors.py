@@ -1,6 +1,6 @@
 # Program writes the Intersection html for ROMEO simulator
 from cutmapnet.petri_nets import inter_tpn
-from cutmapnet.petri_nets import intersections_info
+from cutmapnet.petri_nets import intersections_classes
 from cutmapnet.petri_nets import romeo_graph
 import pandas as pd
 
@@ -35,7 +35,7 @@ file1.close()
 # romeo_graph.net_romeo_graph(fileName, petri_net)
 
 inter_id = 2
-inter_info = intersections_info.Intersection(inter_id)
+inter_info = intersections_classes.Intersection(inter_id)
 inter_info.config()
 petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
                                                                     inter_info.cycles, inter_info.cycles_names)
