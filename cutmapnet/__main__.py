@@ -150,23 +150,23 @@ def manage_accidents(msg_in, petri_net_snake, neighbors_ids, accident_lanes):
 def congestion_model_conf(max_speed, max_vehicle_number):
     # Antecedent/Consequent and universe definition variables
     jamLengthVehicle = ctrl.Antecedent(np.arange(0, max_vehicle_number + 2, 1), 'jamLengthVehicle')
+    vehicleNumber = ctrl.Antecedent(np.arange(0, max_vehicle_number + 2, 1), 'vehicleNumber')
     occupancy = ctrl.Antecedent(np.arange(0, 101, 1), 'occupancy')
     meanSpeed = ctrl.Antecedent(np.arange(0, max_speed + 1, 1), 'meanSpeed')
-    vehicleNumber = ctrl.Antecedent(np.arange(0, max_vehicle_number + 2, 1), 'vehicleNumber')
     congestionLevel = ctrl.Consequent(np.arange(0, 101, 1), 'congestionLevel')
 
     # Membership Functions definition
     jamLengthVehicle.automf(3, 'quant')
+    vehicleNumber.automf(3, 'quant')
     occupancy.automf(3, 'quant')
     meanSpeed.automf(3, 'quant')
-    vehicleNumber.automf(3, 'quant')
     congestionLevel.automf(5, 'quant')
 
     # Graph the Membership Functions
     # jamLengthVehicle.view()
+    # vehicleNumber.view()
     # occupancy.view()
     # meanSpeed.view()
-    # vehicleNumber.view()
     # congestionLevel.view()
 
     # Define the Expert Rules
@@ -203,18 +203,18 @@ def congestion_measure(congestion_measuring_sim, movement, congestionLevel):
     congestion = 0
     if movement.get_vehicle_number() != 0:
         congestion_measuring_sim.input['jamLengthVehicle'] = movement.get_jam_length_vehicle()
+        congestion_measuring_sim.input['vehicleNumber'] = movement.get_vehicle_number()
         congestion_measuring_sim.input['occupancy'] = movement.get_occupancy()
         congestion_measuring_sim.input['meanSpeed'] = movement.get_mean_speed()
-        congestion_measuring_sim.input['vehicleNumber'] = movement.get_vehicle_number()
         # Crunch the numbers
         congestion_measuring_sim.compute()
         congestion = congestion_measuring_sim.output['congestionLevel']
 
     print("Congestion of movement ", movement.id, "= ", congestion)
     print("jamLengthVehicle = ", movement.get_jam_length_vehicle(),
+          "; vehicleNumber = ", movement.get_vehicle_number(),
           "; occupancy = ", movement.get_occupancy(),
-          "; meanSpeed = ", movement.get_mean_speed(),
-          ": vehicleNumber = ", movement.get_vehicle_number())
+          "; meanSpeed = ", movement.get_mean_speed())
     # congestionLevel.view(sim=congestion_measuring_sim)
 
     return congestion

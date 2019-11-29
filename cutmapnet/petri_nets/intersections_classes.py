@@ -342,9 +342,10 @@ class Detector:
     def __init__(self, detect_id):
         self.id = detect_id
         self.jamLengthVehicle = 0
+        self.vehicleNumber = 0
         self.occupancy = 0
         self.meanSpeed = 0
-        self.vehicleNumber = 0
+
 
 
 class Movement:
