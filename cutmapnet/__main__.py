@@ -51,7 +51,7 @@ def on_message(client, userdata, msg):
 
 
 def mqtt_conf() -> mqtt.Client:
-    broker_address = "192.168.0.196"  # PC Office: "192.168.0.196"; PC Lab: "192.168.1.95"
+    broker_address = "192.168.5.95"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -142,7 +142,7 @@ def manage_accidents(msg_in, petri_net_snake, neighbors_ids, accident_lanes):
     if direction_IO is not "":
         petri_net_snake.place(place_name).add(dot)
     else:
-        print(f"Error. Neighbor {accident_neighbor} not found")
+        print("Error. Neighbor "+accident_neighbor_id+" not found")
 
     return
 
@@ -460,10 +460,11 @@ def run():
                 if (("tNormal" in i) or ("tAcc" in i)) and (i[-1] not in ["l", "I", "O"]):
                     print("Measure congestion and split of the Movement of the next Phase --> %s" % i[-2])
                     for j in inter_info.phases[int(i[-2])]:
-                        movements[j].congestionLevel = congestion_measure(congestion_measuring_sim, movements[j],
-                                                                          congestionLevel)
-                        movements[j].split = split_measure(split_measuring_sim, movements[j], neighbors, split)
-                        config_mov_split(petri_net_snake, movements[j])
+                        if j in movements.keys():
+                            movements[j].congestionLevel = congestion_measure(congestion_measuring_sim, movements[j],
+                                                                              congestionLevel)
+                            movements[j].split = split_measure(split_measuring_sim, movements[j], neighbors, split)
+                            config_mov_split(petri_net_snake, movements[j])
                     send_state(my_topic, movements)
 
             # # Add accident in B at t = 30
@@ -520,6 +521,7 @@ def run():
 
 
 if __name__ == '__main__':
-    client_intersection: mqtt.Client = mqtt_conf()
+    client_intersection = mqtt_conf()
+    # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
     run()

@@ -161,7 +161,7 @@ class Intersection:
                 "0007": {
                     "state_topic": "intersection/0007/state",
                     "tls_id": "intersection/0007/tls",
-                    "movements": [2, 5, 7, 3, 6],
+                    "movements": [2, 5, 7, 0, 3, 6],
                     "phases": [[0, 5], [2, 7], [2, 6], [3, 7]],
                     "cycles": [[1, 0, 0, 0],
                                [2, 0, 0, 0],
