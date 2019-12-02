@@ -85,7 +85,7 @@ class Intersection:
                     "cycles": [[1, 0, 0, 0],
                                [1, 2, 1, 1],  # Problem 3
                                [1, 3, 1, 1],
-                               [1, 1, 1, 1],
+                               [1, 1, 1, 1],  # Problem 4: There is no Transition Cxx to the same Phase
                                [0, 0, 0, 0]],
                     "cycles_names": ["Normal", "AccSO", "AccWO", "AccEI", "AccNI"],
                     "neighbors_ids": {
@@ -111,7 +111,7 @@ class Intersection:
                     "cycles": [[1, 0, 0, 0],
                                [2, 0, 0, 0],
                                [3, 0, 0, 0],  # Problem 3
-                               [0, 0, 0, 0],
+                               [0, 0, 0, 0],  # Problem 4:
                                [1, 1, 1, 1]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccSI", "AccEI"],
                     "neighbors_ids": {
@@ -166,7 +166,7 @@ class Intersection:
                     "cycles": [[1, 0, 0, 0],
                                [2, 0, 0, 0],
                                [3, 0, 0, 0],  # Problem 3
-                               [0, 0, 0, 0],
+                               [0, 0, 0, 0],  # Problem 4:
                                [1, 1, 1, 1]],
                     "cycles_names": ["Normal", "AccSO", "AccWO", "AccSI", "AccEI"],
                     "neighbors_ids": {
@@ -192,7 +192,7 @@ class Intersection:
                     "cycles": [[1, 0, 0, 0],
                                [1, 2, 1, 1],  # Problem 3
                                [1, 3, 1, 1],
-                               [1, 1, 1, 1],
+                               [1, 1, 1, 1],  # Problem 4:
                                [0, 0, 0, 0]],
                     "cycles_names": ["Normal", "AccSO", "AccWO", "AccEI", "AccNI"],
                     "neighbors_ids": {
@@ -218,7 +218,7 @@ class Intersection:
                     "cycles": [[1, 0, 0, 0],
                                [1, 2, 1, 1],
                                [1, 3, 1, 1],  # Problem 3
-                               [0, 0, 0, 0],
+                               [0, 0, 0, 0],  # Problem 4:
                                [1, 1, 1, 1]],
                     "cycles_names": ["Normal", "AccEO", "AccNO", "AccSI", "AccWI"],
                     "neighbors_ids": {
@@ -242,9 +242,9 @@ class Intersection:
                     "movements": [1, 4, 6, 0, 2, 5],
                     "phases": [[1, 4], [2, 6], [0, 4], [1, 5]],
                     "cycles": [[1, 0, 0, 0],
-                               [2, 2, 2, 2],  # Problem 3 No se puede resolver
+                               [2, 2, 2, 2],  # Problem 3
                                [1, 3, 1, 1],
-                               [0, 0, 0, 0],
+                               [0, 0, 0, 0],  # Problem 4:
                                [1, 1, 1, 1]],
                     "cycles_names": ["Normal", "AccEO", "AccNO", "AccNI", "AccWI"],
                     "neighbors_ids": {
@@ -270,7 +270,7 @@ class Intersection:
                     "cycles": [[1, 0, 0, 0],
                                [1, 2, 1, 1],
                                [1, 3, 1, 1],  # Problem 3
-                               [0, 0, 0, 0],
+                               [0, 0, 0, 0],  # Problem 4:
                                [1, 1, 1, 1]],
                     "cycles_names": ["Normal", "AccEO", "AccNO", "AccSI", "AccWI"],
                     "neighbors_ids": {
@@ -296,7 +296,7 @@ class Intersection:
                     "cycles": [[1, 0, 0, 0],
                                [2, 0, 0, 0],
                                [3, 0, 0, 0],  # Problem 3
-                               [0, 0, 0, 0],
+                               [0, 0, 0, 0],  # Problem 4:
                                [1, 1, 1, 1]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNI", "AccWI"],
                     "neighbors_ids": {

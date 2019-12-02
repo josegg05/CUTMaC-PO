@@ -15,7 +15,7 @@ snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
 
 # Define the global variable of command_received
-intersection_id = "0002"
+intersection_id = "0009"
 start_flag = False
 msg_dic = []
 
@@ -328,6 +328,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
 def config_mov_split(petri_net_snake, movement):
     transition_name = "Act_" + str(movement.id)
     petri_net_snake.transition(transition_name).min_time = 10 + int(movement.split)
+    print("El tiempo de 'Act_ es: ", (10 + int(movement.split)))
     return
 
 
@@ -517,6 +518,7 @@ def run():
             while time.perf_counter() < time_0 + time_current:
                 pass
             # Update the network time
+            print("step = ", step)
             delay = petri_net_snake.time(step)
 
 

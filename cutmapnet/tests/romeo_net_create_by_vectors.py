@@ -34,9 +34,8 @@ file1.close()
 # petri_net, place_id, transition_id = inter_tpn_pandas.net_create(movements, phases, cycles)
 # romeo_graph.net_romeo_graph(fileName, petri_net)
 
-inter_id = 2
+inter_id = "0009"
 inter_info = intersections_classes.Intersection(inter_id)
-inter_info.config()
 petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
                                                                     inter_info.cycles, inter_info.cycles_names)
 romeo_graph.net_romeo_graph(fileName, petri_net_inter)
