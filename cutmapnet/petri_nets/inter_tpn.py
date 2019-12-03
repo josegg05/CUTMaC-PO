@@ -19,7 +19,7 @@ def net_create(movements, phases, cycles, cycles_names):
 
     t_names_sem = ['Green_', 'Yel_', 'min_', 'Stop_', 'Max_', 'FO_', 'Act_', 'Red_']
     all_red = 2
-    t_time_sem = [0, 0, 10, 4, 100, 200, 0, 0]
+    t_time_sem = [0, 0, 4, 3, 100, 200, 0, 0]
     t_color_sem = [0, 0, 1, 1, 1, 0, 1, 0]
     t_pos_x_sem = [0, 150, 0, 150, -75, 0, 75, 150]
     t_pos_y_sem = [30, 30, 90, 90, 150, 150, 150, 150]
