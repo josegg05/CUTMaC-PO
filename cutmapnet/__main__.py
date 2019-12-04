@@ -375,7 +375,7 @@ def run():
     global msg_dic
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id)
+    inter_info = intersections_classes.IntersectionOpt(intersection_id)
 
     # Define my_topic
     my_topic = inter_info.state_topic

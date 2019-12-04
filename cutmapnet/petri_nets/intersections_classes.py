@@ -1,6 +1,335 @@
 # File that contains the Intersection class
 
 
+class IntersectionOpt:
+    def __init__(self, intersection_id, auto_configuration=True):
+        self.id = intersection_id
+        self.state_topic = []
+        self.tls_id = []
+        self.movements = []
+        self.phases = []
+        self.cycles = []
+        self.cycles_names = []
+        self.neighbors_ids = {}
+        self.m_max_speed = 0
+        self.m_max_vehicle_number = 0
+        self.m_lights = []  # Lights associated with every movement
+        self.m_detectors = []  # detectors associated with every movement
+        self.lights = []
+
+        if auto_configuration:
+            inter_config = {
+                "0002": {
+                    "state_topic": "intersection/0002/state",
+                    "tls_id": "intersection/0002/tls",
+                    "movements": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
+                    "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
+                               [1, 2, 5, 1, 1, 4, 1, 1],
+                               [6, 0, 0, 5, 0, 0, 3, 0],
+                               [1, 6, 7, 1, 1, 1, 2, 1],
+                               [4, 0, 0, 7, 3, 0, 0, 0],
+                               [1, 7, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 4, 2, 2, 2, 2],
+                               [1, 5, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 6, 2, 2, 2, ]],
+                    "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
+                    "neighbors_ids": {
+                        "S": "0005",
+                        "E": "0003",
+                        "N": "",
+                        "W": ""
+                    },
+                    "m_max_speed": 14,
+                    "m_max_vehicle_number": 9,
+                    # Configuration variables for SUMO application
+                    "m_lights": [[[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]]],
+                    "m_detectors": [["e02"], ["w01", "w02"], ["s02"], ["n01", "n02"], ["w02"], ["e01", "e02"], ["n02"], ["s01", "s02"]],
+                    "lights": list("rrrrrrrrrrrrrrrr")
+                },
+                "0003": {
+                    "state_topic": "intersection/0002/state",
+                    "tls_id": "intersection/0002/tls",
+                    "movements": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
+                    "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
+                               [1, 2, 5, 1, 1, 4, 1, 1],
+                               [6, 0, 0, 5, 0, 0, 3, 0],
+                               [1, 6, 7, 1, 1, 1, 2, 1],
+                               [4, 0, 0, 7, 3, 0, 0, 0],
+                               [1, 7, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 4, 2, 2, 2, 2],
+                               [1, 5, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 6, 2, 2, 2, ]],
+                    "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
+                    "neighbors_ids": {
+                        "S": "0006",
+                        "E": "0004",
+                        "N": "",
+                        "W": "0002"
+                    },
+                    "m_max_speed": 14,
+                    "m_max_vehicle_number": 9,
+                    # Configuration variables for SUMO application
+                    "m_lights": [[[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]]],
+                    "m_detectors": [["e02"], ["w01", "w02"], ["s02"], ["n01", "n02"], ["w02"], ["e01", "e02"], ["n02"], ["s01", "s02"]],
+                    "lights": list("rrrrrrrrrrrrrrrr")
+                },
+                "0004": {
+                    "state_topic": "intersection/0002/state",
+                    "tls_id": "intersection/0002/tls",
+                    "movements": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
+                    "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
+                               [1, 2, 5, 1, 1, 4, 1, 1],
+                               [6, 0, 0, 5, 0, 0, 3, 0],
+                               [1, 6, 7, 1, 1, 1, 2, 1],
+                               [4, 0, 0, 7, 3, 0, 0, 0],
+                               [1, 7, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 4, 2, 2, 2, 2],
+                               [1, 5, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 6, 2, 2, 2, ]],
+                    "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
+                    "neighbors_ids": {
+                        "S": "0007",
+                        "E": "",
+                        "N": "",
+                        "W": "0003"
+                    },
+                    "m_max_speed": 14,
+                    "m_max_vehicle_number": 9,
+                    # Configuration variables for SUMO application
+                    "m_lights": [[[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]]],
+                    "m_detectors": [["e02"], ["w01", "w02"], ["s02"], ["n01", "n02"], ["w02"], ["e01", "e02"], ["n02"],
+                                    ["s01", "s02"]],
+                    "lights": list("rrrrrrrrrrrrrrrr")
+                },
+                "0005": {
+                    "state_topic": "intersection/0002/state",
+                    "tls_id": "intersection/0002/tls",
+                    "movements": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
+                    "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
+                               [1, 2, 5, 1, 1, 4, 1, 1],
+                               [6, 0, 0, 5, 0, 0, 3, 0],
+                               [1, 6, 7, 1, 1, 1, 2, 1],
+                               [4, 0, 0, 7, 3, 0, 0, 0],
+                               [1, 7, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 4, 2, 2, 2, 2],
+                               [1, 5, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 6, 2, 2, 2, ]],
+                    "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
+                    "neighbors_ids": {
+                        "S": "0008",
+                        "E": "0006",
+                        "N": "0002",
+                        "W": ""
+                    },
+                    "m_max_speed": 14,
+                    "m_max_vehicle_number": 9,
+                    # Configuration variables for SUMO application
+                    "m_lights": [[[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]]],
+                    "m_detectors": [["e02"], ["w01", "w02"], ["s02"], ["n01", "n02"], ["w02"], ["e01", "e02"], ["n02"],
+                                    ["s01", "s02"]],
+                    "lights": list("rrrrrrrrrrrrrrrr")
+                },
+                "0006": {
+                    "state_topic": "intersection/0002/state",
+                    "tls_id": "intersection/0002/tls",
+                    "movements": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
+                    "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
+                               [1, 2, 5, 1, 1, 4, 1, 1],
+                               [6, 0, 0, 5, 0, 0, 3, 0],
+                               [1, 6, 7, 1, 1, 1, 2, 1],
+                               [4, 0, 0, 7, 3, 0, 0, 0],
+                               [1, 7, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 4, 2, 2, 2, 2],
+                               [1, 5, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 6, 2, 2, 2, ]],
+                    "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
+                    "neighbors_ids": {
+                        "S": "0009",
+                        "E": "0007",
+                        "N": "0003",
+                        "W": "0005"
+                    },
+                    "m_max_speed": 14,
+                    "m_max_vehicle_number": 9,
+                    # Configuration variables for SUMO application
+                    "m_lights": [[[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]]],
+                    "m_detectors": [["e02"], ["w01", "w02"], ["s02"], ["n01", "n02"], ["w02"], ["e01", "e02"], ["n02"],
+                                    ["s01", "s02"]],
+                    "lights": list("rrrrrrrrrrrrrrrr")
+                },
+                "0007": {
+                    "state_topic": "intersection/0002/state",
+                    "tls_id": "intersection/0002/tls",
+                    "movements": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
+                    "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
+                               [1, 2, 5, 1, 1, 4, 1, 1],
+                               [6, 0, 0, 5, 0, 0, 3, 0],
+                               [1, 6, 7, 1, 1, 1, 2, 1],
+                               [4, 0, 0, 7, 3, 0, 0, 0],
+                               [1, 7, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 4, 2, 2, 2, 2],
+                               [1, 5, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 6, 2, 2, 2, ]],
+                    "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
+                    "neighbors_ids": {
+                        "S": "0010",
+                        "E": "",
+                        "N": "0004",
+                        "W": "0006"
+                    },
+                    "m_max_speed": 14,
+                    "m_max_vehicle_number": 9,
+                    # Configuration variables for SUMO application
+                    "m_lights": [[[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]]],
+                    "m_detectors": [["e02"], ["w01", "w02"], ["s02"], ["n01", "n02"], ["w02"], ["e01", "e02"], ["n02"],
+                                    ["s01", "s02"]],
+                    "lights": list("rrrrrrrrrrrrrrrr")
+                },
+                "0008": {
+                    "state_topic": "intersection/0002/state",
+                    "tls_id": "intersection/0002/tls",
+                    "movements": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
+                    "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
+                               [1, 2, 5, 1, 1, 4, 1, 1],
+                               [6, 0, 0, 5, 0, 0, 3, 0],
+                               [1, 6, 7, 1, 1, 1, 2, 1],
+                               [4, 0, 0, 7, 3, 0, 0, 0],
+                               [1, 7, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 4, 2, 2, 2, 2],
+                               [1, 5, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 6, 2, 2, 2, ]],
+                    "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
+                    "neighbors_ids": {
+                        "S": "",
+                        "E": "0009",
+                        "N": "0005",
+                        "W": ""
+                    },
+                    "m_max_speed": 14,
+                    "m_max_vehicle_number": 9,
+                    # Configuration variables for SUMO application
+                    "m_lights": [[[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]]],
+                    "m_detectors": [["e02"], ["w01", "w02"], ["s02"], ["n01", "n02"], ["w02"], ["e01", "e02"], ["n02"],
+                                    ["s01", "s02"]],
+                    "lights": list("rrrrrrrrrrrrrrrr")
+                },
+                "0009": {
+                    "state_topic": "intersection/0002/state",
+                    "tls_id": "intersection/0002/tls",
+                    "movements": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
+                    "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
+                               [1, 2, 5, 1, 1, 4, 1, 1],
+                               [6, 0, 0, 5, 0, 0, 3, 0],
+                               [1, 6, 7, 1, 1, 1, 2, 1],
+                               [4, 0, 0, 7, 3, 0, 0, 0],
+                               [1, 7, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 4, 2, 2, 2, 2],
+                               [1, 5, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 6, 2, 2, 2, ]],
+                    "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
+                    "neighbors_ids": {
+                        "S": "",
+                        "E": "0010",
+                        "N": "0006",
+                        "W": "0008"
+                    },
+                    "m_max_speed": 14,
+                    "m_max_vehicle_number": 9,
+                    # Configuration variables for SUMO application
+                    "m_lights": [[[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]]],
+                    "m_detectors": [["e02"], ["w01", "w02"], ["s02"], ["n01", "n02"], ["w02"], ["e01", "e02"], ["n02"],
+                                    ["s01", "s02"]],
+                    "lights": list("rrrrrrrrrrrrrrrr")
+                },
+                "0010": {
+                    "state_topic": "intersection/0002/state",
+                    "tls_id": "intersection/0002/tls",
+                    "movements": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
+                    "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
+                               [1, 2, 5, 1, 1, 4, 1, 1],
+                               [6, 0, 0, 5, 0, 0, 3, 0],
+                               [1, 6, 7, 1, 1, 1, 2, 1],
+                               [4, 0, 0, 7, 3, 0, 0, 0],
+                               [1, 7, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 4, 2, 2, 2, 2],
+                               [1, 5, 0, 0, 0, 0, 0, 0],
+                               [2, 2, 3, 6, 2, 2, 2, ]],
+                    "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
+                    "neighbors_ids": {
+                        "S": "",
+                        "E": "",
+                        "N": "0007",
+                        "W": "0009"
+                    },
+                    "m_max_speed": 14,
+                    "m_max_vehicle_number": 9,
+                    # Configuration variables for SUMO application
+                    "m_lights": [[[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]],
+                                 [[7], [12, 13, 14], [11], [0, 1, 2], [15], [4, 5, 6], [3], [8, 9, 10]]],
+                    "m_detectors": [["e02"], ["w01", "w02"], ["s02"], ["n01", "n02"], ["w02"], ["e01", "e02"], ["n02"],
+                                    ["s01", "s02"]],
+                    "lights": list("rrrrrrrrrrrrrrrr")
+                }
+            }
+
+            self.state_topic = inter_config[self.id]["state_topic"]
+            self.tls_id = inter_config[self.id]["tls_id"]
+            self.movements = inter_config[self.id]["movements"]
+            self.phases = inter_config[self.id]["phases"]
+            self.cycles = inter_config[self.id]["cycles"]
+            self.cycles_names = inter_config[self.id]["cycles_names"]
+            self.neighbors_ids = inter_config[self.id]["neighbors_ids"]
+            self.m_max_speed = inter_config[self.id]["m_max_speed"]
+            self.m_max_vehicle_number = inter_config[self.id]["m_max_vehicle_number"]
+            self.m_lights = inter_config[self.id]["m_lights"]
+            self.m_detectors = inter_config[self.id]["m_detectors"]
+            self.lights = inter_config[self.id]["lights"]
+
+
 class Intersection:
     def __init__(self, intersection_id, auto_configuration=True):
         self.id = intersection_id
