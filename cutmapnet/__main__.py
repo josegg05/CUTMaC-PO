@@ -292,6 +292,46 @@ def split_model_conf():
     return split_measuring_sim, split
 
 
+def split_pi_model_conf():
+    my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')
+    in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')
+    out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')
+    split = ctrl.Consequent(np.arange(-5, 6, 1), 'split')
+
+    # Membership Functions definition
+    my_congestion_level.automf(5, 'quant')
+    in_congestion_level.automf(5, 'quant')
+    out_congestion_level.automf(5, 'quant')
+    split.automf(5, 'quant')
+
+    # Graph the Membership Functions
+    # my_congestion_level.view()
+    # in_congestion_level.view()
+    # out_congestion_level.view()
+    # split.view()
+
+    # Define the Expert Rules
+    split_values_vector = [1, 1, 2, 2, 3, 4, 4, 5, 5]
+    rules = []
+    for my_cong in range(5):
+        for in_cong in range(5):
+            for out_cong in range(5):
+                my_label = set_five_quant_label(my_cong + 1)
+                in_label = set_five_quant_label(in_cong + 1)
+                out_label = set_five_quant_label(5 - out_cong)
+                split_label = set_five_quant_label(split_values_vector[in_cong + out_cong] - 2 + my_cong)
+                rules.append(ctrl.Rule(my_congestion_level[my_label] &
+                                       in_congestion_level[in_label] &
+                                       out_congestion_level[out_label],
+                                       split[split_label]))
+
+    # print(rules)
+    split_model = ctrl.ControlSystem(rules)
+    split_measuring_sim = ctrl.ControlSystemSimulation(split_model)
+
+    return split_measuring_sim, split
+
+
 def split_measure(split_measuring_sim, movement, neighbors, split):
     # print("Movement to measure Split: ", movement.id)
     split_measuring_sim.input['my_congestion_level'] = movement.congestionLevel
@@ -330,6 +370,18 @@ def config_mov_split(petri_net_snake, movement):
     transition_name = "Act_" + str(movement.id)
     petri_net_snake.transition(transition_name).min_time = mean_green + int(movement.split)
     print("El tiempo de 'Act_ es: ", (mean_green + int(movement.split)))
+    return
+
+
+def config_pi_mov_split(petri_net_snake, movement):
+    transition_name = "Act_" + str(movement.id)
+    actual_green = petri_net_snake.transition(transition_name).min_time + int(movement.split)
+    if actual_green <= 0:
+        actual_green = 0
+    elif actual_green >= 45:
+        actual_green = 45
+    petri_net_snake.transition(transition_name).min_time = actual_green
+    print("El tiempo de 'Act_ es: ", (actual_green + int(movement.split)))
     return
 
 
@@ -385,7 +437,7 @@ def run():
     # Setup the congestion model and split controller
     congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed,
                                                                       inter_info.m_max_vehicle_number)
-    split_measuring_sim, split = split_model_conf()
+    split_measuring_sim, split = split_pi_model_conf()
 
     # Reset Loop
     while True:
@@ -466,7 +518,7 @@ def run():
                             movements[j].congestionLevel = congestion_measure(congestion_measuring_sim, movements[j],
                                                                               congestionLevel)
                             movements[j].split = split_measure(split_measuring_sim, movements[j], neighbors, split)
-                            config_mov_split(petri_net_snake, movements[j])
+                            config_pi_mov_split(petri_net_snake, movements[j])
                     send_state(my_topic, movements)
 
             # # Add accident in B at t = 30
