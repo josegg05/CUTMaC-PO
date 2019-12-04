@@ -39,6 +39,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     global msg_dic
     global start_flag
+    msg.payload = msg.payload.decode("utf-8")
     if msg.topic == "intersection/all/start":
         print("Message %s" % str(msg.payload))
         if "start" in str(msg.payload):
