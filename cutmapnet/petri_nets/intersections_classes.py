@@ -32,7 +32,7 @@ class IntersectionOpt:
                                [1, 7, 0, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2, 2],
                                [1, 5, 0, 0, 0, 0, 0, 0],
-                               [2, 2, 3, 6, 2, 2, 2, ]],
+                               [2, 2, 3, 6, 2, 2, 2, 2]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
                     "neighbors_ids": {
                         "S": "0005",
@@ -64,7 +64,7 @@ class IntersectionOpt:
                                [1, 7, 0, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2, 2],
                                [1, 5, 0, 0, 0, 0, 0, 0],
-                               [2, 2, 3, 6, 2, 2, 2, ]],
+                               [2, 2, 3, 6, 2, 2, 2, 2]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
                     "neighbors_ids": {
                         "S": "0006",
@@ -96,7 +96,7 @@ class IntersectionOpt:
                                [1, 7, 0, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2, 2],
                                [1, 5, 0, 0, 0, 0, 0, 0],
-                               [2, 2, 3, 6, 2, 2, 2, ]],
+                               [2, 2, 3, 6, 2, 2, 2, 2]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
                     "neighbors_ids": {
                         "S": "0007",
@@ -129,7 +129,7 @@ class IntersectionOpt:
                                [1, 7, 0, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2, 2],
                                [1, 5, 0, 0, 0, 0, 0, 0],
-                               [2, 2, 3, 6, 2, 2, 2, ]],
+                               [2, 2, 3, 6, 2, 2, 2, 2]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
                     "neighbors_ids": {
                         "S": "0008",
@@ -162,7 +162,7 @@ class IntersectionOpt:
                                [1, 7, 0, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2, 2],
                                [1, 5, 0, 0, 0, 0, 0, 0],
-                               [2, 2, 3, 6, 2, 2, 2, ]],
+                               [2, 2, 3, 6, 2, 2, 2, 2]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
                     "neighbors_ids": {
                         "S": "0009",
@@ -195,7 +195,7 @@ class IntersectionOpt:
                                [1, 7, 0, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2, 2],
                                [1, 5, 0, 0, 0, 0, 0, 0],
-                               [2, 2, 3, 6, 2, 2, 2, ]],
+                               [2, 2, 3, 6, 2, 2, 2, 2]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
                     "neighbors_ids": {
                         "S": "0010",
@@ -228,7 +228,7 @@ class IntersectionOpt:
                                [1, 7, 0, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2, 2],
                                [1, 5, 0, 0, 0, 0, 0, 0],
-                               [2, 2, 3, 6, 2, 2, 2, ]],
+                               [2, 2, 3, 6, 2, 2, 2, 2]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
                     "neighbors_ids": {
                         "S": "",
@@ -261,7 +261,7 @@ class IntersectionOpt:
                                [1, 7, 0, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2, 2],
                                [1, 5, 0, 0, 0, 0, 0, 0],
-                               [2, 2, 3, 6, 2, 2, 2, ]],
+                               [2, 2, 3, 6, 2, 2, 2, 2]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
                     "neighbors_ids": {
                         "S": "",
@@ -294,7 +294,7 @@ class IntersectionOpt:
                                [1, 7, 0, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2, 2],
                                [1, 5, 0, 0, 0, 0, 0, 0],
-                               [2, 2, 3, 6, 2, 2, 2, ]],
+                               [2, 2, 3, 6, 2, 2, 2, 2]],
                     "cycles_names": ["Normal", "AccSO", "AccEO", "AccNO", "AccWO", "AccSI", "AccEI", "AccNI", "AccWI"],
                     "neighbors_ids": {
                         "S": "",
