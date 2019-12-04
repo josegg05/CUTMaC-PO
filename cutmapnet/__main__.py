@@ -32,6 +32,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("intersection/%s/e2det/s" % intersection_id)
     client.subscribe("intersection/%s/e2det/w" % intersection_id)
     client.subscribe("intersection/all/start")
+    print("intersection/%s/e2det/n" % intersection_id)
 
 
 # The callback for when a PUBLISH message is received from the server.
@@ -381,7 +382,7 @@ def config_pi_mov_split(petri_net_snake, movement):
     elif actual_green >= 45:
         actual_green = 45
     petri_net_snake.transition(transition_name).min_time = actual_green
-    print("El tiempo de 'Act_ es: ", (actual_green + int(movement.split)))
+    print("El tiempo de 'Act_ es: ", actual_green)
     return
 
 
@@ -571,7 +572,7 @@ def run():
             while time.perf_counter() < time_0 + time_current:
                 pass
             # Update the network time
-            print("step = ", step)
+            # print("step = ", step)
             delay = petri_net_snake.time(step)
 
 

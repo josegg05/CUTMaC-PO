@@ -52,8 +52,8 @@ class IntersectionOpt:
                     "lights": list("rrrrrrrrrrrrrrrr")
                 },
                 "0003": {
-                    "state_topic": "intersection/0002/state",
-                    "tls_id": "intersection/0002/tls",
+                    "state_topic": "intersection/0003/state",
+                    "tls_id": "intersection/0003/tls",
                     "movements": [0, 1, 2, 3, 4, 5, 6, 7],
                     "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
                     "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
@@ -84,8 +84,8 @@ class IntersectionOpt:
                     "lights": list("rrrrrrrrrrrrrrrr")
                 },
                 "0004": {
-                    "state_topic": "intersection/0002/state",
-                    "tls_id": "intersection/0002/tls",
+                    "state_topic": "intersection/0004/state",
+                    "tls_id": "intersection/0004/tls",
                     "movements": [0, 1, 2, 3, 4, 5, 6, 7],
                     "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
                     "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
@@ -117,8 +117,8 @@ class IntersectionOpt:
                     "lights": list("rrrrrrrrrrrrrrrr")
                 },
                 "0005": {
-                    "state_topic": "intersection/0002/state",
-                    "tls_id": "intersection/0002/tls",
+                    "state_topic": "intersection/0005/state",
+                    "tls_id": "intersection/0005/tls",
                     "movements": [0, 1, 2, 3, 4, 5, 6, 7],
                     "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
                     "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
@@ -150,8 +150,8 @@ class IntersectionOpt:
                     "lights": list("rrrrrrrrrrrrrrrr")
                 },
                 "0006": {
-                    "state_topic": "intersection/0002/state",
-                    "tls_id": "intersection/0002/tls",
+                    "state_topic": "intersection/0006/state",
+                    "tls_id": "intersection/0006/tls",
                     "movements": [0, 1, 2, 3, 4, 5, 6, 7],
                     "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
                     "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
@@ -183,8 +183,8 @@ class IntersectionOpt:
                     "lights": list("rrrrrrrrrrrrrrrr")
                 },
                 "0007": {
-                    "state_topic": "intersection/0002/state",
-                    "tls_id": "intersection/0002/tls",
+                    "state_topic": "intersection/0007/state",
+                    "tls_id": "intersection/0007/tls",
                     "movements": [0, 1, 2, 3, 4, 5, 6, 7],
                     "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
                     "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
@@ -216,8 +216,8 @@ class IntersectionOpt:
                     "lights": list("rrrrrrrrrrrrrrrr")
                 },
                 "0008": {
-                    "state_topic": "intersection/0002/state",
-                    "tls_id": "intersection/0002/tls",
+                    "state_topic": "intersection/0008/state",
+                    "tls_id": "intersection/0008/tls",
                     "movements": [0, 1, 2, 3, 4, 5, 6, 7],
                     "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
                     "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
@@ -249,8 +249,8 @@ class IntersectionOpt:
                     "lights": list("rrrrrrrrrrrrrrrr")
                 },
                 "0009": {
-                    "state_topic": "intersection/0002/state",
-                    "tls_id": "intersection/0002/tls",
+                    "state_topic": "intersection/0009/state",
+                    "tls_id": "intersection/0009/tls",
                     "movements": [0, 1, 2, 3, 4, 5, 6, 7],
                     "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
                     "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
@@ -282,8 +282,8 @@ class IntersectionOpt:
                     "lights": list("rrrrrrrrrrrrrrrr")
                 },
                 "0010": {
-                    "state_topic": "intersection/0002/state",
-                    "tls_id": "intersection/0002/tls",
+                    "state_topic": "intersection/0010/state",
+                    "tls_id": "intersection/0010/tls",
                     "movements": [0, 1, 2, 3, 4, 5, 6, 7],
                     "phases": [[0, 4], [1, 5], [2, 6], [3, 7], [1, 4], [2, 7], [0, 5], [3, 6]],
                     "cycles": [[1, 2, 3, 0, 0, 0, 0, 0],
