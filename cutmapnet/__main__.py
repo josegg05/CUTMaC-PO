@@ -298,7 +298,7 @@ def split_pi_model_conf():
     my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')
     in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')
     out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')
-    split = ctrl.Consequent(np.arange(-5, 6, 1), 'split')
+    split = ctrl.Consequent(np.arange(-4, 5, 1), 'split')
 
     # Membership Functions definition
     my_congestion_level.automf(5, 'quant')
@@ -310,7 +310,7 @@ def split_pi_model_conf():
     # my_congestion_level.view()
     # in_congestion_level.view()
     # out_congestion_level.view()
-    # split.view()
+    split.view()
 
     # Define the Expert Rules
     split_values_vector = [1, 1, 2, 2, 3, 4, 4, 5, 5]
@@ -380,8 +380,8 @@ def config_pi_mov_split(petri_net_snake, movement):
     actual_green = petri_net_snake.transition(transition_name).min_time + int(movement.split)
     if actual_green <= 0:
         actual_green = 0
-    elif actual_green >= 45:
-        actual_green = 45
+    elif actual_green >= 25:
+        actual_green = 25
     petri_net_snake.transition(transition_name).min_time = actual_green
     print("El tiempo de 'Act_ es: ", actual_green)
     return

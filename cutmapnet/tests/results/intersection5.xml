@@ -826,7 +826,7 @@
 </arc>
 
 
- <transition id="3" identifier="min_1" label="min_1"  eft="10" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="3" identifier="min_1" label="min_1"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="421" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -852,7 +852,7 @@
 </arc>
 
 
- <transition id="4" identifier="Stop_1" label="Stop_1"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="4" identifier="Stop_1" label="Stop_1"  eft="3" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="571" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -1062,7 +1062,7 @@
 </arc>
 
 
- <transition id="11" identifier="min_4" label="min_4"  eft="10" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="11" identifier="min_4" label="min_4"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="1321" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -1088,7 +1088,7 @@
 </arc>
 
 
- <transition id="12" identifier="Stop_4" label="Stop_4"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="12" identifier="Stop_4" label="Stop_4"  eft="3" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="1471" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -1298,7 +1298,7 @@
 </arc>
 
 
- <transition id="19" identifier="min_7" label="min_7"  eft="10" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="19" identifier="min_7" label="min_7"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="2221" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -1324,7 +1324,7 @@
 </arc>
 
 
- <transition id="20" identifier="Stop_7" label="Stop_7"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="20" identifier="Stop_7" label="Stop_7"  eft="3" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="2371" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -1534,7 +1534,7 @@
 </arc>
 
 
- <transition id="27" identifier="min_0" label="min_0"  eft="10" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="27" identifier="min_0" label="min_0"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="121" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -1560,7 +1560,7 @@
 </arc>
 
 
- <transition id="28" identifier="Stop_0" label="Stop_0"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="28" identifier="Stop_0" label="Stop_0"  eft="3" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="271" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -1770,7 +1770,7 @@
 </arc>
 
 
- <transition id="35" identifier="min_2" label="min_2"  eft="10" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="35" identifier="min_2" label="min_2"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="721" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -1796,7 +1796,7 @@
 </arc>
 
 
- <transition id="36" identifier="Stop_2" label="Stop_2"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="36" identifier="Stop_2" label="Stop_2"  eft="3" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="871" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -2006,7 +2006,7 @@
 </arc>
 
 
- <transition id="43" identifier="min_5" label="min_5"  eft="10" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="43" identifier="min_5" label="min_5"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="1621" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
@@ -2032,7 +2032,7 @@
 </arc>
 
 
- <transition id="44" identifier="Stop_5" label="Stop_5"  eft="4" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
+ <transition id="44" identifier="Stop_5" label="Stop_5"  eft="3" lft="inf" speed="1" cost="0" unctrl="0" obs="1"  guard="">
     <graphics color="1">
        <position x="1771" y="4861"/>
        <deltaLabel deltax="25" deltay="0"/>
