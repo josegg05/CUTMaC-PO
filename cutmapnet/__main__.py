@@ -258,7 +258,7 @@ def split_model_conf():
     my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')
     in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')
     out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')
-    split = ctrl.Consequent(np.arange(-25, 26, 1), 'split')
+    split = ctrl.Consequent(np.arange(-13, 14, 1), 'split')
 
     # Membership Functions definition
     my_congestion_level.automf(5, 'quant')
@@ -368,7 +368,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
 
 
 def config_mov_split(petri_net_snake, movement):
-    mean_green = 25
+    mean_green = 13
     transition_name = "Act_" + str(movement.id)
     petri_net_snake.transition(transition_name).min_time = mean_green + int(movement.split)
     print("El tiempo de 'Act_ es: ", (mean_green + int(movement.split)))
