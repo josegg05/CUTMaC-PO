@@ -16,7 +16,7 @@ snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
 
 # Define the global variable of command_received
-intersection_id = "0009"
+intersection_id = "0002"
 start_flag = False
 msg_dic = []
 
@@ -304,7 +304,7 @@ def split_pi_model_conf():
     my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')
     in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')
     out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')
-    split = ctrl.Consequent(np.arange(-4, 5, 1), 'split')
+    split = ctrl.Consequent(np.arange(-2, 3, 1), 'split')
 
     # Membership Functions definition
     my_congestion_level.automf(5, 'quant')
@@ -389,7 +389,7 @@ def config_mov_split(petri_net_snake, movement):
 
 def config_pi_mov_split(petri_net_snake, movement):
     transition_name = "Act_" + str(movement.id)
-    actual_green = petri_net_snake.transition(transition_name).min_time + int(movement.split)
+    actual_green = petri_net_snake.transition(transition_name).min_time + movement.split
     if actual_green <= 0:
         actual_green = 0.0
     elif actual_green >= 25:
@@ -442,7 +442,7 @@ def run():
     global msg_dic
 
     # Setup of the intersection
-    inter_info = intersections_classes.IntersectionOpt(intersection_id)
+    inter_info = intersections_classes.Intersection(intersection_id)
 
     # Define my_topic
     my_topic = inter_info.state_topic
@@ -573,13 +573,6 @@ def run():
                 elif msg_type == "AccidentObserved":
                     manage_accidents(msg_in, petri_net_snake, inter_info.neighbors_ids, accident_lanes)
 
-        # # Manage Split
-        # if my_detector_change or neighbor_flow_change:
-        #     manage_flow(movements, moves_green, inter_info.m_detectors, neighbors)
-        #
-        # # Manage accidents
-        # if my_accident_change or neighbor_accident_change:
-        #     manage_accidents(petri_net_snake, inter_info.neighbors_ids, accident_lanes)
 
         # Wait for a second to transit
         time_current += 1.0
