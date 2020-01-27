@@ -845,6 +845,7 @@ class Movement:
         elif det == "ALL":
             for i in self._detectors:
                 jam_length_vehicle += self._detectors[i].jamLengthVehicle
+            jam_length_vehicle = jam_length_vehicle/len(self._detectors)
         else:
             jam_length_vehicle = "NA"
         return jam_length_vehicle
@@ -856,6 +857,7 @@ class Movement:
         elif det == "ALL":
             for i in self._detectors:
                 occupancy += self._detectors[i].occupancy
+            occupancy = occupancy/len(self._detectors)
         else:
             occupancy = "NA"
         return occupancy
@@ -867,6 +869,7 @@ class Movement:
         elif det == "ALL":
             for i in self._detectors:
                 mean_speed += self._detectors[i].meanSpeed
+            mean_speed = mean_speed/len(self._detectors)
         else:
             mean_speed = "NA"
         return mean_speed
@@ -878,6 +881,7 @@ class Movement:
         elif det == "ALL":
             for i in self._detectors:
                 vehicle_number += self._detectors[i].vehicleNumber
+            vehicle_number = vehicle_number/len(self._detectors)
         else:
             vehicle_number = "NA"
         return vehicle_number
