@@ -4,7 +4,7 @@
 class PetriNetInfo:
     def __init__(self):
         self.places = [["name", "color", "x_pos", "y_pos", "M0", "id"]]
-        self.transitions = [["name", "color", "x_pos", "y_pos", "time", "arcs_in", "arcs_out", "id"]]
+        self.transitions = [["name", "color", "x_pos", "y_pos", "min_time ", "max_time", "arcs_in", "arcs_out", "id"]]
 
 
 def net_create(movements, phases, cycles, cycles_names):
@@ -12,14 +12,15 @@ def net_create(movements, phases, cycles, cycles_names):
     t_id = 1
     petri_net = PetriNetInfo()
 
-    p_names_sem = ['GG_', 'DG_', 'GR_', 'mG_', 'DY_', 'EG_', 'M_', 'SM_', 'RG_', 'RR_', 'FOS_']
-    p_color_sem = [0, 3, 0, 0, 4, 0, 0, 0, 0, 5, 0]
-    p_pos_x_sem = [0, 75, 150, 0, 150, 0, 75, 150, 0, 150, 75, 75, 75]
-    p_pos_y_sem = [0, 30, 0, 60, 60, 120, 90, 120, 180, 180, 180]
+    p_names_sem = ['GG_', 'DG_', 'GR_', 'mG_', 'DY_', 'EG_', 'M_', 'SM_', 'RG_', 'RR_']#, 'FOS_']
+    p_color_sem = [0, 3, 0, 0, 4, 0, 0, 0, 0, 5]#, 0]<
+    p_pos_x_sem = [0, 75, 150, 0, 150, 0, 75, 150, 0, 150, 75, 75]#, 75]
+    p_pos_y_sem = [0, 30, 0, 60, 60, 120, 90, 120, 180, 180,]# 180]
 
-    t_names_sem = ['Green_', 'Yel_', 'min_', 'Stop_', 'Max_', 'FO_', 'Act_', 'Red_']
+    t_names_sem = ['tGreen_', 'tYel_', 'tmin_', 'tStop_', 'tMax_', 'tFO_', 'tAct_', 'tRed_']
     all_red = 2
-    t_time_sem = [0, 0, 4, 3, 100, 200, 16, 0]
+    t_min_time_sem = [0, 0, 4, 3, 200, 300, 16, 0]
+    t_max_time_sem = [None, None, 4, 3, 200, 300, 100, None]
     t_color_sem = [0, 0, 1, 1, 1, 0, 1, 0]
     t_pos_x_sem = [0, 150, 0, 150, -75, 0, 75, 150]
     t_pos_y_sem = [30, 30, 90, 90, 150, 150, 150, 150]
@@ -30,7 +31,7 @@ def net_create(movements, phases, cycles, cycles_names):
     arcs_in = [['GG_'], ['DG_', 'GR_'], ['mG_'], ['DY_'], ['EG_'], ['EG_'], ['EG_'], ['M_', 'SM_']]
     arcs_out = [['DG_', 'mG_', 'M_'], ['DY_'], ['EG_'], ['SM_'], ['RG_'], ['RG_'], ['RG_'], ['RR_']]
 
-    m0_places = ["S" + str(cycles[0][0]), "Normal"]
+    m0_places = ["P" + str(cycles[0][0]), "Normal"]
     for x in movements:
         if x in phases[0]:
             m_temp = "GG_" + str(x)
@@ -57,38 +58,38 @@ def net_create(movements, phases, cycles, cycles_names):
             t_ident = t_names_sem[i] + str(x)
             petri_net.transitions.append(
                 [t_ident, t_color_sem[i], t_pos_x_sem[i] + pos_x_init[x],
-                 pos_y_init[x] - t_pos_y_sem[i], t_time_sem[i], "", "",
+                 pos_y_init[x] - t_pos_y_sem[i], t_min_time_sem[i], t_max_time_sem[i], "", "",
                  t_id])
 
             arcs_in_t = list(arcs_in[i])
             for j in range(len(arcs_in_t)):
                 arcs_in_t[j] = arcs_in_t[j] + str(x)
-            petri_net.transitions[t_id][5] = arcs_in_t  # "arcs_in"
+            petri_net.transitions[t_id][6] = arcs_in_t  # "arcs_in"
             # if isinstance(arcs_out[i], str):
             arcs_out_t = list(arcs_out[i])
             for j in range(len(arcs_out_t)):
                 arcs_out_t[j] = arcs_out_t[j] + str(x)
-            petri_net.transitions[t_id][6] = arcs_out_t  # "arcs_out"
+            petri_net.transitions[t_id][7] = arcs_out_t  # "arcs_out"
 
             t_id += 1
 
     phase_changes = []
     for x in range(len(phases)):
         for i in range(len(cycles)):
-            if ("C" + str(x) + str(cycles[i][x])) not in phase_changes:
-                phase_changes.append("C" + str(x) + str(cycles[i][x]))
+            if ("C_" + str(x) + str(cycles[i][x])) not in phase_changes:
+                phase_changes.append("C_" + str(x) + str(cycles[i][x]))
 
     print("Move Changes: " + str(phase_changes))
     # Create Cycle change process
     for x in range(len(phases)):  # Start phase
         for i in range(len(phases)):  # Golas phase
             # if x != i:
-            if ("C" + str(x) + str(i)) in phase_changes:
-                # print("C" + str(x) + str(i))
+            if ("C_" + str(x) + str(i)) in phase_changes:
+                # print("C_" + str(x) + str(i))
                 dir_start_list = phases[x]
                 dir_goal_list = phases[i]
 
-                p_ident = "C" + str(x) + str(i)
+                p_ident = "C_" + str(x) + str(i)
                 m0 = 0
                 if p_ident in m0_places:
                     m0 = 1
@@ -102,11 +103,11 @@ def net_create(movements, phases, cycles, cycles_names):
                     arcs_in_1 = ["DG_" + str(dir_start_list[0]),
                                  "RG_" + str(dir_start_list[1]),
                                  "RR_" + str(goal[0]),
-                                 "S" + str(i)]
+                                 "P" + str(i)]
                     arcs_out_1 = ["DG_" + str(dir_start_list[0]),
                                   "GR_" + str(dir_start_list[1]),
                                   p_ident,
-                                  "ST"]
+                                  "PTC"]
                     arcs_in_2 = ["DG_" + str(dir_start_list[0]),
                                  "RR_" + str(dir_start_list[1]),
                                  p_ident]
@@ -118,11 +119,11 @@ def net_create(movements, phases, cycles, cycles_names):
                     arcs_in_1 = ["DG_" + str(dir_start_list[1]),
                                  "RG_" + str(dir_start_list[0]),
                                  "RR_" + str(goal[0]),
-                                 "S" + str(i)]
+                                 "P" + str(i)]
                     arcs_out_1 = ["DG_" + str(dir_start_list[1]),
                                   "GR_" + str(dir_start_list[0]),
                                   p_ident,
-                                  "ST"]
+                                  "PTC"]
                     arcs_in_2 = ["DG_" + str(dir_start_list[1]),
                                  "RR_" + str(dir_start_list[0]),
                                  p_ident]
@@ -134,11 +135,11 @@ def net_create(movements, phases, cycles, cycles_names):
                                  "RG_" + str(dir_start_list[1]),
                                  "RR_" + str(dir_goal_list[0]),
                                  "RR_" + str(dir_goal_list[1]),
-                                 "S" + str(i)]
+                                 "P" + str(i)]
                     arcs_out_1 = ["GR_" + str(dir_start_list[0]),
                                   "GR_" + str(dir_start_list[1]),
                                   p_ident,
-                                  "ST"]
+                                  "PTC"]
                     arcs_in_2 = ["RR_" + str(dir_start_list[0]),
                                  "RR_" + str(dir_start_list[1]),
                                  p_ident]
@@ -147,22 +148,22 @@ def net_create(movements, phases, cycles, cycles_names):
                                   "GG_" + str(dir_goal_list[0]),
                                   "GG_" + str(dir_goal_list[1])]
                 # print(arcs_in_1)
-                t_ident = "t1" + str(x) + str(i)
+                t_ident = "t1_" + str(x) + str(i)
                 petri_net.transitions.append(
                     [t_ident, 0, 75 + pos_x_init[x],
-                     pos_y_init[x] - 240 - 120 * i, 0, arcs_in_1, arcs_out_1,
+                     pos_y_init[x] - 240 - 120 * i, 0, None, arcs_in_1, arcs_out_1,
                      t_id])
                 t_id += 1
 
-                t_ident = "t2" + str(x) + str(i)
+                t_ident = "t2_" + str(x) + str(i)
                 petri_net.transitions.append(
                     [t_ident, 1, 75 + pos_x_init[x],
-                     pos_y_init[x] - 300 - 120 * i, all_red, arcs_in_2, arcs_out_2,
+                     pos_y_init[x] - 300 - 120 * i, all_red, all_red, arcs_in_2, arcs_out_2,
                      t_id])
                 t_id += 1
 
         # Create Phases change control. (x="2491" y="4681")
-        p_ident = "S" + str(x)
+        p_ident = "P" + str(x)
         m0 = 0
         if p_ident in m0_places:
             m0 = 1
@@ -178,57 +179,94 @@ def net_create(movements, phases, cycles, cycles_names):
                 if cycles[y][i] == x:
                     count += 2
                     for j in range(len(phases)):
-                        if j != i and ("C" + str(j) + str(i)) in phase_changes:
-                            arcs_in = [cycles_names[y], "ST", "C" + str(j) + str(i)]
-                            arcs_out = [cycles_names[y], p_ident, "C" + str(j) + str(i)]
+                        if j != i and ("C_" + str(j) + str(i)) in phase_changes:
+                            arcs_in = [cycles_names[y], "PTC", "C_" + str(j) + str(i)]
+                            arcs_out = [cycles_names[y], p_ident, "C_" + str(j) + str(i)]
                             delay = 1  # para que ocurra la trasición que apaga el DG
                             t_ident = "t" + cycles_names[y] + str(j) + str(i) + str(x)
                             petri_net.transitions.append(
                                 [t_ident, 0, 2491 + 60 + j,
-                                 pos_y_init[x] - count - 240 - 15 * y - 120 * x, 1, arcs_in, arcs_out,
+                                 pos_y_init[x] - count - 240 - 15 * y - 120 * x, 1, 1, arcs_in, arcs_out,
                                  t_id])
                             t_id += 1
 
+
+    # for i in range(len(cycles)):
+    #     p_ident = cycles_names[i]
+    #     m0 = 0
+    #     if p_ident == "Normal":
+    #         m0 = 1
+    #         petri_net.places.append(
+    #             [p_ident, 0, 2491 + 180,
+    #              pos_y_init[x] - 270 - 120 * i, m0, p_id])
+    #         p_id += 1
+    #     else:
+    #         petri_net.places.append(
+    #             [p_ident, 0, 2491 + 180,
+    #              pos_y_init[x] - 270 - 120 * i, m0, p_id])
+    #         p_id += 1
+    #         p_ident2 = p_ident + "_to_Normal"
+    #         petri_net.places.append(
+    #             [p_ident2, 0, 2491 + 180 + 90,
+    #              pos_y_init[x] - 210 - 120 * i, m0, p_id])
+    #         p_id += 1
+    #         p_ident3 = "Normal_to_" + p_ident
+    #         petri_net.places.append(
+    #             [p_ident3, 0, 2491 + 180 + 210,
+    #              pos_y_init[x] - 210 - 120 * i, m0, p_id])
+    #         p_id += 1
+    #
+    #         arcs_in_control = [["*Normal"], [p_ident2, p_ident], ["Normal", p_ident3], ["*" + p_ident]]
+    #         arcs_out_control = [[p_ident2], ["Normal"], [p_ident], [p_ident3]]
+    #         t_control_names = ["t_no_" + p_ident, "t" + p_ident + "_Normal", "tNormal_" + p_ident, "t_" + p_ident]
+    #         for j in range(len(t_control_names)):
+    #             arcs_in = arcs_in_control[j]
+    #             arcs_out = arcs_out_control[j]
+    #             t_ident = t_control_names[j]
+    #             petri_net.transitions.append(
+    #                 [t_ident, 0, 2491 + 180 + 60 + j * 60,
+    #                  pos_y_init[x] - 210 - 120 * i, 0, None, arcs_in, arcs_out,
+    #                  t_id])
+    #             t_id += 1
     # Create Cycle types and accident controls
-    for i in range(len(cycles)):
+    for i in range(len(cycles_names)):
         p_ident = cycles_names[i]
         m0 = 0
         if p_ident == "Normal":
             m0 = 1
-            petri_net.places.append(
-                [p_ident, 0, 2491 + 180,
-                 pos_y_init[x] - 270 - 120 * i, m0, p_id])
-            p_id += 1
-        else:
-            petri_net.places.append(
-                [p_ident, 0, 2491 + 180,
-                 pos_y_init[x] - 270 - 120 * i, m0, p_id])
-            p_id += 1
-            p_ident2 = p_ident + "_to_Normal"
-            petri_net.places.append(
-                [p_ident2, 0, 2491 + 180 + 90,
-                 pos_y_init[x] - 210 - 120 * i, m0, p_id])
-            p_id += 1
-            p_ident3 = "Normal_to_" + p_ident
-            petri_net.places.append(
-                [p_ident3, 0, 2491 + 180 + 210,
-                 pos_y_init[x] - 210 - 120 * i, m0, p_id])
-            p_id += 1
+        petri_net.places.append(
+            [p_ident, 0, 2491 + 180,
+             pos_y_init[x] - 270 - 120 * i, m0, p_id])
+        p_id += 1
+        m0 = 0
+        p_ident2 = "C" + p_ident #+ "_to_Normal"
+        petri_net.places.append(
+            [p_ident2, 0, 2491 + 180 + 120,
+             pos_y_init[x] - 270 - 120 * i, m0, p_id])
+        p_id += 1
 
-            arcs_in_control = [["*Normal"], [p_ident2, p_ident], ["Normal", p_ident3], ["*" + p_ident]]
-            arcs_out_control = [[p_ident2], ["Normal"], [p_ident], [p_ident3]]
-            t_control_names = ["t_no_" + p_ident, "t" + p_ident + "_Normal", "tNormal_" + p_ident, "t_" + p_ident]
-            for j in range(len(t_control_names)):
-                arcs_in = arcs_in_control[j]
-                arcs_out = arcs_out_control[j]
-                t_ident = t_control_names[j]
+        t_ident = "tE" + p_ident
+        petri_net.transitions.append(
+            [t_ident, 0, 2491 + 180 + 180,
+             pos_y_init[x] - 270 - 120 * i, 0, None, [], [p_ident2],
+             t_id])
+        t_id += 1
+
+        for j in range(len(cycles_names)):
+            p_ident3 = cycles_names[j]
+            if p_ident3 is not p_ident:
+                arcs_in = [p_ident2, p_ident3]
+                arcs_out = [p_ident]
+                t_ident = "tC" + p_ident + "_" + p_ident3
                 petri_net.transitions.append(
-                    [t_ident, 0, 2491 + 180 + 60 + j * 60,
-                     pos_y_init[x] - 210 - 120 * i, 0, arcs_in, arcs_out,
+                    [t_ident, 0, 2491 + 180 + 60,
+                     pos_y_init[x] - 270 - 120 * i + 10 * j, 0, None, arcs_in, arcs_out,
                      t_id])
                 t_id += 1
 
-    p_ident = "ST"
+
+
+    p_ident = "PTC"
     m0 = 0
     if p_ident in m0_places:
         m0 = 1

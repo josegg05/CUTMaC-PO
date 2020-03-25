@@ -54,7 +54,7 @@ def on_message(client, userdata, msg):
 
 
 def mqtt_conf() -> mqtt.Client:
-    broker_address = "192.168.5.95"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
+    broker_address = "localhost"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -333,7 +333,7 @@ def split_pi_model_conf():
                                        out_congestion_level[out_label],
                                        split[split_label]))
 
-    # print(rules)
+    #print(rules)
     split_model = ctrl.ControlSystem(rules)
     split_measuring_sim = ctrl.ControlSystemSimulation(split_model)
 
@@ -379,23 +379,24 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
 
 def config_mov_split(petri_net_snake, movement):
     mean_green = 13
-    transition_name = "Act_" + str(movement.id)
-    petri_net_snake.transition(transition_name).min_time = mean_green + int(movement.split)
-    print("Act_" + str(movement.id) + "_time = ", (mean_green + int(movement.split)))
+    t_split = 0
+    transition_name = "tAct_" + str(movement.id)
+    t_split = min(mean_green + int(movement.split), petri_net_snake.transition(transition_name).max_time)
+    petri_net_snake.transition(transition_name).min_time = t_split
+    print("tAct_" + str(movement.id) + "_time = ", (mean_green + int(movement.split)))
     f.write(str(mean_green + int(movement.split)) + ";" + "\n")
-
     return
 
 
 def config_pi_mov_split(petri_net_snake, movement):
-    transition_name = "Act_" + str(movement.id)
+    transition_name = "tAct_" + str(movement.id)
     actual_green = petri_net_snake.transition(transition_name).min_time + movement.split
     if actual_green <= 0:
         actual_green = 0.0
     elif actual_green >= 25:
         actual_green = 25.0
     petri_net_snake.transition(transition_name).min_time = actual_green
-    print("Act_" + str(movement.id) + "_time = ", actual_green)
+    print("tAct_" + str(movement.id) + "_time = ", actual_green)
     f.write(str(actual_green) + ";" + "\n")
     return
 
@@ -403,19 +404,19 @@ def config_pi_mov_split(petri_net_snake, movement):
 def set_tls_lights(transitions_fire, inter_info, moves_green):
     l_change = False
     for i in transitions_fire:
-        if "Green" in i:
+        if "tGreen" in i:
             print("Voy a poner en GREEN el Movimiento %s" % i[-1])
             l_change = True
             moves_green.append(int(i[-1]))
             for j in inter_info.m_lights[0][int(i[-1])]:
                 inter_info.lights[j] = "G"
-        elif "Yel" in i:
+        elif "tYel" in i:
             print("Voy a poner en YELLOW el Movimiento %s" % i[-1])
             l_change = True
             moves_green.remove(int(i[-1]))
             for j in inter_info.m_lights[0][int(i[-1])]:
                 inter_info.lights[j] = "y"
-        elif "Red" in i:
+        elif "tRed" in i:
             print("Voy a poner en RED el Movimiento %s" % i[-1])
             l_change = True
             for j in inter_info.m_lights[0][int(i[-1])]:
@@ -519,7 +520,7 @@ def run():
                     pass
         # print(transitions_fire)
 
-        # Set the TLS lights
+        # Set the TS
         set_tls_lights(transitions_fire, inter_info, moves_green)
         # print("Moves in Green: ", moves_green)
 
