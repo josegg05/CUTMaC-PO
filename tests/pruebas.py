@@ -270,3 +270,49 @@ print(list(ages.keys())[1])
 
 for i in range(1,6):
     print(i)
+
+# json
+import json
+msg = '{"0": "G", "1": "R", "2": "R", "3": "R", "4": "G", "5": "R", "6": "R", "7": "R"}'
+msg_dec = json.loads(msg)
+moves_green = [int(i) for i in msg_dec.keys() if msg_dec[i] == "G"]
+print(moves_green)
+
+phases = {"P0": 0, "P1": 1, "P2": 0, "P3": 0}
+msg = json.dumps(dict)
+print(msg)
+dic = json.loads(msg)
+print(dic)
+print(dic["P1"])
+
+list1 = [["P2", 0],
+         ["P1", 1],
+         ["P3", 2],
+         ["P0", 3]]
+phases_state = [int(place[1]) for place in list1 if "P" in place[0]]
+print(phases_state)
+phases_state = [0, 0, 0, 0, 0, 0, 0, 0]
+for place in list1:
+    if "P" in place[0]:
+        phases_state[int(place[0][-1])] = int(place[1])  # Markings
+print(phases_state)
+
+msg = {
+    "id": "papa",
+    "type": "pepe",
+    "category": {
+        "value": ["lolo"]
+           },
+    "state": {
+        "value": [0, 0, 0, 1, 0, 0, 0]
+           }
+    }
+
+msg_sup = {
+    "id": msg_dic["id"],
+    "type": msg_dic["type"],
+    "category": msg_dic["category"],
+    "data": msg_dic["state"]
+}
+print(msg_sup)
+print(msg_sup["data"]["value"][3])

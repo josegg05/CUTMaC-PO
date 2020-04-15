@@ -1,6 +1,6 @@
-from cutmapnet.petri_nets import tpn
-from cutmapnet.petri_nets import inter_tpn
-from cutmapnet.petri_nets import net_snakes
+from petri_nets import tpn
+from petri_nets import inter_tpn
+from petri_nets import net_snakes
 import pandas as pd
 import snakes.plugins
 

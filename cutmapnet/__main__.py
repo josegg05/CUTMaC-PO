@@ -1,16 +1,16 @@
-from cutmapnet.petri_nets import tpn
-from cutmapnet.petri_nets import inter_tpn
-from cutmapnet.petri_nets import net_snakes
-from cutmapnet.petri_nets import intersections_classes
+from petri_nets import tpn
+from petri_nets import inter_tpn_v2
+from petri_nets import net_snakes
+from petri_nets import intersections_classes
 import snakes.plugins
 import time
 import paho.mqtt.client as mqtt
 import json
 import datetime
 import numpy as np
-import skfuzzy as fuzz
 from skfuzzy import control as ctrl
-import logging
+
+# import logging
 
 snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
@@ -217,7 +217,7 @@ def congestion_measure(congestion_measuring_sim, movement, congestionLevel):
             str(movement.get_vehicle_number()) + "; " +
             str(movement.get_occupancy()) + "; " +
             str(movement.get_mean_speed()) + "; ")
-    #f.write("Congestion_" + str(movement.id) + " = " + str(congestion) + "; ")
+    # f.write("Congestion_" + str(movement.id) + " = " + str(congestion) + "; ")
     print("Congestion_", movement.id, " = ", congestion)
     # print("jamLengthVehicle = ", movement.get_jam_length_vehicle(),
     #       "; vehicleNumber = ", movement.get_vehicle_number(),
@@ -333,7 +333,7 @@ def split_pi_model_conf():
                                        out_congestion_level[out_label],
                                        split[split_label]))
 
-    #print(rules)
+    # print(rules)
     split_model = ctrl.ControlSystem(rules)
     split_measuring_sim = ctrl.ControlSystemSimulation(split_model)
 
@@ -434,7 +434,7 @@ def set_tls_lights(transitions_fire, inter_info, moves_green):
         client_intersection.publish(inter_info.tls_id, json.dumps(control_msg))
         print("send: " + json.dumps(control_msg))
 
-        return
+    return
 
 
 def run():
@@ -461,6 +461,7 @@ def run():
     movements = {}  # dictionary of movements
     neighbors = {}  # dictionary of neighbors
     moves_green = []
+    phases_list = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
 
     # Create intersection Movements
     for i in range(len(inter_info.movements)):
@@ -475,8 +476,8 @@ def run():
     print("Intersection Neighbors: ", neighbors)
 
     # Set the definition vectors of the Timed Petri Net
-    petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
-                                                                    inter_info.cycles, inter_info.cycles_names)
+    petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.phases,
+                                                                       inter_info.cycles, inter_info.cycles_names)
 
     # Create de SNAKE Petri Net
     petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
@@ -528,13 +529,14 @@ def run():
         for i in transitions_fire:
             if (("tNormal" in i) or ("tAcc" in i)) and (i[-1] not in ["l", "I", "O"]):
                 print("Measure congestion and split of the Movement of the next Phase --> %s" % i[-2])
-                for j in inter_info.phases[int(i[-2])]:
-                    if j in movements.keys():
-                        f.write(str(movements[j].id) + "; " + str(time_current) + "; ")
-                        movements[j].congestionLevel = congestion_measure(congestion_measuring_sim, movements[j],
+                # for j in inter_info.phases[int(i[-2])]:  # For inter_tpn
+                for mov in phases_list[int(i[-2])]:  # For inter_tpn_v2
+                    if mov in movements.keys():
+                        f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
+                        movements[j].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov],
                                                                           congestionLevel)
-                        movements[j].split = split_measure(split_measuring_sim, movements[j], neighbors, split)
-                        config_pi_mov_split(petri_net_snake, movements[j])
+                        movements[mov].split = split_measure(split_measuring_sim, movements[mov], neighbors, split)
+                        config_pi_mov_split(petri_net_snake, movements[mov])
                 send_state(my_topic, movements)
 
         # # Add accident in B at t = 30
@@ -564,8 +566,7 @@ def run():
 
         # Manage msgs received
         if msg_dic:
-            msg_in = msg_dic[0]
-            msg_dic.pop(0)
+            msg_in = msg_dic.pop(0)
             msg_id = msg_in['id']
             msg_type = msg_in['type']
             if ("e2det" in msg_id) or ("state" in msg_id):
@@ -573,7 +574,6 @@ def run():
                     manage_flow(msg_in, movements, moves_green, inter_info.m_detectors, neighbors)
                 elif msg_type == "AccidentObserved":
                     manage_accidents(msg_in, petri_net_snake, inter_info.neighbors_ids, accident_lanes)
-
 
         # Wait for a second to transit
         time_current += 1.0

@@ -570,7 +570,7 @@ class Intersection:
                     "cycles": [[1, 0, 0, 0],
                                [1, 2, 1, 1],  # Problem 3
                                [1, 3, 1, 1],
-                               [1, 1, 1, 1],  # Problem 4: There is no Transition Cxx to the same Phase
+                               [1, 1, 1, 1],    # Problem 4: There is no Transition Cxx to the same Phase / Solution: Force that it can't be a cycle with only one phase!
                                [0, 0, 0, 0]],
                     "cycles_names": ["Normal", "AccSO", "AccWO", "AccEI", "AccNI"],
                     "neighbors_ids": {
@@ -843,8 +843,9 @@ class Movement:
         self.in_neighbors = []
         self.out_neighbors = []
         self.congestionLevel = 0
-        self.split = 0
-        self.light_state = "RED"
+        self.split = 16  # Same as "tAct_" in inter_tpn
+        self.accident = [0, ""]
+        self.light_state = "r"
 
         for i in range(len(intersection.phases)):
             if self.id in intersection.phases[i]:

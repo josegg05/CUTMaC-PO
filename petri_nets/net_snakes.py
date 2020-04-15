@@ -1,4 +1,4 @@
-from cutmapnet.petri_nets import tpn
+from petri_nets import tpn
 import snakes.plugins
 
 snakes.plugins.load(tpn, "snakes.nets", "snk")
