@@ -487,6 +487,7 @@ def run():
     petri_net_snake.set_marking(init)
     print(init)
 
+    print("Tokens de Normal = ", petri_net_snake.place("CNormal").tokens)
     print("Intersection '%s' READY:" % intersection_id)
     while not start_flag:
         pass  # Do nothing waiting for the start signal

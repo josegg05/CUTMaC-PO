@@ -51,7 +51,20 @@ def mqtt_conf() -> mqtt.Client:
     return client
 
 
-def client_zmq_config():
+def pub_zmq_config():
+    port = "5557"
+    if len(sys.argv) > 1:
+        port = sys.argv[1]
+        int(port)
+
+    context = zmq.Context()
+    sock = context.socket(zmq.PUB)
+    sock.bind("tcp://127.0.0.1:%s" % port)
+    time.sleep(0.5)
+    return sock
+
+
+def sub_zmq_config():
     port = "5556"
     if len(sys.argv) > 1:
         port = sys.argv[1]
@@ -59,8 +72,10 @@ def client_zmq_config():
 
     context = zmq.Context()
     print("Connecting to server on port %s" % port)
-    sock = context.socket(zmq.REQ)
+    sock = context.socket(zmq.SUB)
     sock.connect("tcp://127.0.0.1:%s" % port)
+    sock.setsockopt(zmq.SUBSCRIBE, b"super/tscm/command")
+    time.sleep(0.5)
     return sock
 
 
@@ -131,10 +146,37 @@ def config_mov_split(petri_net_snake, mov_splits):
     return
 
 
+def config_cycle(petri_net_snake, cycle_name):
+    if not petri_net_snake.place(cycle_name).tokens:
+        petri_net_snake.place("C" + cycle_name).add(dot)
+    return
+
+
+def set_phase_state(transition, phases_state, id):
+    print("Start Process to change to next Phase --> %s" % transition[-1])
+    phases_state[int(transition[-2])] = 0
+    phases_state[int(transition[-1])] = 1
+
+    phase_state_msg = {
+        "id": id,
+        "type": "stateChange",
+        "category": {
+            "value": ["phase"]
+        },
+        "state": {
+            "value": phases_state
+        }
+    }
+    return phase_state_msg, phases_state
+
+
 def run():
     global intersection_id
     global start_flag
     global msg_dic
+
+    super_topic_display = b"tsmc/state"
+    super_topic_phase = b"tsmc/state"
 
     # Setup of the intersection
     inter_info = intersections_classes.Intersection(intersection_id)
@@ -153,7 +195,6 @@ def run():
     cycle = 0
 
     # Set initial phases_state
-    #phases_state = {}
     phases_state = [0, 0, 0, 0, 0, 0, 0, 0]
     for place in petri_net_inter.places:
         if "P" in place[0]:
@@ -202,6 +243,13 @@ def run():
                     pass
         # print(transitions_fire)
 
+        # Measure congestion and split of correspondent Movement
+        for transition in transitions_fire:
+            if "t1_" in transition:  # A Phase Transition t1_xy fires
+                phase_state_msg, phases_state = set_phase_state(transition, phases_state.copy(), inter_info.tls_id)
+                # Done: TODO: Send state_msg to supervisor
+                pub_socket.send_multipart([super_topic_phase, json.dumps(phase_state_msg).encode()])
+
         # Set the TS displays
         moves_displays_state, display_state_msg, control_msg = set_tls_lights(transitions_fire, inter_info, moves_displays_state.copy(), cycle)
         if control_msg:
@@ -209,38 +257,20 @@ def run():
             print("send: ", control_msg)
         # Done: TODO: Send display_state_msg to supervisor
         if display_state_msg:
-            client_socket.send_pyobj(display_state_msg)
-            msg_rec = client_socket.recv_pyobj()
-            if msg_rec["type"] == "acknowledge":
-                pass
-            elif msg_rec["type"] == "config" and "split" in msg_rec["category"]["value"]:
-                config_mov_split(petri_net_snake, msg_rec["value"]["value"])
-            elif msg_rec["type"] == "config" and "cycle" in msg_rec["category"]["value"]:
-                config_cycle(petri_net_snake, msg_rec["value"]["value"])
-        # Measure congestion and split of correspondent Movement
-        for transition in transitions_fire:
-            if "t1_" in transition:  # A Phase Transition t1_xy fires
-                print("Start Process to change to next Phase --> %s" % transition[-1])
-                phases_state[int(transition[-2])] = 0
-                phases_state[int(transition[-1])] = 1
+            pub_socket.send_multipart([super_topic_display, json.dumps(display_state_msg).encode()])
 
-                phase_state_msg = {
-                    "id": inter_info.tls_id,
-                    "type": "stateChange",
-                    "category": {
-                        "value": ["phase"]
-                    },
-                    "state": {
-                        "value": phases_state
-                    }
-                }
-                # Done: TODO: Send state_msg to supervisor
-                client_socket.send_pyobj(phase_state_msg)
-                msg_rec = client_socket.recv_pyobj()
-                if msg_rec["type"] == "acknowledge":
-                    pass
 
-        # TODO: Make the zmq msgs receiver
+
+        # Done: TODO: Make the zmq msgs receiver
+        poll = dict(poller.poll(20))
+        if sub_socket in poll and poll[sub_socket] == zmq.POLLIN:
+            [top, contents] = sub_socket.recv_multipart()
+            msg_zmq = json.loads(contents.decode())
+            if b"command" in top:
+                if msg_zmq["type"] == "config" and "split" in msg_zmq["category"]["value"]:
+                    config_mov_split(petri_net_snake, msg_zmq["value"]["value"])
+                elif msg_zmq["type"] == "config" and "cycle" in msg_zmq["category"]["value"]:
+                    config_cycle(petri_net_snake, msg_zmq["value"]["value"][0])
 
         # Wait for a second to transit
         time_current += 1.0
@@ -255,5 +285,7 @@ if __name__ == '__main__':
     client_intersection = mqtt_conf()
     # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
-    client_socket = client_zmq_config()
+    pub_socket = pub_zmq_config()
+    sub_socket = sub_zmq_config()
+    poller = poller_config(sub_socket)
     run()
