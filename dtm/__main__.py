@@ -1,4 +1,3 @@
-from petri_nets import inter_tpn
 from petri_nets import intersections_classes
 import time
 import paho.mqtt.client as mqtt
@@ -11,7 +10,7 @@ import sys
 
 
 # Define the global variable of command_received
-intersection_id = "0002"
+intersection_id = ""
 start_flag = False
 msg_dic_dtm = []
 
@@ -33,7 +32,7 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    global msg_dic
+    global msg_dic_dtm
     global start_flag
     msg.payload = msg.payload.decode("utf-8")
     if msg.topic == "intersection/all/start":
@@ -43,9 +42,9 @@ def on_message(client, userdata, msg):
         elif "stop" in str(msg.payload):
             start_flag = False
     else:
-        msg_dic.append(json.loads(msg.payload))
+        msg_dic_dtm.append(json.loads(msg.payload))
         print("message arrive from topic: ", msg.topic)
-        print(msg.topic + " " + str(msg.payload))
+        # print(msg.topic + " " + str(msg.payload))
 
 
 def mqtt_conf() -> mqtt.Client:
@@ -57,12 +56,7 @@ def mqtt_conf() -> mqtt.Client:
     return client
 
 
-def pub_zmq_config():  # Puede que haya que cambiarlo
-    port = "5557"
-    if len(sys.argv) > 1:
-        port = sys.argv[1]
-        int(port)
-
+def pub_zmq_config(port):
     context = zmq.Context()
     sock = context.socket(zmq.PUB)
     sock.bind("tcp://127.0.0.1:%s" % port)
@@ -70,12 +64,7 @@ def pub_zmq_config():  # Puede que haya que cambiarlo
     return sock
 
 
-def sub_zmq_config():
-    port = "5556"
-    if len(sys.argv) > 1:
-        port = sys.argv[1]
-        int(port)
-
+def sub_zmq_config(port):
     context = zmq.Context()
     print("Connecting to server on port %s" % port)
     sock = context.socket(zmq.SUB)
@@ -92,22 +81,19 @@ def poller_config(socket):
         for sock in socket:
             poller.register(sock, zmq.POLLIN)
     else:
-        poller.register(socket, zmq.POLLIN)
+        poller.register(socket[0], zmq.POLLIN)
     return poller
 
 
 def manage_flow(msg_in, movements, moves_detectors, moves_green):
     # Function that saves the detectors and neighbor congestion info
     detector_id = msg_in["id"][-3:]
-    print("detector_id: ", detector_id)
     mov_ids = []
-
     # with open("tpn_state.txt") as f_state:
     #     tpn_state = json.loads(f_state.read())
     #
     # moves_green = [int(i) for i in tpn_state.keys() if tpn_state[i] == "G"]
-
-    print("Detector value changed in lane " + msg_in['laneId'])
+    print("Detector '", detector_id, "' value changed in lane '", msg_in['laneId'], "'")
     for mov in range(8):  # 8 movements
         if detector_id in moves_detectors[mov]:
             mov_ids.append(mov)
@@ -116,6 +102,7 @@ def manage_flow(msg_in, movements, moves_detectors, moves_green):
         if mov in moves_green:
             movements[mov].set_jam_length_vehicle(detector_id, msg_in["jamLengthVehicle"])
             movements[mov].set_mean_speed(detector_id, msg_in["meanSpeed"])
+            print("Speed of: ", mov, " = ", msg_in["meanSpeed"])
         movements[mov].set_occupancy(detector_id, msg_in["occupancy"])
         movements[mov].set_vehicle_number(detector_id, msg_in["vehicleNumber"])
 
@@ -208,6 +195,56 @@ def congestion_model_conf(max_speed, max_vehicle_number):
     return congestion_measuring_sim, congestionLevel
 
 
+def congestion_model_conf2(max_speed, max_vehicle_number):
+    # Antecedent/Consequent and universe definition variables
+    vehicleNumber = ctrl.Antecedent(np.arange(0, max_vehicle_number + 2, 1), 'vehicleNumber')
+    occupancy = ctrl.Antecedent(np.arange(0, 101, 1), 'occupancy')
+    meanSpeed = ctrl.Antecedent(np.arange(0, max_speed + 1, 1), 'meanSpeed')
+    congestionLevel = ctrl.Consequent(np.arange(0, 101, 1), 'congestionLevel')
+
+    # Membership Functions definition
+    vehicleNumber.automf(3, 'quant')
+    occupancy.automf(3, 'quant')
+    meanSpeed.automf(3, 'quant')
+    congestionLevel.automf(5, 'quant')
+
+    # Graph the Membership Functions
+    # jamLengthVehicle.view()
+    # vehicleNumber.view()
+    # occupancy.view()
+    # meanSpeed.view()
+    # congestionLevel.view()
+
+    # Define the Expert Rules
+    rules = [
+        ctrl.Rule((vehicleNumber['high'] | occupancy['high']) & (meanSpeed['low']),
+                  congestionLevel['higher']),
+        ctrl.Rule((vehicleNumber['high'] | occupancy['high']) & (meanSpeed['average']),
+                  congestionLevel['high']),
+        ctrl.Rule((vehicleNumber['high'] | occupancy['high']) & (meanSpeed['high']),
+                  congestionLevel['average']),
+        ctrl.Rule((vehicleNumber['average'] | occupancy['average']) & (meanSpeed['low']),
+                  congestionLevel['high']),
+        ctrl.Rule(
+            (vehicleNumber['average'] | occupancy['average']) & (meanSpeed['average']),
+            congestionLevel['average']),
+        ctrl.Rule((vehicleNumber['average'] | occupancy['average']) & (meanSpeed['high']),
+                  congestionLevel['low']),
+        ctrl.Rule((vehicleNumber['low'] | occupancy['low']) & (meanSpeed['low']),
+                  congestionLevel['average']),
+        ctrl.Rule((vehicleNumber['low'] | occupancy['low']) & (meanSpeed['average']),
+                  congestionLevel['low']),
+        ctrl.Rule((vehicleNumber['low'] | occupancy['low']) & (meanSpeed['high']),
+                  congestionLevel['lower']),
+    ]
+
+    # Controller definition
+    congestion_model = ctrl.ControlSystem(rules)
+    congestion_measuring_sim = ctrl.ControlSystemSimulation(congestion_model)
+
+    return congestion_measuring_sim, congestionLevel
+
+
 def congestion_measure(congestion_measuring_sim, movement):
     congestion = 0.0
     if movement.get_vehicle_number() != 0:
@@ -235,12 +272,41 @@ def congestion_measure(congestion_measuring_sim, movement):
     return congestion
 
 
+def congestion_measure2(congestion_measuring_sim, movement):
+    congestion = 0.0
+    mov_vehicle_num = movement.get_vehicle_number()
+    mov_speed = movement.get_mean_speed()
+    if mov_speed < 0:
+        mov_speed = 14  # MAX_SPEED
+    if mov_vehicle_num != 0:
+        congestion_measuring_sim.input['vehicleNumber'] = mov_vehicle_num
+        congestion_measuring_sim.input['occupancy'] = movement.get_occupancy()
+        congestion_measuring_sim.input['meanSpeed'] = mov_speed
+        # Crunch the numbers
+        congestion_measuring_sim.compute()
+        congestion = congestion_measuring_sim.output['congestionLevel']
+
+    with open("app_%s.log" % intersection_id, "w+") as f:
+        f.write(str(movement.get_jam_length_vehicle()) + "; " +
+                str(movement.get_vehicle_number()) + "; " +
+                str(movement.get_occupancy()) + "; " +
+                str(movement.get_mean_speed()) + "; ")
+
+    print("Congestion_", movement.id, " = ", congestion)
+    print("vehicleNumber = ", mov_vehicle_num,
+          "; occupancy = ", movement.get_occupancy(),
+          "; meanSpeed = ", mov_speed)
+    #congestionLevel.view(sim=congestion_measuring_sim)
+
+    return congestion
+
+
 def congestion_msg_set(msg_in, mov_cong):
     msg_sup = {
         "id": msg_in["id"],
-        "type": msg_in["type"],
+        "type": "stateResult",
         "category": msg_in["category"],
-        "data": {
+        "state": {
             "value": mov_cong
         }
     }
@@ -250,9 +316,11 @@ def congestion_msg_set(msg_in, mov_cong):
 def struct_accident_data_msg(msg_in, mov_acc):
     msg_sup = {
         "id": msg_in["id"],
-        "type": msg_in["type"],
-        "category": msg_in["category"],
-        "data": {
+        "type": "stateChange",
+        "category": {
+            "value": ["mov_accident"]
+        },
+        "state": {
             "value": mov_acc
         }
     }
@@ -271,7 +339,7 @@ def run():
     inter_info = intersections_classes.Intersection(intersection_id)
 
     # Setup the congestion model
-    congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed,
+    congestion_measuring_sim, congestionLevel = congestion_model_conf2(inter_info.m_max_speed,
                                                                       inter_info.m_max_vehicle_number)
     # Reset Loop
     accident_lanes = []
@@ -282,6 +350,8 @@ def run():
     for i in range(len(inter_info.movements)):
         if (i == 0) or (inter_info.movements[i] > inter_info.movements[i - 1]):
             movements[inter_info.movements[i]] = intersections_classes.Movement(inter_info.movements[i], inter_info)
+        else:
+            break
     print("Intersection Movements: ", movements)
 
     print("DTM '%s' READY:" % intersection_id)
@@ -299,7 +369,7 @@ def run():
         # # Add accident in B at t = 30
         # if time_current == 30:
         #     my_accident_change = True
-        #     msg_dic.append({
+        #     msg_dic_dtm.append({
         #         "id": "intersection/0002/e2det/s03",
         #         "type": "AccidentObserved",
         #         "laneId": "436291016#3_3",
@@ -311,7 +381,7 @@ def run():
         # # Remove accident in B at t = 300
         # if time_current == 300:
         #     my_accident_change = True
-        #     msg_dic.append({
+        #     msg_dic_dtm.append({
         #         "id": "intersection/0002/e2det/s03",
         #         "type": "AccidentObserved",
         #         "laneId": "436291016#3_3",
@@ -322,8 +392,8 @@ def run():
         #     })
 
         # Manage msgs received
-        if msg_dic:
-            msg_mqtt = msg_dic.pop(0)
+        if msg_dic_dtm:
+            msg_mqtt = msg_dic_dtm.pop(0)
             msg_id = msg_mqtt['id']
             msg_type = msg_mqtt['type']
             if "e2det" in msg_id:
@@ -339,38 +409,45 @@ def run():
         if sub_socket in poll and poll[sub_socket] == zmq.POLLIN:
             [top, contents] = sub_socket.recv_multipart()
             msg_zmq = json.loads(contents.decode())
+            print(msg_zmq)
             if b"command" in top:
-                if "congestion" in msg_zmq["category"]["value"]:
+                if "mov_congestion" in msg_zmq["category"]["value"]:
                     msg_movements = list(msg_zmq["value"]["value"])
                     mov_cong = {}
+                    print(time_current, "*** Measure congestion of movements: ", msg_movements, " ***")
                     for mov in msg_movements:
-                        with open("app_%s.log" % intersection_id, "w+") as f:
-                            f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
-                        movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov])
-                        mov_cong[mov] = movements[mov].congestionLevel
+                        if mov in movements:
+                            with open("app_%s.log" % intersection_id, "w+") as f:
+                                f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
+                            movements[mov].congestionLevel = congestion_measure2(congestion_measuring_sim, movements[mov])
+                            mov_cong[mov] = movements[mov].congestionLevel
                     cong_data_msg = congestion_msg_set(msg_zmq, mov_cong)
+                    print(cong_data_msg)
                     pub_socket.send_multipart([super_topic_congestion, json.dumps(cong_data_msg).encode()])
             elif b"state" in top:
                 if "display" in msg_zmq["category"]["value"]:
-                    msg_display = list(msg_zmq["value"]["value"])
+                    msg_display = list(msg_zmq["state"]["value"])
                     moves_green = []
                     for mov in range(len(msg_display)):
                         if msg_display[mov] == "G":
                             moves_green.append(mov)
+                    print("Moves Green : ", moves_green)
 
-        # Wait for a second to transit
-        time_current += 1.0
-        while time.perf_counter() < time_0 + time_current:
-            pass
+        # Update time_current
+        if time.perf_counter() >= time_0 + time_current + 1:
+            time_current += 1.0
 
 
 if __name__ == '__main__':
+    with open("inter_id.txt", "r") as f:
+        intersection_id = f.read()
+    print("Intersection_ID: ", intersection_id)
     client_intersection = mqtt_conf()
     # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
-    pub_socket = pub_zmq_config()
-    sub_socket = sub_zmq_config()
-    poller = poller_config(sub_socket)
+    pub_socket = pub_zmq_config("5556")
+    sub_socket = sub_zmq_config("5558")
+    poller = poller_config([sub_socket])
     with open("app_%s.log" % intersection_id, "w+") as f:
         f.write("movement_id; time; jam_length_vehicle; vehicle_number; occupancy; mean_speed; my_congestion_level; \n")
     run()

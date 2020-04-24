@@ -507,7 +507,7 @@ class Intersection:
                 "0002": {
                     "state_topic": "intersection/0002/state",
                     "tls_id": "intersection/0002/tls",
-                    "movements": [1, 2, 4, 5, 7, 0, 3, 6],  # Phantom 0, 3, 6
+                    "movements": [1, 2, 4, 5, 7, 0, 3, 6],  # Phantom 0, 3, 6. Hecho de esta manera para solo manejar los movs que me interesan
                     "phases": [[1, 4], [1, 5], [2, 7], [0, 4], [0, 5], [2, 6], [3, 7]],
                     "cycles": [[1, 2, 0, 0, 0, 0, 0],
                                [2, 2, 3, 4, 2, 2, 2],
@@ -524,7 +524,7 @@ class Intersection:
                         "W": ""
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 5,
                     # Configuration variables for SUMO application
                     "m_lights": [[[], [7], [6], [], [8], [0, 1], [], [2, 3, 4, 5]],
                                  [[], [7], [6], [], [8], [0, 1], [], [2, 3, 4, 5]],
@@ -553,7 +553,7 @@ class Intersection:
                         "W": ""
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 8,
                     # Configuration variables for SUMO application
                     "m_lights": [[[1], [2, 3], [], [4, 5, 6], [], [0], [7], []],
                                  [[1], [2, 3], [], [4, 5, 6], [], [0], [7], []],
@@ -580,7 +580,7 @@ class Intersection:
                         "W": ""
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 5,
                     # Configuration variables for SUMO application
                     "m_lights": [[[2, 3], [], [], [4, 5, 6], [], [0, 1], [], []],
                                  [[2, 3], [], [], [4], [], [0, 1], [], []],
@@ -606,7 +606,7 @@ class Intersection:
                         "W": "0004"
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 5,
                     # Configuration variables for SUMO application
                     "m_lights": [[[], [], [8, 9], [], [], [0, 1, 2, 3, 4], [], [5, 6, 7]],
                                  [[], [], [8, 9], [], [], [0, 1, 2, 3, 4], [], [5, 6, 7]],
@@ -635,7 +635,7 @@ class Intersection:
                         "W": "0005"
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 5,
                     # Configuration variables for SUMO application
                     "m_lights": [[[5], [], [7], [0, 1], [], [2, 3, 4], [], [6]],
                                  [[5], [], [7], [0, 1], [], [2, 3, 4], [], [6]],
@@ -662,7 +662,7 @@ class Intersection:
                         "W": "0006"
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 5,
                     # Configuration variables for SUMO application
                     "m_lights": [[[], [], [4], [], [], [0, 1, 2], [], [3]],
                                  [[], [], [4], [], [], [0, 1, 2], [], [3]],
@@ -688,12 +688,12 @@ class Intersection:
                         "W": "0007"
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 8,
                     # Configuration variables for SUMO application
                     "m_lights": [[[2], [], [], [3, 4, 5, 6], [], [0, 1], [], []],
                                  [[2], [], [], [3, 4], [], [0, 1], [], []],
                                  [[2], [], [], [3, 4, 5, 6], [], [0, 1], [], []]],
-                    "m_detectors": [["e02"], [], [], ["n01", "n02", "n03", "n04"], [], ["e01", "e02"], [], []],
+                    "m_detectors": [["e02"], [], [], ["n01", "n02"], [], ["e01", "e02"], [], []],
                     "lights": list("rrrrrrrrr")
                 },
                 "0009": {
@@ -714,12 +714,12 @@ class Intersection:
                         "W": ""
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 8,
                     # Configuration variables for SUMO application
                     "m_lights": [[[], [5, 6], [], [], [7], [], [], [0, 1, 2, 3, 4]],
                                  [[], [5, 6], [], [], [7], [], [], [0, 1, 2, 3, 4]],
                                  [[], [5, 6], [], [], [7], [], [], [0, 1]]],
-                    "m_detectors": [[], ["w01", "w02"], [], [], ["w02"], [], [], ["s01", "s02", "s03", "s04"]],
+                    "m_detectors": [[], ["w01", "w02"], [], [], ["w02"], [], [], ["s01", "s02", "s03"]],
                     "lights": list("rrrrrrrrrr")
                 },
                 "0010": {
@@ -740,7 +740,7 @@ class Intersection:
                         "W": "0009"
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 8,
                     # Configuration variables for SUMO application
                     "m_lights": [[[], [1, 2], [], [], [3], [], [0], []],
                                  [[], [1, 2], [], [], [3], [], [0], []],
@@ -766,7 +766,7 @@ class Intersection:
                         "W": "0010"
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 6,
                     # Configuration variables for SUMO application
                     "m_lights": [[[], [2, 3, 4], [], [], [5], [], [], [0, 1]],
                                  [[], [2, 3, 4], [], [], [5], [], [], [0, 1]],
@@ -792,12 +792,12 @@ class Intersection:
                         "W": "0011"
                     },
                     "m_max_speed": 14,
-                    "m_max_vehicle_number": 9,
+                    "m_max_vehicle_number": 7,
                     # Configuration variables for SUMO application
                     "m_lights": [[[], [0, 1, 2], [], [3, 4], [], [], [5, 6], []],
                                  [[], [0, 1, 2], [], [3, 4], [], [], [5, 6], []],
                                  [[], [0], [], [3, 4], [], [], [5, 6], []]],
-                    "m_detectors": [[], ["w01", "w02"], [], ["n01", "n02"], [], [], ["n03", "n04"], []],
+                    "m_detectors": [[], ["w01", "w02"], [], ["n01"], [], [], ["n02"], []],
                     "lights": list("rrrrrrrrr")
                 }
             }

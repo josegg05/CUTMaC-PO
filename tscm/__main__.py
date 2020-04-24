@@ -1,5 +1,5 @@
 from petri_nets import tpn
-from petri_nets import inter_tpn
+from petri_nets import inter_tpn_v2
 from petri_nets import net_snakes
 from petri_nets import intersections_classes
 import snakes.plugins
@@ -13,7 +13,7 @@ snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
 
 # Define the global variable of command_received
-intersection_id = "0002"
+intersection_id = ""
 start_flag = False
 msg_dic = []
 
@@ -51,12 +51,7 @@ def mqtt_conf() -> mqtt.Client:
     return client
 
 
-def pub_zmq_config():
-    port = "5557"
-    if len(sys.argv) > 1:
-        port = sys.argv[1]
-        int(port)
-
+def pub_zmq_config(port):
     context = zmq.Context()
     sock = context.socket(zmq.PUB)
     sock.bind("tcp://127.0.0.1:%s" % port)
@@ -64,12 +59,7 @@ def pub_zmq_config():
     return sock
 
 
-def sub_zmq_config():
-    port = "5556"
-    if len(sys.argv) > 1:
-        port = sys.argv[1]
-        int(port)
-
+def sub_zmq_config(port):
     context = zmq.Context()
     print("Connecting to server on port %s" % port)
     sock = context.socket(zmq.SUB)
@@ -85,7 +75,7 @@ def poller_config(socket):
         for sock in socket:
             poller.register(sock, zmq.POLLIN)
     else:
-        poller.register(socket, zmq.POLLIN)
+        poller.register(socket[0], zmq.POLLIN)
     return poller
 
 
@@ -175,13 +165,13 @@ def run():
     global start_flag
     global msg_dic
 
-    super_topic_display = b"tsmc/state"
-    super_topic_phase = b"tsmc/state"
+    super_topic_display = b"tscm/state"
+    super_topic_phase = b"tscm/state"
 
     # Setup of the intersection
     inter_info = intersections_classes.Intersection(intersection_id)
     # Set the definition vectors of the Timed Petri Net
-    petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
+    petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.phases,
                                                                     inter_info.cycles, inter_info.cycles_names)
     # Create de SNAKE Petri Net
     petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
@@ -197,18 +187,14 @@ def run():
     # Set initial phases_state
     phases_state = [0, 0, 0, 0, 0, 0, 0, 0]
     for place in petri_net_inter.places:
-        if "P" in place[0]:
+        if "P" in place[0] and place[0] is not "PTC":
+            print(place)
             #phases_state[place[0][-1]] = (int(place[4]))  # Markings
             phases_state[int(place[0][-1])] = (int(place[4]))  # Markings
     print("Phases states are: ", phases_state)
 
-    # Create intersection Movements
-    movements = {}  # dictionary of movements
+    # Create intersection Movements displays
     moves_displays_state = ["r", "r", "r", "r", "r", "r", "r", "r"]
-    for i in range(len(inter_info.movements)):
-        if (i == 0) or (inter_info.movements[i] > inter_info.movements[i - 1]):
-            movements[inter_info.movements[i]] = intersections_classes.Movement(inter_info.movements[i], inter_info)
-    print("Intersection Movements: ", movements)
 
     print("Intersection '%s' READY:" % intersection_id)
     while not start_flag:
@@ -282,10 +268,13 @@ def run():
 
 
 if __name__ == '__main__':
+    with open("inter_id.txt", "r") as f:
+        intersection_id = f.read()
+    print("Intersection_ID: ", intersection_id)
     client_intersection = mqtt_conf()
     # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
-    pub_socket = pub_zmq_config()
-    sub_socket = sub_zmq_config()
-    poller = poller_config(sub_socket)
+    pub_socket = pub_zmq_config("5557")
+    sub_socket = sub_zmq_config("5558")
+    poller = poller_config([sub_socket])
     run()
