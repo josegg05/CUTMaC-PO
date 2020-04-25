@@ -1,5 +1,4 @@
-from petri_nets import inter_tpn
-from petri_nets import intersections_classes
+from tscm.petri_nets import intersections_classes
 import time
 import paho.mqtt.client as mqtt
 import json

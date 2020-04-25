@@ -1,7 +1,5 @@
-from petri_nets import tpn
-from petri_nets import inter_tpn
-from petri_nets import net_snakes
-from petri_nets import intersections_classes
+from tscm.petri_nets import tpn, inter_tpn, net_snakes
+from tscm.petri_nets import intersections_classes
 import snakes.plugins
 import time
 import paho.mqtt.client as mqtt

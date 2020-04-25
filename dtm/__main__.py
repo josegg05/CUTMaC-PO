@@ -1,4 +1,5 @@
-from petri_nets import intersections_classes
+from intersection import intersections_classes
+from intersection import intersections_config
 import time
 import paho.mqtt.client as mqtt
 import json
@@ -6,18 +7,10 @@ import datetime
 import numpy as np
 from skfuzzy import control as ctrl
 import zmq
-import sys
-
-
-# Define the global variable of command_received
-intersection_id = ""
-start_flag = False
-msg_dic_dtm = []
 
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    global intersection_id
     print("Connected with result code " + str(rc))
 
     # Subscribing in on_connect() means that if we lose the connection and
@@ -32,7 +25,7 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    global msg_dic_dtm
+    global msg_dic
     global start_flag
     msg.payload = msg.payload.decode("utf-8")
     if msg.topic == "intersection/all/start":
@@ -42,13 +35,13 @@ def on_message(client, userdata, msg):
         elif "stop" in str(msg.payload):
             start_flag = False
     else:
-        msg_dic_dtm.append(json.loads(msg.payload))
+        msg_dic.append(json.loads(msg.payload))
         print("message arrive from topic: ", msg.topic)
         # print(msg.topic + " " + str(msg.payload))
 
 
-def mqtt_conf() -> mqtt.Client:
-    broker_address = "localhost"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
+def mqtt_conf(mqtt_broker_ip) -> mqtt.Client:
+    broker_address = mqtt_broker_ip
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -328,15 +321,18 @@ def struct_accident_data_msg(msg_in, mov_acc):
 
 
 def run():
-    global intersection_id
-    global start_flag
-    global msg_dic_dtm
+    global msg_dic
 
     super_topic_congestion = b"dtm/state"
     super_topic_accident = b"dtm/state"
+    pub_socket = pub_zmq_config("5556")
+    sub_socket = sub_zmq_config("5558")
+    poller = poller_config([sub_socket])
+    with open("app_%s.log" % intersection_id, "w+") as f:
+        f.write("movement_id; time; jam_length_vehicle; vehicle_number; occupancy; mean_speed; my_congestion_level; \n")
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
 
     # Setup the congestion model
     congestion_measuring_sim, congestionLevel = congestion_model_conf2(inter_info.m_max_speed,
@@ -369,7 +365,7 @@ def run():
         # # Add accident in B at t = 30
         # if time_current == 30:
         #     my_accident_change = True
-        #     msg_dic_dtm.append({
+        #     msg_dic.append({
         #         "id": "intersection/0002/e2det/s03",
         #         "type": "AccidentObserved",
         #         "laneId": "436291016#3_3",
@@ -381,7 +377,7 @@ def run():
         # # Remove accident in B at t = 300
         # if time_current == 300:
         #     my_accident_change = True
-        #     msg_dic_dtm.append({
+        #     msg_dic.append({
         #         "id": "intersection/0002/e2det/s03",
         #         "type": "AccidentObserved",
         #         "laneId": "436291016#3_3",
@@ -392,8 +388,8 @@ def run():
         #     })
 
         # Manage msgs received
-        if msg_dic_dtm:
-            msg_mqtt = msg_dic_dtm.pop(0)
+        if msg_dic:
+            msg_mqtt = msg_dic.pop(0)
             msg_id = msg_mqtt['id']
             msg_type = msg_mqtt['type']
             if "e2det" in msg_id:
@@ -439,15 +435,17 @@ def run():
 
 
 if __name__ == '__main__':
-    with open("inter_id.txt", "r") as f:
+    # Define the Global Variables
+    start_flag = False
+    msg_dic = []
+    with open("intersection/inter_id.txt", "r") as f:
         intersection_id = f.read()
+    with open("intersection/broker_ip.txt", "r") as f:
+        mqtt_broker_ip = f.read()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
     print("Intersection_ID: ", intersection_id)
-    client_intersection = mqtt_conf()
+
+    client_intersection = mqtt_conf(mqtt_broker_ip)
     # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
-    pub_socket = pub_zmq_config("5556")
-    sub_socket = sub_zmq_config("5558")
-    poller = poller_config([sub_socket])
-    with open("app_%s.log" % intersection_id, "w+") as f:
-        f.write("movement_id; time; jam_length_vehicle; vehicle_number; occupancy; mean_speed; my_congestion_level; \n")
+
     run()

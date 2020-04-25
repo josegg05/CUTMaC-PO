@@ -1,6 +1,4 @@
-from petri_nets import tpn
-from petri_nets import inter_tpn
-from petri_nets import net_snakes
+from tscm.petri_nets import tpn, inter_tpn, net_snakes
 import pandas as pd
 import snakes.plugins
 

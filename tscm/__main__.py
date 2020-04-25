@@ -1,21 +1,14 @@
-from petri_nets import tpn
-from petri_nets import inter_tpn_v2
-from petri_nets import net_snakes
-from petri_nets import intersections_classes
+from tscm.petri_nets import tpn, net_snakes, inter_tpn_v2
+from intersection import intersections_classes
+from intersection import intersections_config
 import snakes.plugins
 import time
 import paho.mqtt.client as mqtt
 import json
 import zmq
-import sys
 
 snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
-
-# Define the global variable of command_received
-intersection_id = ""
-start_flag = False
-msg_dic = []
 
 
 # The callback for when the client receives a CONNACK response from the server.
@@ -42,8 +35,8 @@ def on_message(client, userdata, msg):
         print("message arrive from topic: " + msg.topic + " " + str(msg.payload))
 
 
-def mqtt_conf() -> mqtt.Client:
-    broker_address = "localhost"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
+def mqtt_conf(mqtt_broker_ip) -> mqtt.Client:
+    broker_address = mqtt_broker_ip
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -161,18 +154,19 @@ def set_phase_state(transition, phases_state, id):
 
 
 def run():
-    global intersection_id
-    global start_flag
     global msg_dic
 
     super_topic_display = b"tscm/state"
     super_topic_phase = b"tscm/state"
+    pub_socket = pub_zmq_config("5557")
+    sub_socket = sub_zmq_config("5558")
+    poller = poller_config([sub_socket])
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
     # Set the definition vectors of the Timed Petri Net
     petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.phases,
-                                                                    inter_info.cycles, inter_info.cycles_names)
+                                                                       inter_info.cycles, inter_info.cycles_names)
     # Create de SNAKE Petri Net
     petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
     init = petri_net_snake.get_marking()
@@ -268,13 +262,17 @@ def run():
 
 
 if __name__ == '__main__':
-    with open("inter_id.txt", "r") as f:
+    # Define the Global Variables
+    start_flag = False
+    msg_dic = []
+    with open("intersection/inter_id.txt", "r") as f:
         intersection_id = f.read()
+    with open("intersection/broker_ip.txt", "r") as f:
+        mqtt_broker_ip = f.read()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
     print("Intersection_ID: ", intersection_id)
-    client_intersection = mqtt_conf()
+
+    client_intersection = mqtt_conf(mqtt_broker_ip)
     # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
-    pub_socket = pub_zmq_config("5557")
-    sub_socket = sub_zmq_config("5558")
-    poller = poller_config([sub_socket])
+
     run()

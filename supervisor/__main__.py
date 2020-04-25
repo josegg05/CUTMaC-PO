@@ -1,4 +1,5 @@
-from petri_nets import intersections_classes
+from intersection import intersections_classes
+from intersection import intersections_config
 import time
 import paho.mqtt.client as mqtt
 import json
@@ -6,17 +7,10 @@ import datetime
 import numpy as np
 from skfuzzy import control as ctrl
 import zmq
-import sys
-
-# Define the global variable of command_received
-intersection_id = ""
-start_flag = False
-msg_dic = []
 
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    global intersection_id
     print("Connected with result code " + str(rc))
 
     # Subscribing in on_connect() means that if we lose the connection and
@@ -41,8 +35,8 @@ def on_message(client, userdata, msg):
         print(msg.topic + " " + str(msg.payload))
 
 
-def mqtt_conf() -> mqtt.Client:
-    broker_address = "localhost"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
+def mqtt_conf(mqtt_broker_ip) -> mqtt.Client:
+    broker_address = mqtt_broker_ip
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -195,7 +189,6 @@ def config_pi_mov_split(movement, split_cal):
 
 
 def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, split, time_current, id):
-    global intersection_id
     mov_splits_changed = {}
     for mov in mov_displays_change:
         with open("app_%s.log" % intersection_id, "w+") as f:
@@ -273,7 +266,7 @@ def manage_accidents(msg_in, neighbors_ids, accident_lanes):
         accident_lanes.remove(msg_in['id'])
 
     if direction_IO is not "":
-        #TODO: Send change cycle to TPN
+        # TODO: Send change cycle to TPN
         # petri_net_snake.place(place_name).add(dot)
         pass
     else:
@@ -300,17 +293,19 @@ def send_state(my_topic, movements):
 
 
 def run():
-    global intersection_id
-    global start_flag
     global msg_dic
 
     tscm_topic_split = b"super/tscm/command"
     tscm_topic_cycle = b"super/tscm/command"
     dtm_topic_congestion = b"super/dtm/command"
     dtm_topic_display = b"super/dtm/state"
+    pub_socket = pub_zmq_config("5558")
+    dtm_sub_socket = sub_zmq_config("5556", b"dtm/state")
+    tscm_sub_socket = sub_zmq_config("5557", b"tscm/state")
+    poller = poller_config([dtm_sub_socket, tscm_sub_socket])
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
 
     # Define my_topic
     my_topic = inter_info.state_topic
@@ -341,6 +336,12 @@ def run():
             neighbors[i] = intersections_classes.Neighbor(inter_info.neighbors_ids[i], i)
     print("Intersection Neighbors: ", neighbors)
 
+    # Beging the log
+    with open("app_%s.log" % intersection_id, "w+") as f:
+        f.write("movement_id; time; jam_length_vehicle; vehicle_number; occupancy; mean_speed; my_congestion_level; "
+                "in_congestion_level; out_congestion_level; split; act_ime;\n")
+
+    # Intersection ready tu start
     print("Intersection '%s' READY:" % intersection_id)
     while not start_flag:
         pass  # Do nothing waiting for the start signal
@@ -377,8 +378,10 @@ def run():
                 print(msg_zmq)
                 # Measure congestion of correspondent Movement
                 if "phase" in msg_zmq['category']["value"]:  # Debe ser el nombre exacto
-                    print(time_current, "Measure congestion of the Movement of the next Phase -->", msg_zmq['state']["value"])
-                    mov_congestion_measure = [phases_list[i] for i in range(len(msg_zmq["state"]["value"])) if msg_zmq["state"]["value"][i] != 0]  # list of list
+                    print(time_current, "Measure congestion of the Movement of the next Phase -->",
+                          msg_zmq['state']["value"])
+                    mov_congestion_measure = [phases_list[i] for i in range(len(msg_zmq["state"]["value"])) if
+                                              msg_zmq["state"]["value"][i] != 0]  # list of list
                     congestion_msg = {
                         "id": inter_info.id,
                         "type": "stateMeasure",
@@ -402,8 +405,8 @@ def run():
                     if "r" in mov_displays_change.values():
                         # TODO: Crear el msg de cycle_msg con la info de los movimientos
                         pass
-                        #cycle_msg = cycle_set(msg_zmq["id"])
-                        #pub_socket.send_multipart([tscm_topic_cycle, json.dumps(cycle_msg).encode()])
+                        # cycle_msg = cycle_set(msg_zmq["id"])
+                        # pub_socket.send_multipart([tscm_topic_cycle, json.dumps(cycle_msg).encode()])
                     # Measure split of correspondent Movement
                     elif "G" in mov_displays_change.values():
                         print("Calculate split of movements: ", mov_displays_change)
@@ -438,18 +441,42 @@ def run():
         #     pass
 
 
-if __name__ == '__main__':
-    with open("inter_id.txt", "r") as f:
+def initialize():
+    # Define the global variable of command_received
+    global start_flag, msg_dic, intersection_id, client_intersection, pub_socket, dtm_sub_socket, tscm_sub_socket, \
+        poller
+    start_flag = False
+    msg_dic = []
+
+    with open("intersection/inter_id.txt", "r") as f:
         intersection_id = f.read()
+    with open("intersection/broker_ip.txt", "r") as f:
+        mqtt_broker_ip = f.read()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
     print("Intersection_ID: ", intersection_id)
-    client_intersection = mqtt_conf()
-    # client_intersection: mqtt.Client = mqtt_conf()
+
+    client_intersection = mqtt_conf(mqtt_broker_ip)
     client_intersection.loop_start()  # Necessary to maintain connection
     pub_socket = pub_zmq_config("5558")
     dtm_sub_socket = sub_zmq_config("5556", b"dtm/state")
     tscm_sub_socket = sub_zmq_config("5557", b"tscm/state")
     poller = poller_config([dtm_sub_socket, tscm_sub_socket])
-    with open("app_%s.log" % intersection_id, "w+") as f:
-        f.write("movement_id; time; jam_length_vehicle; vehicle_number; occupancy; mean_speed; my_congestion_level; "
-            "in_congestion_level; out_congestion_level; split; act_ime;\n")
+
+
+# if you have global variables, you must
+# initialize them outside the main block
+# initialize()
+if __name__ == '__main__':
+    # Define Global Variables
+    start_flag = False
+    msg_dic = []
+    with open("intersection/inter_id.txt", "r") as f:
+        intersection_id = f.read()
+    with open("intersection/broker_ip.txt", "r") as f:
+        mqtt_broker_ip = f.read()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
+    print("Intersection_ID: ", intersection_id)
+
+    client_intersection = mqtt_conf(mqtt_broker_ip)
+    # client_intersection: mqtt.Client = mqtt_conf()
+    client_intersection.loop_start()  # Necessary to maintain connection
+
     run()
