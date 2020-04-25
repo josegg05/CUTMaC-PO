@@ -1,5 +1,6 @@
 from tscm.petri_nets import tpn, net_snakes, inter_tpn_v2
-from tscm.petri_nets import intersections_classes
+from intersection import intersections_classes
+from intersection import intersections_config
 import snakes.plugins
 import time
 import paho.mqtt.client as mqtt
@@ -441,7 +442,7 @@ def run():
     global msg_dic
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
 
     # Define my_topic
     my_topic = inter_info.state_topic

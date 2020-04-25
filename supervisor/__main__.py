@@ -470,9 +470,9 @@ if __name__ == '__main__':
     start_flag = False
     msg_dic = []
     with open("intersection/inter_id.txt", "r") as f:
-        intersection_id = f.read()
+        intersection_id = f.read().rstrip()
     with open("intersection/broker_ip.txt", "r") as f:
-        mqtt_broker_ip = f.read()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
+        mqtt_broker_ip = f.read().rstrip()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
     print("Intersection_ID: ", intersection_id)
 
     client_intersection = mqtt_conf(mqtt_broker_ip)
