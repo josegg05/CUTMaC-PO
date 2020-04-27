@@ -466,6 +466,8 @@ def run():
     for i in range(len(inter_info.movements)):
         if (i == 0) or (inter_info.movements[i] > inter_info.movements[i - 1]):
             movements[inter_info.movements[i]] = intersections_classes.Movement(inter_info.movements[i], inter_info)
+        else:
+            break
     print("Intersection Movements: ", movements)
 
     # Create intersection neighbors
@@ -533,7 +535,7 @@ def run():
                 for mov in phases_list[int(i[-2])]:  # For inter_tpn_v2
                     if mov in movements.keys():
                         f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
-                        movements[j].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov],
+                        movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov],
                                                                           congestionLevel)
                         movements[mov].split = split_measure(split_measuring_sim, movements[mov], neighbors, split)
                         config_pi_mov_split(petri_net_snake, movements[mov])
