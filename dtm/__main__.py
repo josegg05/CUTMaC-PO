@@ -249,11 +249,12 @@ def congestion_measure(congestion_measuring_sim, movement):
         congestion_measuring_sim.compute()
         congestion = congestion_measuring_sim.output['congestionLevel']
 
-    with open("app_%s.log" % intersection_id, "w+") as f:
+    with open("dtm_%s.log" % intersection_id, "a") as f:
         f.write(str(movement.get_jam_length_vehicle()) + "; " +
                 str(movement.get_vehicle_number()) + "; " +
                 str(movement.get_occupancy()) + "; " +
-                str(movement.get_mean_speed()) + "; ")
+                str(movement.get_mean_speed()) + "; " +
+                str(congestion) + ";\n")
 
     print("Congestion_", movement.id, " = ", congestion)
     # print("jamLengthVehicle = ", movement.get_jam_length_vehicle(),
@@ -279,11 +280,11 @@ def congestion_measure2(congestion_measuring_sim, movement):
         congestion_measuring_sim.compute()
         congestion = congestion_measuring_sim.output['congestionLevel']
 
-    with open("app_%s.log" % intersection_id, "w+") as f:
-        f.write(str(movement.get_jam_length_vehicle()) + "; " +
-                str(movement.get_vehicle_number()) + "; " +
+    with open("dtm_%s.log" % intersection_id, "a") as f:
+        f.write(str(movement.get_vehicle_number()) + "; " +
                 str(movement.get_occupancy()) + "; " +
-                str(movement.get_mean_speed()) + "; ")
+                str(movement.get_mean_speed()) + "; " +
+                str(congestion) + ";\n")
 
     print("Congestion_", movement.id, " = ", congestion)
     print("vehicleNumber = ", mov_vehicle_num,
@@ -328,8 +329,8 @@ def run():
     pub_socket = pub_zmq_config("5556")
     sub_socket = sub_zmq_config("5558")
     poller = poller_config([sub_socket])
-    with open("app_%s.log" % intersection_id, "w+") as f:
-        f.write("movement_id; time; jam_length_vehicle; vehicle_number; occupancy; mean_speed; my_congestion_level; \n")
+    with open("dtm_%s.log" % intersection_id, "w") as f:
+        f.write("movement_id; time; vehicle_number; occupancy; mean_speed; my_congestion_level; \n")
 
     # Setup of the intersection
     inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
@@ -413,7 +414,7 @@ def run():
                     print(time_current, "*** Measure congestion of movements: ", msg_movements, " ***")
                     for mov in msg_movements:
                         if mov in movements:
-                            with open("app_%s.log" % intersection_id, "w+") as f:
+                            with open("dtm_%s.log" % intersection_id, "a") as f:
                                 f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
                             movements[mov].congestionLevel = congestion_measure2(congestion_measuring_sim, movements[mov])
                             mov_cong[mov] = movements[mov].congestionLevel

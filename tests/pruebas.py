@@ -316,3 +316,19 @@ msg_sup = {
 }
 print(msg_sup)
 print(msg_sup["data"]["value"][3])
+
+# Log File structure
+intersection_id = "0004"
+
+with open("app_%s.log" % intersection_id, "w") as f:
+    f.write("movement_id; time; vehicle_number; occupancy; mean_speed; my_congestion_level; \n")
+
+for i in range(10):
+    with open("app_%s.log" % intersection_id, "a") as f:
+        f.write(str(intersection_id) + "; " + str(i) + "; ")
+
+    with open("app_%s.log" % intersection_id, "a") as f:
+        f.write(str(i + 10) + "; " +
+                str(i + 50) + "; " +
+                str(i + 1) + "; " +
+                str(i + 60) + ";\n")

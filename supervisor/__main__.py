@@ -159,7 +159,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
 
     # Crunch the numbers
     split_measuring_sim.compute()
-    with open("app_%s.log" % intersection_id, "w+") as f:
+    with open("sup_%s.log" % intersection_id, "a") as f:
         f.write(str(movement.congestionLevel) + "; " +
                 str(in_congestion_level) + "; " +
                 str(out_congestion_level) + "; " +
@@ -191,7 +191,7 @@ def config_pi_mov_split(movement, split_cal):
 def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, split, time_current, id):
     mov_splits_changed = {}
     for mov in mov_displays_change:
-        with open("app_%s.log" % intersection_id, "w+") as f:
+        with open("sup_%s.log" % intersection_id, "a") as f:
             f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
         # TODO: Read the dtm log and write the info to the complete log
         split_cal = split_measure(split_measuring_sim, movements[mov], neighbors, split)
@@ -199,7 +199,7 @@ def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, sp
         movements[mov].split = actual_green
         mov_splits_changed[mov] = actual_green
         print("tAct_" + str(movements[mov].id) + "_time = ", actual_green)
-        with open("app_%s.log" % intersection_id, "w+") as f:
+        with open("sup_%s.log" % intersection_id, "a") as f:
             f.write(str(actual_green) + ";" + "\n")
     # Done: TODO: Send t_split to the TPN
     split_msg = {
@@ -337,9 +337,8 @@ def run():
     print("Intersection Neighbors: ", neighbors)
 
     # Beging the log
-    with open("app_%s.log" % intersection_id, "w+") as f:
-        f.write("movement_id; time; jam_length_vehicle; vehicle_number; occupancy; mean_speed; my_congestion_level; "
-                "in_congestion_level; out_congestion_level; split; act_ime;\n")
+    with open("sup_%s.log" % intersection_id, "w") as f:
+        f.write("movement_id; time; my_congestion_level; in_congestion_level; out_congestion_level; split; act_time;\n")
 
     # Intersection ready tu start
     print("Intersection '%s' READY:" % intersection_id)
