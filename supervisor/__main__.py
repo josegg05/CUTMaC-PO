@@ -96,9 +96,9 @@ def set_five_quant_label(level):
 
 
 def split_pi_model_conf():
-    my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')
-    in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')
-    out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')
+    my_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'my_congestion_level')  # Antes 101
+    in_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'in_congestion_level')  # Antes 101
+    out_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'out_congestion_level')  # Antes 101
     split = ctrl.Consequent(np.arange(-2, 3, 1), 'split')
 
     # Membership Functions definition
@@ -200,7 +200,7 @@ def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, sp
         mov_splits_changed[mov] = actual_green
         print("tAct_" + str(movements[mov].id) + "_time = ", actual_green)
         with open("sup_%s.log" % intersection_id, "a") as f:
-            f.write(str(actual_green) + ";" + "\n")
+            f.write(str(actual_green) + "\n")
     # Done: TODO: Send t_split to the TPN
     split_msg = {
         "id": id,
@@ -338,7 +338,7 @@ def run():
 
     # Beging the log
     with open("sup_%s.log" % intersection_id, "w") as f:
-        f.write("movement_id; time; my_congestion_level; in_congestion_level; out_congestion_level; split; act_time;\n")
+        f.write("movement_id; time; my_congestion_level; in_congestion_level; out_congestion_level; split; act_time\n")
 
     # Intersection ready tu start
     print("Intersection '%s' READY:" % intersection_id)

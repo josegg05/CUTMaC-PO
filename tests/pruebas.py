@@ -14,9 +14,12 @@ df.loc[1]['X'] = 10
 print(df)
 print(a)
 
+
 class Hola:
     def __init__(self):
         self.hi = 0
+
+
 hola = Hola()
 print(hola.hi)
 hola.hi = [1, 2, 3]
@@ -26,26 +29,26 @@ print(hola.hi)
 data = pd.Series([5, 2, 3, 7], index=['a', 'b', 'c', 'd'])
 print(data['a'])
 
-#Pandas series
+# Pandas series
 data2 = pd.Series()
 data2 = data2.append(pd.Series([5], index=['jose']))
 data2 = data2.append(pd.Series([6], index=['jesi']))
 print(data2)
 
-#Lists
+# Lists
 data3 = []
 data3.append("jeje")
 data3.append("jojo")
 print(data3)
 
-#Dictionaries
+# Dictionaries
 data4 = {}
 data4["jaja"] = 5
 data4["fomo"] = 6
 print(data4)
 print(data4["fomo"])
 
-#Pandas dataframe
+# Pandas dataframe
 data5 = pd.DataFrame(columns=["name", "color", "x_pos", "y_pos", "id"])
 data5 = data5.append({'name': 'Sahil', 'color': 2, "x_pos": 70, "y_pos": 0, "id": 1}, ignore_index=True)
 data5 = data5.append({'name': 'Jose', 'color': 2, "x_pos": 75, "y_pos": 0, "id": 1}, ignore_index=True)
@@ -72,14 +75,15 @@ print(pepe[0])
 # ******************************************************
 from cutmapnet.petri_nets import tpn
 import snakes.plugins
+
 snakes.plugins.load(tpn, "snakes.nets", "snk")
 from snk import *
 
 n = PetriNet("stepper")
 
-for i in range(3) :
+for i in range(3):
     n.add_place(Place("p%s" % i, [dot]))
-    n.add_transition(Transition("t%s" % i, min_time=i+1, max_time=i*2+1))
+    n.add_transition(Transition("t%s" % i, min_time=i + 1, max_time=i * 2 + 1))
     n.add_input("p%s" % i, "t%s" % i, Value(dot))
 init = n.get_marking()
 print(init)
@@ -97,13 +101,14 @@ for i in range(3):
     n.transition("t%d" % i).fire(Substitution())
 
 print("\n")
-n.set_marking(init) # Acts like n.reset(), because each transition has a place in its pre-set whose marking is reset, just like for method reset
+n.set_marking(
+    init)  # Acts like n.reset(), because each transition has a place in its pre-set whose marking is reset, just like for method reset
 clock = 0.0
-for i in range(3) :
+for i in range(3):
     print(" , ".join("%s[%s,%s]=%s" % (t, t.min_time, t.max_time,
                                        "#" if t.time is None else t.time)
                      for t in n.transition()))
-    for j in range(3) :
+    for j in range(3):
         delay = n.time()
         print("[%s]" % clock, "delay:", delay)
         clock += delay
@@ -114,8 +119,9 @@ for i in range(3) :
 # Pruebas graph with SNAKE
 # ******************************************************
 
-#from snakes.nets import *
+# from snakes.nets import *
 import snakes.plugins
+
 snakes.plugins.load("gv", "snakes.nets", "nets")
 from nets import *
 
@@ -127,13 +133,13 @@ n.add_output('p', 't', Expression('x+1'))
 
 modes = n.transition('t').modes()
 print(modes)
-#n.draw("value-0.png")
+# n.draw("value-0.png")
 
 n.transition('t').fire(Substitution(x=0))
 state = n.get_marking()
 print(state)
 
-#for engine in ('neato', 'dot', 'circo', 'twopi', 'fdp'):
+# for engine in ('neato', 'dot', 'circo', 'twopi', 'fdp'):
 #    n.draw(',test-gv-%s.png' % engine, engine=engine)
 
 # Draw the PN and the state graph
@@ -142,14 +148,15 @@ s = StateGraph(n)
 s.build()
 s.draw('test-gv-graph.png')
 
-
 # ******************************************************
 # Pruebas time
 # ******************************************************
 import time
 
+
 def procedure():
-   time.sleep(2.5)
+    time.sleep(2.5)
+
 
 # measure process time
 t0 = time.perf_counter()
@@ -171,14 +178,12 @@ print(lista)
 print(lista[2][4])
 print(len(lista))
 
-
 # prueba 2 listas con los mismos elementos
 pepe = [1, 2]
 if set(pepe) == set([2, 1]):
     print("hola pepe")
 else:
     pepe.append(5)
-
 
 # List of list of lists
 m_lights = [[[], [2], [], [], [5], [], [], [0, 1]],
@@ -198,7 +203,6 @@ dic = {
 
 print(dic[1]["neighbors"]["NORTH"])
 
-
 # If x is not None
 variable = "hi"
 if variable is not "":
@@ -206,20 +210,18 @@ if variable is not "":
 else:
     print("It is ''")
 
-
 # String in a string
 string = "hola/soy/Jose"
 if "Jose" in string:
     print(f"Jose is in string {string}")
 
-
 # 'f"{}"' string format
 direction = "n"
 print(f"Acc{direction.capitalize()}I_to_Normal")
 
-
 # prueba np.sum
 import numpy as np
+
 vehicleNumber = []
 vehicleNumber.append(2)
 vehicleNumber.append(5)
@@ -231,8 +233,8 @@ print(vehiNum)
 # del from list
 moves = []
 moves.append(1)
-moves. append(5)
-moves. append(7)
+moves.append(5)
+moves.append(7)
 print(moves)
 moves.remove(5)
 print(moves)
@@ -267,12 +269,12 @@ ages = {"Jose": 29,
         "Mari": 13}
 print(list(ages.keys())[1])
 
-
-for i in range(1,6):
+for i in range(1, 6):
     print(i)
 
 # json
 import json
+
 msg = '{"0": "G", "1": "R", "2": "R", "3": "R", "4": "G", "5": "R", "6": "R", "7": "R"}'
 msg_dec = json.loads(msg)
 moves_green = [int(i) for i in msg_dec.keys() if msg_dec[i] == "G"]
@@ -302,11 +304,11 @@ msg = {
     "type": "pepe",
     "category": {
         "value": ["lolo"]
-           },
+    },
     "state": {
         "value": [0, 0, 0, 1, 0, 0, 0]
-           }
     }
+}
 
 msg_sup = {
     "id": msg_dic["id"],
@@ -332,3 +334,58 @@ for i in range(10):
                 str(i + 50) + "; " +
                 str(i + 1) + "; " +
                 str(i + 60) + ";\n")
+
+# Read the log file
+# ************* DTM ****************
+import csv
+dtm_log_list = []
+with open('tests\dtm_0002.log') as csvfile:
+    reader = csv.reader(csvfile, delimiter=';')
+    for row in reader:
+        dtm_log_list.append(row)
+
+print(dtm_log_list[1])
+
+vehi_num = []
+occupancy = []
+speed = []
+congestion = []
+for i in range(1, len(dtm_log_list)):
+    vehi_num.append(float(dtm_log_list[i][2]))
+    occupancy.append(float(dtm_log_list[i][3]))
+    speed.append(float(dtm_log_list[i][4]))
+    congestion.append(float(dtm_log_list[i][5]))
+
+print([min(vehi_num), max(vehi_num)])
+print([min(occupancy), max(occupancy)])
+print([min(speed), max(speed)])
+print([min(congestion), max(congestion)])
+
+# ************* SUPERVISOR ****************
+super_log_list = []
+with open('tests\sup_0002.log') as csvfile:
+    reader = csv.reader(csvfile, delimiter=';')
+    for row in reader:
+        super_log_list.append(row)
+print(super_log_list[0])
+
+my_congestion = []
+in_congestion = []
+out_congestion = []
+split = []
+act_time = []
+for i in range(1, len(super_log_list)):
+    my_congestion.append(float(super_log_list[i][2]))
+    in_congestion.append(float(super_log_list[i][3]))
+    out_congestion.append(float(super_log_list[i][4]))
+    split.append(float(super_log_list[i][5]))
+    act_time.append(float(super_log_list[i][6]))
+
+print([min(my_congestion), max(my_congestion)])
+print([min(in_congestion), max(in_congestion)])
+print([min(out_congestion), max(out_congestion)])
+print([min(split), max(split)])
+print([min(act_time), max(act_time)])
+
+for row in super_log_list:
+    print(row)

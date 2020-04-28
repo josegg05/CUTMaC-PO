@@ -240,11 +240,14 @@ def congestion_model_conf2(max_speed, max_vehicle_number):
 
 def congestion_measure(congestion_measuring_sim, movement):
     congestion = 0.0
+    mov_speed = movement.get_mean_speed()
+    if mov_speed < 0:
+        mov_speed = 14  # MAX_SPEED
     if movement.get_vehicle_number() != 0:
         congestion_measuring_sim.input['jamLengthVehicle'] = movement.get_jam_length_vehicle()
         congestion_measuring_sim.input['vehicleNumber'] = movement.get_vehicle_number()
         congestion_measuring_sim.input['occupancy'] = movement.get_occupancy()
-        congestion_measuring_sim.input['meanSpeed'] = movement.get_mean_speed()
+        congestion_measuring_sim.input['meanSpeed'] = mov_speed
         # Crunch the numbers
         congestion_measuring_sim.compute()
         congestion = congestion_measuring_sim.output['congestionLevel']
@@ -253,8 +256,8 @@ def congestion_measure(congestion_measuring_sim, movement):
         f.write(str(movement.get_jam_length_vehicle()) + "; " +
                 str(movement.get_vehicle_number()) + "; " +
                 str(movement.get_occupancy()) + "; " +
-                str(movement.get_mean_speed()) + "; " +
-                str(congestion) + ";\n")
+                str(mov_speed) + "; " +
+                str(congestion) + "\n")
 
     print("Congestion_", movement.id, " = ", congestion)
     # print("jamLengthVehicle = ", movement.get_jam_length_vehicle(),
@@ -283,8 +286,8 @@ def congestion_measure2(congestion_measuring_sim, movement):
     with open("dtm_%s.log" % intersection_id, "a") as f:
         f.write(str(movement.get_vehicle_number()) + "; " +
                 str(movement.get_occupancy()) + "; " +
-                str(movement.get_mean_speed()) + "; " +
-                str(congestion) + ";\n")
+                str(mov_speed) + "; " +
+                str(congestion) + "\n")
 
     print("Congestion_", movement.id, " = ", congestion)
     print("vehicleNumber = ", mov_vehicle_num,
@@ -330,7 +333,7 @@ def run():
     sub_socket = sub_zmq_config("5558")
     poller = poller_config([sub_socket])
     with open("dtm_%s.log" % intersection_id, "w") as f:
-        f.write("movement_id; time; vehicle_number; occupancy; mean_speed; my_congestion_level; \n")
+        f.write("movement_id; time; vehicle_number; occupancy; mean_speed; my_congestion_level\n")
 
     # Setup of the intersection
     inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)

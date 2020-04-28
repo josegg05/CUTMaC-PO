@@ -37,7 +37,7 @@ class Neighbor:
         self.id = neighbor_id
         self.direction = neighbor_dir
         self.mov_accident = [False, False, False, False, False, False, False, False]
-        self.mov_congestion = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.mov_congestion = [50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0]
 
 
 class Detector:
