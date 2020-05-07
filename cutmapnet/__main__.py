@@ -53,7 +53,7 @@ def on_message(client, userdata, msg):
 
 
 def mqtt_conf() -> mqtt.Client:
-    broker_address = "localhost"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
+    broker_address = "192.168.5.95"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -441,7 +441,7 @@ def run():
     global msg_dic
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
 
     # Define my_topic
     my_topic = inter_info.state_topic
