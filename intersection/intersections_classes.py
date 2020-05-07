@@ -32,12 +32,13 @@ class Intersection:
             self.lights = inter_config[self.id]["lights"]
 
 
+
 class Neighbor:
     def __init__(self, neighbor_id, neighbor_dir):
         self.id = neighbor_id
         self.direction = neighbor_dir
         self.mov_accident = [False, False, False, False, False, False, False, False]
-        self.mov_congestion = [50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0]
+        self.mov_congestion = [0, 0, 0, 0, 0, 0, 0, 0] #  [50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0]
 
 
 class Detector:
@@ -59,7 +60,7 @@ class Movement:
         self.in_neighbors = []
         self.out_neighbors = []
         self.congestionLevel = 0
-        self.split = 16  # Same as "tAct_" in inter_tpn
+        self.split = 0 #  16  # Same as "tAct_" in inter_tpn
         self.accident = [0, ""]
         self.light_state = "r"
 
@@ -107,7 +108,7 @@ class Movement:
         elif det == "ALL":
             for i in self._detectors:
                 jam_length_vehicle += self._detectors[i].jamLengthVehicle
-            jam_length_vehicle = jam_length_vehicle / len(self._detectors)
+            #jam_length_vehicle = jam_length_vehicle / len(self._detectors)
         else:
             jam_length_vehicle = "NA"
         return jam_length_vehicle
@@ -119,7 +120,7 @@ class Movement:
         elif det == "ALL":
             for i in self._detectors:
                 occupancy += self._detectors[i].occupancy
-            occupancy = occupancy / len(self._detectors)
+            #occupancy = occupancy / len(self._detectors)
         else:
             occupancy = "NA"
         return occupancy
@@ -131,7 +132,7 @@ class Movement:
         elif det == "ALL":
             for i in self._detectors:
                 mean_speed += self._detectors[i].meanSpeed
-            mean_speed = mean_speed / len(self._detectors)
+            #mean_speed = mean_speed / len(self._detectors)
         else:
             mean_speed = "NA"
         return mean_speed
@@ -143,7 +144,7 @@ class Movement:
         elif det == "ALL":
             for i in self._detectors:
                 vehicle_number += self._detectors[i].vehicleNumber
-            vehicle_number = vehicle_number / len(self._detectors)
+            #vehicle_number = vehicle_number / len(self._detectors)
         else:
             vehicle_number = "NA"
         return vehicle_number
@@ -163,3 +164,5 @@ class Movement:
     def set_vehicle_number(self, detector_id, vehicle_number):
         self._detectors[detector_id].vehicleNumber = vehicle_number
         return
+
+

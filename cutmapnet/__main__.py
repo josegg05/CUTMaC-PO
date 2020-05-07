@@ -1,4 +1,4 @@
-from tscm.petri_nets import tpn, net_snakes, inter_tpn_v2
+from tscm.petri_nets import tpn, net_snakes, inter_tpn
 from intersection import intersections_classes
 from intersection import intersections_config
 import snakes.plugins
@@ -303,7 +303,7 @@ def split_pi_model_conf():
     my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')
     in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')
     out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')
-    split = ctrl.Consequent(np.arange(-2, 3, 1), 'split')
+    split = ctrl.Consequent(np.arange(-4, 5, 1), 'split')
 
     # Membership Functions definition
     my_congestion_level.automf(5, 'quant')
@@ -378,7 +378,6 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
 
 def config_mov_split(petri_net_snake, movement):
     mean_green = 13
-    t_split = 0
     transition_name = "tAct_" + str(movement.id)
     t_split = min(mean_green + int(movement.split), petri_net_snake.transition(transition_name).max_time)
     petri_net_snake.transition(transition_name).min_time = t_split
@@ -477,8 +476,8 @@ def run():
     print("Intersection Neighbors: ", neighbors)
 
     # Set the definition vectors of the Timed Petri Net
-    petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.phases,
-                                                                       inter_info.cycles, inter_info.cycles_names)
+    petri_net_inter, place_id, transition_id = inter_tpn.net_create(inter_info.movements, inter_info.phases,
+                                                                    inter_info.cycles, inter_info.cycles_names)
 
     # Create de SNAKE Petri Net
     petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
@@ -531,8 +530,8 @@ def run():
         for i in transitions_fire:
             if (("tNormal" in i) or ("tAcc" in i)) and (i[-1] not in ["l", "I", "O"]):
                 print("Measure congestion and split of the Movement of the next Phase --> %s" % i[-2])
-                # for j in inter_info.phases[int(i[-2])]:  # For inter_tpn
-                for mov in phases_list[int(i[-2])]:  # For inter_tpn_v2
+                for mov in inter_info.phases[int(i[-2])]:  # For inter_tpn
+                # for mov in phases_list[int(i[-2])]:  # For inter_tpn_v2
                     if mov in movements.keys():
                         f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
                         movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov],
