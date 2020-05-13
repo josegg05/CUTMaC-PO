@@ -32,7 +32,6 @@ class Intersection:
             self.lights = inter_config[self.id]["lights"]
 
 
-
 class Neighbor:
     def __init__(self, neighbor_id, neighbor_dir):
         self.id = neighbor_id

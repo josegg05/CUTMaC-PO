@@ -53,7 +53,7 @@ def on_message(client, userdata, msg):
 
 
 def mqtt_conf() -> mqtt.Client:
-    broker_address = "192.168.5.95"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
+    broker_address = "localhost"  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -69,12 +69,14 @@ def subscribe_neighbors(neighbors):
     return
 
 
-def manage_flow(msg_in, movements, moves_green, moves_detectors, neighbors):
+def manage_flow(msg_in, movements, moves_green, moves_detectors, neighbors, time_current):
     # Function that saves the detectors and neighbor congestion info
     detector_id = msg_in["id"][-3:]
     msg_id = msg_in["id"]
     print("detector_id: ", detector_id)
     mov_ids = []
+    # mov_jam = "NA"
+    # mov_speed = "NA"
     if "e2det" in msg_id:  # My Flow Change
         print("Detector value changed in lane " + msg_in['laneId'])
         for mov in range(8):  # 8 movements
@@ -85,8 +87,14 @@ def manage_flow(msg_in, movements, moves_green, moves_detectors, neighbors):
             if mov in moves_green:
                 movements[mov].set_jam_length_vehicle(detector_id, msg_in["jamLengthVehicle"])
                 movements[mov].set_mean_speed(detector_id, msg_in["meanSpeed"])
+                # mov_jam = msg_in["jamLengthVehicle"]
+                # mov_speed = msg_in["meanSpeed"]
             movements[mov].set_occupancy(detector_id, msg_in["occupancy"])
             movements[mov].set_vehicle_number(detector_id, msg_in["vehicleNumber"])
+        with open("detect_%s.log" % intersection_id, "a") as f:
+            f.write(str(time_current) + "; " + str(msg_id) + "; " + str(msg_in["vehicleNumber"]) + "; " +
+                    str(msg_in["occupancy"]) + "; " + str(msg_in["jamLengthVehicle"]) + "; " +
+                    str(msg_in["meanSpeed"]) + "\n")
 
     elif "state" in msg_id:  # Neighbor Flow Changes
         print("Flow status changes on neighbor " + msg_in['id'])
@@ -212,10 +220,11 @@ def congestion_measure(congestion_measuring_sim, movement, congestionLevel):
         congestion_measuring_sim.compute()
         congestion = congestion_measuring_sim.output['congestionLevel']
 
-    f.write(str(movement.get_jam_length_vehicle()) + "; " +
-            str(movement.get_vehicle_number()) + "; " +
-            str(movement.get_occupancy()) + "; " +
-            str(movement.get_mean_speed()) + "; ")
+    with open("app_%s.log" % intersection_id, "a") as f:
+        f.write(str(movement.get_vehicle_number()) + "; " +
+                str(movement.get_occupancy()) + "; " +
+                str(movement.get_jam_length_vehicle()) + "; " +
+                str(movement.get_mean_speed()) + "; ")
     # f.write("Congestion_" + str(movement.id) + " = " + str(congestion) + "; ")
     print("Congestion_", movement.id, " = ", congestion)
     # print("jamLengthVehicle = ", movement.get_jam_length_vehicle(),
@@ -303,7 +312,7 @@ def split_pi_model_conf():
     my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')
     in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')
     out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')
-    split = ctrl.Consequent(np.arange(-4, 5, 1), 'split')
+    split = ctrl.Consequent(np.arange(-2, 3, 1), 'split')
 
     # Membership Functions definition
     my_congestion_level.automf(5, 'quant')
@@ -363,10 +372,11 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
 
     # Crunch the numbers
     split_measuring_sim.compute()
-    f.write(str(movement.congestionLevel) + "; " +
-            str(in_congestion_level) + "; " +
-            str(out_congestion_level) + "; " +
-            str(split_measuring_sim.output['split']) + "; ")
+    with open("app_%s.log" % intersection_id, "a") as f:
+        f.write(str(movement.congestionLevel) + "; " +
+                str(in_congestion_level) + "; " +
+                str(out_congestion_level) + "; " +
+                str(split_measuring_sim.output['split']) + "; ")
     print("Split_", movement.id, " = ", split_measuring_sim.output['split'])
     # print("my_congestion_level = ", movement.congestionLevel,
     #       "; in_congestion_level = ", in_congestion_level,
@@ -382,7 +392,8 @@ def config_mov_split(petri_net_snake, movement):
     t_split = min(mean_green + int(movement.split), petri_net_snake.transition(transition_name).max_time)
     petri_net_snake.transition(transition_name).min_time = t_split
     print("tAct_" + str(movement.id) + "_time = ", (mean_green + int(movement.split)))
-    f.write(str(mean_green + int(movement.split)) + ";" + "\n")
+    with open("app_%s.log" % intersection_id, "a") as f:
+        f.write(str(mean_green + int(movement.split)) + ";" + "\n")
     return
 
 
@@ -395,23 +406,25 @@ def config_pi_mov_split(petri_net_snake, movement):
         actual_green = 25.0
     petri_net_snake.transition(transition_name).min_time = actual_green
     print("tAct_" + str(movement.id) + "_time = ", actual_green)
-    f.write(str(actual_green) + ";" + "\n")
+    with open("app_%s.log" % intersection_id, "a") as f:
+        f.write(str(actual_green) + ";" + "\n")
     return
 
 
-def set_tls_lights(transitions_fire, inter_info, moves_green):
+def set_tls_lights(transitions_fire, inter_info, moves_green, time_current):
     l_change = False
+    m_green = moves_green
     for i in transitions_fire:
         if "tGreen" in i:
             print("Voy a poner en GREEN el Movimiento %s" % i[-1])
             l_change = True
-            moves_green.append(int(i[-1]))
+            m_green.append(int(i[-1]))
             for j in inter_info.m_lights[0][int(i[-1])]:
                 inter_info.lights[j] = "G"
         elif "tYel" in i:
             print("Voy a poner en YELLOW el Movimiento %s" % i[-1])
             l_change = True
-            moves_green.remove(int(i[-1]))
+            m_green.remove(int(i[-1]))
             for j in inter_info.m_lights[0][int(i[-1])]:
                 inter_info.lights[j] = "y"
         elif "tRed" in i:
@@ -429,10 +442,12 @@ def set_tls_lights(transitions_fire, inter_info, moves_green):
             "data": "".join(inter_info.lights)
         }
 
+        with open("tls_%s.log" % intersection_id, "a") as f:
+            f.write(str(inter_info.tls_id) + "; " + str(time_current) + "; " + "".join(inter_info.lights) + "\n")
         client_intersection.publish(inter_info.tls_id, json.dumps(control_msg))
         print("send: " + json.dumps(control_msg))
 
-    return
+    return m_green
 
 
 def run():
@@ -495,12 +510,14 @@ def run():
     # Set Petri Net Time, delay and step variables initial values to start
     time_0 = time.perf_counter()
     time_current = 0.0
+    time_step = 0.0
     delay = 0.0
     step = 1.0
 
     # Start the Intersection Petri Net
     print("\n\nStart the Intersection Petri Net:")
     while start_flag:
+        time.sleep(0.2)  # Wait to receive all simulation msgs
         transitions_fire = []
 
         # Print the current time and delay
@@ -523,7 +540,9 @@ def run():
         # print(transitions_fire)
 
         # Set the TS
-        set_tls_lights(transitions_fire, inter_info, moves_green)
+        moves_green = set_tls_lights(transitions_fire, inter_info, moves_green.copy(), time_current)
+        with open("mg_%s.log" % intersection_id, "a") as f:
+            f.write(str(time_current) + "; " + str(moves_green) + "\n")
         # print("Moves in Green: ", moves_green)
 
         # Measure congestion and split of correspondent Movement
@@ -533,7 +552,8 @@ def run():
                 for mov in inter_info.phases[int(i[-2])]:  # For inter_tpn
                 # for mov in phases_list[int(i[-2])]:  # For inter_tpn_v2
                     if mov in movements.keys():
-                        f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
+                        with open("app_%s.log" % intersection_id, "a") as f:
+                            f.write(str(movements[j].id) + "; " + str(time_current) + "; ")
                         movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov],
                                                                           congestionLevel)
                         movements[mov].split = split_measure(split_measuring_sim, movements[mov], neighbors, split)
@@ -566,20 +586,21 @@ def run():
         #     })
 
         # Manage msgs received
-        if msg_dic:
+        while msg_dic:
             msg_in = msg_dic.pop(0)
             msg_id = msg_in['id']
             msg_type = msg_in['type']
             if ("e2det" in msg_id) or ("state" in msg_id):
                 if msg_type == "TrafficFlowObserved":
-                    manage_flow(msg_in, movements, moves_green, inter_info.m_detectors, neighbors)
+                    manage_flow(msg_in, movements, moves_green, inter_info.m_detectors, neighbors, time_current)
                 elif msg_type == "AccidentObserved":
                     manage_accidents(msg_in, petri_net_snake, inter_info.neighbors_ids, accident_lanes)
 
         # Wait for a second to transit
-        time_current += 1.0
-        while time.perf_counter() < time_0 + time_current:
+        time_step += 1.0
+        while time.perf_counter() < time_0 + time_step: # --> DON'T SEND MSGS TO THE NODES IN THIS PART
             pass
+        time_current += 1.0
         # Update the network time
         # print("step = ", step)
         delay = petri_net_snake.time(step)
@@ -589,8 +610,18 @@ if __name__ == '__main__':
     client_intersection = mqtt_conf()
     # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
-    f = open("app_%s.log" % intersection_id, "w+")
-    f.write("movement_id; time; jam_length_vehicle; vehicle_number; occupancy; mean_speed; my_congestion_level; "
-            "in_congestion_level; out_congestion_level; split; act_ime;\n")
+    with open("app_%s.log" % intersection_id, "w") as f:
+        f.write("movement_id; time; vehicle_number; occupancy; jam_length_vehicle; mean_speed; my_congestion_level; "
+                "in_congestion_level; out_congestion_level; split; act_ime;\n")
+
+    with open("tls_%s.log" % intersection_id, "w") as f:
+        f.write("movement_id; time; state\n")
+
+    with open("mg_%s.log" % intersection_id, "w") as f:
+        f.write("time; state\n")
+
+    with open("detect_%s.log" % intersection_id, "w") as f:
+        f.write("time; detect_id; cars_number; occupancy; jam; mean_speed\n")
+
     run()
     f.close()
