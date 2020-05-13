@@ -72,7 +72,7 @@ def poller_config(socket):
     return poller
 
 
-def set_tls_lights(transitions_fire, inter_info, mv_displays, cycle):
+def set_tls_lights(transitions_fire, inter_info, mv_displays, cycle, time_current):
     l_change = False
     moves_displays = mv_displays
     for transition in transitions_fire:
@@ -103,6 +103,8 @@ def set_tls_lights(transitions_fire, inter_info, mv_displays, cycle):
             "command": "setPhase",
             "data": "".join(inter_info.lights)
         }
+        with open("tls_%s.log" % intersection_id, "a") as f:
+            f.write(str(inter_info.tls_id) + "; " + str(time_current) + "; " + "".join(inter_info.lights) + "\n")
 
         display_state_msg = {
             "id": inter_info.tls_id,
@@ -161,6 +163,8 @@ def run():
     pub_socket = pub_zmq_config("5557")
     sub_socket = sub_zmq_config("5558")
     poller = poller_config([sub_socket])
+    with open("tls_%s.log" % intersection_id, "w") as f:
+        f.write("movement_id; time; state\n")
 
     # Setup of the intersection
     inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
@@ -197,6 +201,7 @@ def run():
     # Set Petri Net Time, delay and step variables initial values to start
     time_0 = time.perf_counter()
     time_current = 0.0
+    time_step = 0.0
     delay = 0.0
     step = 1.0
 
@@ -231,7 +236,10 @@ def run():
                 pub_socket.send_multipart([super_topic_phase, json.dumps(phase_state_msg).encode()])
 
         # Set the TS displays
-        moves_displays_state, display_state_msg, control_msg = set_tls_lights(transitions_fire, inter_info, moves_displays_state.copy(), cycle)
+        moves_displays_state, display_state_msg, control_msg = set_tls_lights(transitions_fire, inter_info,
+                                                                              moves_displays_state.copy(),
+                                                                              cycle,
+                                                                              time_current)
         if control_msg:
             client_intersection.publish(inter_info.tls_id, json.dumps(control_msg))
             print("send: ", control_msg)
@@ -253,9 +261,10 @@ def run():
                     config_cycle(petri_net_snake, msg_zmq["value"]["value"][0])
 
         # Wait for a second to transit
-        time_current += 1.0
-        while time.perf_counter() < time_0 + time_current:
+        time_step += 1.0
+        while time.perf_counter() < time_0 + time_step:
             pass
+        time_current += 1.0
         # Update the network time
         # print("step = ", step)
         delay = petri_net_snake.time(step)

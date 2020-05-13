@@ -553,7 +553,7 @@ def run():
                 # for mov in phases_list[int(i[-2])]:  # For inter_tpn_v2
                     if mov in movements.keys():
                         with open("app_%s.log" % intersection_id, "a") as f:
-                            f.write(str(movements[j].id) + "; " + str(time_current) + "; ")
+                            f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
                         movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov],
                                                                           congestionLevel)
                         movements[mov].split = split_measure(split_measuring_sim, movements[mov], neighbors, split)
