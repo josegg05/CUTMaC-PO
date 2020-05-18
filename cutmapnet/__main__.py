@@ -443,7 +443,7 @@ def set_tls_lights(transitions_fire, inter_info, moves_green, time_current):
         }
 
         with open("tls_%s.log" % intersection_id, "a") as f:
-            f.write(str(inter_info.tls_id) + "; " + str(time_current) + "; " + "".join(inter_info.lights) + "\n")
+            f.write(str(time_current) + "; " + str(inter_info.tls_id) + "; " + "".join(inter_info.lights) + "\n")
         client_intersection.publish(inter_info.tls_id, json.dumps(control_msg))
         print("send: " + json.dumps(control_msg))
 
@@ -553,7 +553,7 @@ def run():
                 # for mov in phases_list[int(i[-2])]:  # For inter_tpn_v2
                     if mov in movements.keys():
                         with open("app_%s.log" % intersection_id, "a") as f:
-                            f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
+                            f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
                         movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov],
                                                                           congestionLevel)
                         movements[mov].split = split_measure(split_measuring_sim, movements[mov], neighbors, split)
@@ -611,11 +611,11 @@ if __name__ == '__main__':
     # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
     with open("app_%s.log" % intersection_id, "w") as f:
-        f.write("movement_id; time; vehicle_number; occupancy; jam_length_vehicle; mean_speed; my_congestion_level; "
+        f.write("time; movement_id; vehicle_number; occupancy; jam_length_vehicle; mean_speed; my_congestion_level; "
                 "in_congestion_level; out_congestion_level; split; act_ime;\n")
 
     with open("tls_%s.log" % intersection_id, "w") as f:
-        f.write("movement_id; time; state\n")
+        f.write("time; movement_id; state\n")
 
     with open("mg_%s.log" % intersection_id, "w") as f:
         f.write("time; state\n")

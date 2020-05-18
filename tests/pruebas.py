@@ -389,3 +389,12 @@ print([min(act_time), max(act_time)])
 
 for row in super_log_list:
     print(row)
+
+
+# Update a FIFO Buffer
+buff_prueba = [[0, 0], [0, 0]]
+for i in range(10):
+    buff_prueba.insert(0, [i, i*5])
+    buff_prueba.pop(-1)
+print(buff_prueba)
+

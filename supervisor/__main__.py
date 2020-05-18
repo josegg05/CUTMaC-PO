@@ -192,7 +192,7 @@ def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, sp
     mov_splits_changed = {}
     for mov in mov_displays_change:
         with open("sup_%s.log" % intersection_id, "a") as f:
-            f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
+            f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
         # TODO: Read the dtm log and write the info to the complete log
         split_cal = split_measure(split_measuring_sim, movements[mov], neighbors, split)
         actual_green = config_pi_mov_split(movements[mov], split_cal)
@@ -305,7 +305,7 @@ def run():
     poller = poller_config([dtm_sub_socket, tscm_sub_socket])
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
 
     # Define my_topic
     my_topic = inter_info.state_topic
@@ -338,7 +338,7 @@ def run():
 
     # Beging the log
     with open("sup_%s.log" % intersection_id, "w") as f:
-        f.write("movement_id; time; my_congestion_level; in_congestion_level; out_congestion_level; split; act_time\n")
+        f.write("time; movement_id; my_congestion_level; in_congestion_level; out_congestion_level; split; act_time\n")
 
     # Intersection ready tu start
     print("Intersection '%s' READY:" % intersection_id)

@@ -93,11 +93,11 @@ def manage_flow(msg_in, movements, moves_detectors, moves_green):
     print("Moves affected: ", mov_ids)
     for mov in mov_ids:
         if mov in moves_green:
-            movements[mov].set_jam_length_vehicle(detector_id, msg_in["jamLengthVehicle"])
-            movements[mov].set_mean_speed(detector_id, msg_in["meanSpeed"])
+            movements[mov].set_jam_length_vehicle(detector_id, [msg_in["dateObserved"], msg_in["jamLengthVehicle"]])
+            movements[mov].set_mean_speed(detector_id, [msg_in["dateObserved"], msg_in["meanSpeed"]])
             #print("Speed of: ", mov, " = ", msg_in["meanSpeed"])
-        movements[mov].set_occupancy(detector_id, msg_in["occupancy"])
-        movements[mov].set_vehicle_number(detector_id, msg_in["vehicleNumber"])
+        movements[mov].set_occupancy(detector_id, [msg_in["dateObserved"], msg_in["occupancy"]])
+        movements[mov].set_vehicle_number(detector_id, [msg_in["dateObserved"], msg_in["vehicleNumber"]])
 
     return
 
@@ -238,60 +238,65 @@ def congestion_model_conf2(max_speed, max_vehicle_number):
     return congestion_measuring_sim, congestionLevel
 
 
-def congestion_measure(congestion_measuring_sim, movement):
+def congestion_measure(congestion_measuring_sim, movement, time_current):
     congestion = 0.0
-    mov_speed = movement.get_mean_speed()
+    mov_vehicle_num = movement.get_vehicle_number(time_current)
+    mov_speed = movement.get_mean_speed(time_current)
     #if mov_speed < 0:
     #    mov_speed = 14  # MAX_SPEED
-    if movement.get_vehicle_number() != 0:
-        congestion_measuring_sim.input['jamLengthVehicle'] = movement.get_jam_length_vehicle()
-        congestion_measuring_sim.input['vehicleNumber'] = movement.get_vehicle_number()
-        congestion_measuring_sim.input['occupancy'] = movement.get_occupancy()
+    if mov_vehicle_num != 0:
+        congestion_measuring_sim.input['jamLengthVehicle'] = movement.get_jam_length_vehicle(time_current)
+        congestion_measuring_sim.input['vehicleNumber'] = mov_vehicle_num
+        congestion_measuring_sim.input['occupancy'] = movement.get_occupancy(time_current)
         congestion_measuring_sim.input['meanSpeed'] = mov_speed
         # Crunch the numbers
         congestion_measuring_sim.compute()
         congestion = congestion_measuring_sim.output['congestionLevel']
 
     with open("dtm_%s.log" % intersection_id, "a") as f:
-        f.write(str(movement.get_jam_length_vehicle()) + "; " +
-                str(movement.get_vehicle_number()) + "; " +
-                str(movement.get_occupancy()) + "; " +
+        f.write(str(time_current) + "; " +
+                str(movement.id) + "; " +
+                str(movement.get_jam_length_vehicle(time_current)) + "; " +
+                str(movement.mov_vehicle_num) + "; " +
+                str(movement.get_occupancy(time_current)) + "; " +
                 str(mov_speed) + "; " +
                 str(congestion) + "\n")
 
     print("Congestion_", movement.id, " = ", congestion)
-    # print("jamLengthVehicle = ", movement.get_jam_length_vehicle(),
-    #       "; vehicleNumber = ", movement.get_vehicle_number(),
-    #       "; occupancy = ", movement.get_occupancy(),
-    #       "; meanSpeed = ", movement.get_mean_speed())
+    # print("jamLengthVehicle = ", movement.get_jam_length_vehicle(time_current),
+    #       "; vehicleNumber = ", mov_vehicle_num,
+    #       "; occupancy = ", movement.get_occupancy(time_current),
+    #       "; meanSpeed = ", mov_speed)
     # congestionLevel.view(sim=congestion_measuring_sim)
 
     return congestion
 
 
-def congestion_measure2(congestion_measuring_sim, movement):
+def congestion_measure2(congestion_measuring_sim, movement, time_current):
     congestion = 0.0
-    mov_vehicle_num = movement.get_vehicle_number()
-    mov_speed = movement.get_mean_speed()
+    mov_vehicle_num = movement.get_vehicle_number(time_current)
+    mov_speed = movement.get_mean_speed(time_current)
     if mov_speed < 0:
         mov_speed = 14  # MAX_SPEED
     if mov_vehicle_num != 0:
         congestion_measuring_sim.input['vehicleNumber'] = mov_vehicle_num
-        congestion_measuring_sim.input['occupancy'] = movement.get_occupancy()
+        congestion_measuring_sim.input['occupancy'] = movement.get_occupancy(time_current)
         congestion_measuring_sim.input['meanSpeed'] = mov_speed
         # Crunch the numbers
         congestion_measuring_sim.compute()
         congestion = congestion_measuring_sim.output['congestionLevel']
 
     with open("dtm_%s.log" % intersection_id, "a") as f:
-        f.write(str(movement.get_vehicle_number()) + "; " +
-                str(movement.get_occupancy()) + "; " +
+        f.write(str(time_current) + "; " +
+                str(movement.id) + "; " +
+                str(mov_vehicle_num) + "; " +
+                str(movement.get_occupancy(time_current)) + "; " +
                 str(mov_speed) + "; " +
                 str(congestion) + "\n")
 
     print("Congestion_", movement.id, " = ", congestion)
     print("vehicleNumber = ", mov_vehicle_num,
-          "; occupancy = ", movement.get_occupancy(),
+          "; occupancy = ", movement.get_occupancy(time_current),
           "; meanSpeed = ", mov_speed)
     #congestionLevel.view(sim=congestion_measuring_sim)
 
@@ -333,14 +338,14 @@ def run():
     sub_socket = sub_zmq_config("5558")
     poller = poller_config([sub_socket])
     with open("dtm_%s.log" % intersection_id, "w") as f:
-        f.write("movement_id; time; vehicle_number; occupancy; mean_speed; my_congestion_level\n")
+        f.write("time; movement_id; vehicle_number; occupancy; mean_speed; my_congestion_level\n")
     with open("detect_%s.log" % intersection_id, "w") as f:
-        f.write("time; detect_id; cars_number; occupancy; jam; mean_speed\n")
+        f.write("time; time_det; detect_id; cars_number; occupancy; jam; mean_speed\n")
     with open("mg_%s.log" % intersection_id, "w") as f:
         f.write("time; state\n")
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
 
     # Setup the congestion model
     congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed,
@@ -409,9 +414,7 @@ def run():
                     print(time_current, "*** Measure congestion of movements: ", msg_movements, " ***")
                     for mov in msg_movements:
                         if mov in movements:
-                            with open("dtm_%s.log" % intersection_id, "a") as f:
-                                f.write(str(movements[mov].id) + "; " + str(time_current) + "; ")
-                            movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov])
+                            movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov], time_current)
                             mov_cong[mov] = movements[mov].congestionLevel
                     cong_data_msg = congestion_msg_set(msg_zmq, mov_cong)
                     print(cong_data_msg)
@@ -435,8 +438,12 @@ def run():
                 if msg_type == "TrafficFlowObserved":
                     manage_flow(msg_mqtt, movements, inter_info.m_detectors, moves_green)
                     with open("detect_%s.log" % intersection_id, "a") as f:
-                        f.write(str(time_current) + "; " + str(msg_id) + "; " + str(msg_mqtt["vehicleNumber"]) + "; " +
-                                str(msg_mqtt["occupancy"]) + "; " + str(msg_mqtt["jamLengthVehicle"]) + "; " +
+                        f.write(str(time_current) + "; " +
+                                str(msg_mqtt["dateObserved"]) + "; " +
+                                str(msg_id) + "; " +
+                                str(msg_mqtt["vehicleNumber"]) + "; " +
+                                str(msg_mqtt["occupancy"]) + "; " +
+                                str(msg_mqtt["jamLengthVehicle"]) + "; " +
                                 str(msg_mqtt["meanSpeed"]) + "\n")
                 elif msg_type == "AccidentObserved":
                     # TODO: Create the accident_msg

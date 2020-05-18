@@ -104,7 +104,7 @@ def set_tls_lights(transitions_fire, inter_info, mv_displays, cycle, time_curren
             "data": "".join(inter_info.lights)
         }
         with open("tls_%s.log" % intersection_id, "a") as f:
-            f.write(str(inter_info.tls_id) + "; " + str(time_current) + "; " + "".join(inter_info.lights) + "\n")
+            f.write(str(time_current) + "; " + str(inter_info.tls_id) + "; " + "".join(inter_info.lights) + "\n")
 
         display_state_msg = {
             "id": inter_info.tls_id,
@@ -164,10 +164,10 @@ def run():
     sub_socket = sub_zmq_config("5558")
     poller = poller_config([sub_socket])
     with open("tls_%s.log" % intersection_id, "w") as f:
-        f.write("movement_id; time; state\n")
+        f.write("time; movement_id; state\n")
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
     # Set the definition vectors of the Timed Petri Net
     petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.phases,
                                                                        inter_info.cycles, inter_info.cycles_names)
