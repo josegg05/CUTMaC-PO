@@ -257,7 +257,7 @@ def congestion_measure(congestion_measuring_sim, movement, time_current):
         f.write(str(time_current) + "; " +
                 str(movement.id) + "; " +
                 str(movement.get_jam_length_vehicle(time_current)) + "; " +
-                str(movement.mov_vehicle_num) + "; " +
+                str(mov_vehicle_num) + "; " +
                 str(movement.get_occupancy(time_current)) + "; " +
                 str(mov_speed) + "; " +
                 str(congestion) + "\n")
@@ -338,7 +338,7 @@ def run():
     sub_socket = sub_zmq_config("5558")
     poller = poller_config([sub_socket])
     with open("dtm_%s.log" % intersection_id, "w") as f:
-        f.write("time; movement_id; vehicle_number; occupancy; mean_speed; my_congestion_level\n")
+        f.write("time; movement_id; jam; vehicle_number; occupancy; mean_speed; my_congestion_level\n")
     with open("detect_%s.log" % intersection_id, "w") as f:
         f.write("time; time_det; detect_id; cars_number; occupancy; jam; mean_speed\n")
     with open("mg_%s.log" % intersection_id, "w") as f:
