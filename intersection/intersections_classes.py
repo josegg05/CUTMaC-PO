@@ -43,10 +43,10 @@ class Neighbor:
 class Detector:
     def __init__(self, detect_id):
         self.id = detect_id
-        self.jamLengthVehicle = [[0, 0], [0, 0]]
         self.vehicleNumber = [[0, 0], [0, 0]]
         self.occupancy = [[0, 0], [0, 0]]
-        self.meanSpeed = [[0, 0], [0, 0]]
+        self.jamLengthVehicle = [[0, 0]]
+        self.meanSpeed = [[0, 0]]
 
 
 class Movement:
@@ -100,23 +100,23 @@ class Movement:
             self.in_neighbors = ["ERROR"]
             self.out_neighbors = ["ERROR"]
 
-    def get_jam_length_vehicle(self, time, detector="ALL"):
-        jam_length_vehicle = 0
+    def get_vehicle_number(self, time, detector="ALL"):
+        vehicle_number = 0
         if detector in self.detectors_name:
-            if self._detectors[detector].jamLengthVehicle[0][0] < time:
-                jam_length_vehicle = self._detectors[detector].jamLengthVehicle[0][1]
+            if self._detectors[detector].vehicleNumber[0][0] < time:
+                vehicle_number = self._detectors[detector].vehicleNumber[0][1]
             else:
-                jam_length_vehicle = self._detectors[detector].jamLengthVehicle[1][1]
+                vehicle_number = self._detectors[detector].vehicleNumber[1][1]
         elif detector == "ALL":
             for det in self._detectors:
-                if self._detectors[det].jamLengthVehicle[0][0] < time:
-                    jam_length_vehicle += self._detectors[det].jamLengthVehicle[0][1]
+                if self._detectors[det].vehicleNumber[0][0] < time:
+                    vehicle_number += self._detectors[det].vehicleNumber[0][1]
                 else:
-                    jam_length_vehicle += self._detectors[det].jamLengthVehicle[1][1]
-            #jam_length_vehicle = jam_length_vehicle / len(self._detectors)
+                    vehicle_number += self._detectors[det].vehicleNumber[1][1]
+            #vehicle_number = vehicle_number / len(self._detectors)
         else:
-            jam_length_vehicle = "NA"
-        return jam_length_vehicle
+            vehicle_number = "NA"
+        return vehicle_number
 
     def get_occupancy(self, time, detector="ALL"):
         occupancy = 0
@@ -136,60 +136,88 @@ class Movement:
             occupancy = "NA"
         return occupancy
 
-    def get_mean_speed(self, time, detector="ALL"):
-        mean_speed = 0
+    def get_jam_length_vehicle(self, time, detector="ALL"):  # "time" variable is irrelevant in the current control ...
+        jam_length_vehicle = 0
+        future_val = 0
         if detector in self.detectors_name:
-            if self._detectors[detector].meanSpeed[0][0] < time:
-                mean_speed = self._detectors[detector].meanSpeed[0][1]
-            else:
-                mean_speed = self._detectors[detector].meanSpeed[1][1]
-        elif detector == "ALL":
-            for det in self._detectors:
-                if self._detectors[det].meanSpeed[0][0] < time:
-                    mean_speed += self._detectors[det].meanSpeed[0][1]
+            for jam in self._detectors[detector].jamLengthVehicle:
+                if jam[0] < time:
+                    jam_length_vehicle += jam[1]
                 else:
-                    mean_speed += self._detectors[det].meanSpeed[1][1]
-            #mean_speed = mean_speed / len(self._detectors)
+                    future_val += 1
+            jam_length_vehicle = jam_length_vehicle / len(self._detectors[detector].jamLengthVehicle) - future_val
+        elif detector == "ALL":
+            jam_length_vehicle_list = []
+            for det in self._detectors:
+                jam_length_vehicle_list.append(0)
+                future_val = 0
+                for jam in self._detectors[det].jamLengthVehicle:
+                    if jam[0] < time:
+                        jam_length_vehicle_list[-1] += jam[1]
+                    else:
+                        future_val += 1
+                jam_length_vehicle_list[-1] = jam_length_vehicle_list[-1] / len(self._detectors[det].jamLengthVehicle) - future_val
+            jam_length_vehicle = sum(jam_length_vehicle_list) / len(jam_length_vehicle_list)
+        else:
+            jam_length_vehicle = "NA"
+        return jam_length_vehicle
+
+    def get_mean_speed(self, time, detector="ALL"):  # "time" variable is irrelevant in the current control strategy (speed values are used in the phase transition process, much later its recollection)
+        mean_speed = 0
+        future_val = 0
+        if detector in self.detectors_name:
+            for msp in self._detectors[detector].meanSpeed:
+                if msp[0] < time:
+                    mean_speed += msp[1]
+                else:
+                    future_val += 1
+            mean_speed = mean_speed / len(self._detectors[detector].meanSpeed) - future_val
+        elif detector == "ALL":
+            mean_speed_list = []
+            for det in self._detectors:
+                mean_speed_list.append(0)
+                future_val = 0
+                for msp in self._detectors[det].meanSpeed:
+                    if msp[0] < time:
+                        mean_speed_list[-1] += msp[1]
+                    else:
+                        future_val += 1
+                mean_speed_list[-1] = mean_speed_list[-1] / len(self._detectors[det].meanSpeed) - future_val
+            mean_speed = sum(mean_speed_list) / len(mean_speed_list)
         else:
             mean_speed = "NA"
         return mean_speed
 
-    def get_vehicle_number(self, time, detector="ALL"):
-        vehicle_number = 0
+    def set_vehicle_number(self, detector, vehicle_number):
+        self._detectors[detector].vehicleNumber.insert(0, vehicle_number)
+        self._detectors[detector].vehicleNumber.pop(-1)
+        return
+
+    def set_occupancy(self, detector, occupancy):
+        self._detectors[detector].occupancy.insert(0, occupancy)
+        self._detectors[detector].occupancy.pop(-1)
+        return
+
+    def set_jam_length_vehicle(self, detector, jam_length_vehicle):
+        self._detectors[detector].jamLengthVehicle.insert(0, jam_length_vehicle)
+        return
+
+    def set_mean_speed(self, detector, mean_speed):
+        self._detectors[detector].meanSpeed.insert(0, mean_speed)
+        return
+
+    def reset_jam_length_vehicle(self, detector="ALL"):
         if detector in self.detectors_name:
-            if self._detectors[detector].vehicleNumber[0][0] < time:
-                vehicle_number = self._detectors[detector].vehicleNumber[0][1]
-            else:
-                vehicle_number = self._detectors[detector].vehicleNumber[1][1]
+            self._detectors[detector].jamLengthVehicle = []
         elif detector == "ALL":
-            for det in self._detectors:
-                if self._detectors[det].vehicleNumber[0][0] < time:
-                    vehicle_number += self._detectors[det].vehicleNumber[0][1]
-                else:
-                    vehicle_number += self._detectors[det].vehicleNumber[1][1]
-            #vehicle_number = vehicle_number / len(self._detectors)
-        else:
-            vehicle_number = "NA"
-        return vehicle_number
-
-    def set_jam_length_vehicle(self, detector_id, jam_length_vehicle):
-        self._detectors[detector_id].jamLengthVehicle.insert(0, jam_length_vehicle)
-        self._detectors[detector_id].jamLengthVehicle.pop(-1)
+            for det in self.detectors:
+                self._detectors[det].jamLengthVehicle = []
         return
 
-    def set_occupancy(self, detector_id, occupancy):
-        self._detectors[detector_id].occupancy.insert(0, occupancy)
-        self._detectors[detector_id].occupancy.pop(-1)
+    def reset_mean_speed(self, detector="ALL"):
+        if detector in self.detectors_name:
+            self._detectors[detector].meanSpeed = []
+        elif detector == "ALL":
+            for det in self.detectors:
+                self._detectors[det].meanSpeed = []
         return
-
-    def set_mean_speed(self, detector_id, mean_speed):
-        self._detectors[detector_id].meanSpeed.insert(0, mean_speed)
-        self._detectors[detector_id].meanSpeed.pop(-1)
-        return
-
-    def set_vehicle_number(self, detector_id, vehicle_number):
-        self._detectors[detector_id].vehicleNumber.insert(0, vehicle_number)
-        self._detectors[detector_id].vehicleNumber.pop(-1)
-        return
-
-

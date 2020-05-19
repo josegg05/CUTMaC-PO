@@ -426,6 +426,8 @@ def run():
                     for mov in range(len(msg_display)):
                         if msg_display[mov] == "G":
                             moves_green.append(mov)
+                            movements[mov].reset_jam_length_vehicle()
+                            movements[mov].reset_mean_speed()
                     with open("mg_%s.log" % intersection_id, "a") as f:
                         f.write(str(time_current) + "; " + str(moves_green) + "\n")
                     print("Moves Green : ", moves_green)
