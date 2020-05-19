@@ -150,13 +150,14 @@ class Movement:
             jam_length_vehicle_list = []
             for det in self._detectors:
                 jam_length_vehicle_list.append(0)
-                future_val = 0
-                for jam in self._detectors[det].jamLengthVehicle:
-                    if jam[0] < time:
-                        jam_length_vehicle_list[-1] += jam[1]
-                    else:
-                        future_val += 1
-                jam_length_vehicle_list[-1] = jam_length_vehicle_list[-1] / len(self._detectors[det].jamLengthVehicle) - future_val
+                if self._detectors[det].jamLengthVehicle:
+                    future_val = 0
+                    for jam in self._detectors[det].jamLengthVehicle:
+                        if jam[0] < time:
+                            jam_length_vehicle_list[-1] += jam[1]
+                        else:
+                            future_val += 1
+                    jam_length_vehicle_list[-1] = jam_length_vehicle_list[-1] / len(self._detectors[det].jamLengthVehicle) - future_val
             jam_length_vehicle = sum(jam_length_vehicle_list) / len(jam_length_vehicle_list)
         else:
             jam_length_vehicle = "NA"
@@ -176,13 +177,14 @@ class Movement:
             mean_speed_list = []
             for det in self._detectors:
                 mean_speed_list.append(0)
-                future_val = 0
-                for msp in self._detectors[det].meanSpeed:
-                    if msp[0] < time:
-                        mean_speed_list[-1] += msp[1]
-                    else:
-                        future_val += 1
-                mean_speed_list[-1] = mean_speed_list[-1] / len(self._detectors[det].meanSpeed) - future_val
+                if self._detectors[det].meanSpeed:
+                    future_val = 0
+                    for msp in self._detectors[det].meanSpeed:
+                        if msp[0] < time:
+                            mean_speed_list[-1] += msp[1]
+                        else:
+                            future_val += 1
+                    mean_speed_list[-1] = mean_speed_list[-1] / len(self._detectors[det].meanSpeed) - future_val
             mean_speed = sum(mean_speed_list) / len(mean_speed_list)
         else:
             mean_speed = "NA"
@@ -210,7 +212,7 @@ class Movement:
         if detector in self.detectors_name:
             self._detectors[detector].jamLengthVehicle = []
         elif detector == "ALL":
-            for det in self.detectors:
+            for det in self._detectors:
                 self._detectors[det].jamLengthVehicle = []
         return
 
@@ -218,6 +220,6 @@ class Movement:
         if detector in self.detectors_name:
             self._detectors[detector].meanSpeed = []
         elif detector == "ALL":
-            for det in self.detectors:
+            for det in self._detectors:
                 self._detectors[det].meanSpeed = []
         return
