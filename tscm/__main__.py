@@ -72,6 +72,24 @@ def poller_config(socket):
     return poller
 
 
+def set_phase_state(transition, phases_state, id):
+    print("Start Process to change to next Phase --> %s" % transition[-1])
+    phases_state[int(transition[-2])] = 0
+    phases_state[int(transition[-1])] = 1
+
+    phase_state_msg = {
+        "id": id,
+        "type": "stateChange",
+        "category": {
+            "value": ["phase"]
+        },
+        "state": {
+            "value": phases_state
+        }
+    }
+    return phase_state_msg, phases_state
+
+
 def set_tls_lights(transitions_fire, inter_info, mv_displays, cycle, time_current):
     l_change = False
     moves_displays = mv_displays
@@ -137,53 +155,15 @@ def config_cycle(petri_net_snake, cycle_name):
     return
 
 
-def set_phase_state(transition, phases_state, id):
-    print("Start Process to change to next Phase --> %s" % transition[-1])
-    phases_state[int(transition[-2])] = 0
-    phases_state[int(transition[-1])] = 1
-
-    phase_state_msg = {
-        "id": id,
-        "type": "stateChange",
-        "category": {
-            "value": ["phase"]
-        },
-        "state": {
-            "value": phases_state
-        }
-    }
-    return phase_state_msg, phases_state
-
-
 def run():
-    global msg_dic
-
-    super_topic_display = b"tscm/state"
-    super_topic_phase = b"tscm/state"
-    pub_socket = pub_zmq_config("5557")
-    sub_socket = sub_zmq_config("5558")
-    poller = poller_config([sub_socket])
-    with open("tls_%s.log" % intersection_id, "w") as f:
-        f.write("time; movement_id; state\n")
-
-    # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
-    # Set the definition vectors of the Timed Petri Net
-    petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.phases,
-                                                                       inter_info.cycles, inter_info.cycles_names)
-    # Create de SNAKE Petri Net
-    petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
-    init = petri_net_snake.get_marking()
+    # Set or Reset of run variables
+    cycle = 0  # Set initial Cycle
+    moves_displays_state = ["r", "r", "r", "r", "r", "r", "r", "r"]  # Create intersection Movements displays
+    phases_state = [0, 0, 0, 0, 0, 0, 0, 0]  # Set initial phases_state
     # "petri_net_snake.set_marking(init)" Acts like n.reset(), because each transition has a place in its pre-set whose
     # marking is reset, just like for method reset
     petri_net_snake.set_marking(init)
-    print(init)
 
-    # Set initial Cycle
-    cycle = 0
-
-    # Set initial phases_state
-    phases_state = [0, 0, 0, 0, 0, 0, 0, 0]
     for place in petri_net_inter.places:
         if "P" in place[0] and place[0] is not "PTC":
             print(place)
@@ -191,9 +171,11 @@ def run():
             phases_state[int(place[0][-1])] = (int(place[4]))  # Markings
     print("Phases states are: ", phases_state)
 
-    # Create intersection Movements displays
-    moves_displays_state = ["r", "r", "r", "r", "r", "r", "r", "r"]
+    # Begging the run() log
+    with open("tls_%s.log" % intersection_id, "w") as f:
+        f.write("time; movement_id; state\n")
 
+    # ----------------------------------------- TSCM ready tu start -----------------------------------------
     print("Intersection '%s' READY:" % intersection_id)
     while not start_flag:
         pass  # Do nothing waiting for the start signal
@@ -205,15 +187,16 @@ def run():
     delay = 0.0
     step = 1.0
 
-    # Start the Intersection Petri Net
+    # -------- Start the TSCM --------
     print("\n\nStart the Intersection Petri Net:")
     while start_flag:
-        time.sleep(0.1)  # Wait SUMO to update and send all simulation msgs
+        # Wait SUMO to update and send all simulation msgs
+        time.sleep(0.1)
         transitions_fire = []
         # Print the current time and delay
         print("Time:[%s] " % time_current, "delay:", delay)
 
-        # Fires all the fireable transitions
+        # ---- Fires all the fireable transitions
         p_fire = True
         count_fire = 0
         while p_fire:
@@ -229,35 +212,35 @@ def run():
                     pass
         # print(transitions_fire)
 
-        # Measure congestion and split of correspondent Movement
+        # ---- Inform Phase State Change
         for transition in transitions_fire:
             if "t1_" in transition:  # A Phase Transition t1_xy fires
                 phase_state_msg, phases_state = set_phase_state(transition, phases_state.copy(), inter_info.tls_id)
-                # Done: TODO: Send state_msg to supervisor
                 pub_socket.send_multipart([super_topic_phase, json.dumps(phase_state_msg).encode()])
 
-        # Set the TS displays
+        # ---- Set the TS displays
         moves_displays_state, display_state_msg, control_msg = set_tls_lights(transitions_fire, inter_info,
                                                                               moves_displays_state.copy(),
                                                                               cycle,
                                                                               time_current)
+        # ---- Inform Display State Change
         if control_msg:
             client_intersection.publish(inter_info.tls_id, json.dumps(control_msg))
             print("send: ", control_msg)
-        # Done: TODO: Send display_state_msg to supervisor
         if display_state_msg:
             pub_socket.send_multipart([super_topic_display, json.dumps(display_state_msg).encode()])
 
-
-
-        # Done: TODO: Make the zmq msgs receiver
+        # ---- Manage Supervisor ZeroMQ msgs received
         poll = dict(poller.poll(20))
         if sub_socket in poll and poll[sub_socket] == zmq.POLLIN:
             [top, contents] = sub_socket.recv_multipart()
             msg_zmq = json.loads(contents.decode())
+            # Manage supervisor COMMANDS
             if b"command" in top:
+                # Manage Split Configuration measure command
                 if msg_zmq["type"] == "config" and "split" in msg_zmq["category"]["value"]:
                     config_mov_split(petri_net_snake, msg_zmq["value"]["value"])
+                # Manage Cycle Configuration measure command
                 elif msg_zmq["type"] == "config" and "cycle" in msg_zmq["category"]["value"]:
                     config_cycle(petri_net_snake, msg_zmq["value"]["value"][0])
 
@@ -281,8 +264,29 @@ if __name__ == '__main__':
         mqtt_broker_ip = f.read().rstrip()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
     print("Intersection_ID: ", intersection_id)
 
+    # Setup of the intersection
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
+
+    # Start mqtt connection
     client_intersection = mqtt_conf(mqtt_broker_ip)
-    # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
 
+    # Define ZeroMQ topics
+    super_topic_display = b"tscm/state"
+    super_topic_phase = b"tscm/state"
+    # Configure ZeroMQ sockets
+    pub_socket = pub_zmq_config("5557")
+    sub_socket = sub_zmq_config("5558")
+    poller = poller_config([sub_socket])
+
+    # Set the definition vectors of the Timed Petri Net
+    petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.phases,
+                                                                       inter_info.cycles, inter_info.cycles_names)
+    # Create de SNAKE Petri Net
+    petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
+    init = petri_net_snake.get_marking()
+    print(init)
+
+    # Reset Loop
+    # while True:
     run()

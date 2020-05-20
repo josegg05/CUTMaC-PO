@@ -398,6 +398,7 @@ for i in range(10):
     buff_prueba.pop(-1)
 print(buff_prueba)
 
+
 lista = []
 count= 0
 for x in range(10):
@@ -406,3 +407,7 @@ for x in range(10):
         lista[-1]+=1
     count += 1
 print(lista)
+
+
+float_num = 0.5
+print(round(float_num))

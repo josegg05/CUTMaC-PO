@@ -44,6 +44,14 @@ def mqtt_conf(mqtt_broker_ip) -> mqtt.Client:
     return client
 
 
+def subscribe_neighbors(neighbors):
+    for x in neighbors.values():
+        if x is not "":
+            client_intersection.subscribe("intersection/" + x + "/state")
+            print("Subscribed to: 'intersection/" + x + "/state'")
+    return
+
+
 def pub_zmq_config(port):
     context = zmq.Context()
     sock = context.socket(zmq.PUB)
@@ -72,14 +80,6 @@ def poller_config(socket):
     return poller
 
 
-def subscribe_neighbors(neighbors):
-    for x in neighbors.values():
-        if x is not "":
-            client_intersection.subscribe("intersection/" + x + "/state")
-            print("Subscribed to: 'intersection/" + x + "/state'")
-    return
-
-
 def set_five_quant_label(level):
     label = ""
     if level <= 1:
@@ -99,7 +99,7 @@ def split_pi_model_conf():
     my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')  # Antes 101
     in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')  # Antes 101
     out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')  # Antes 101
-    split = ctrl.Consequent(np.arange(-2, 3, 1), 'split')
+    split = ctrl.Consequent(np.arange(-4, 5, 1), 'split')
 
     # Membership Functions definition
     my_congestion_level.automf(5, 'quant')
@@ -133,100 +133,6 @@ def split_pi_model_conf():
     split_measuring_sim = ctrl.ControlSystemSimulation(split_model)
 
     return split_measuring_sim, split
-
-
-def split_measure(split_measuring_sim, movement, neighbors, split):
-    # print("Movement to measure Split: ", movement.id)
-    split_measuring_sim.input['my_congestion_level'] = movement.congestionLevel
-
-    # print("In Neighbor: ", movement.in_neighbors[1])
-    if movement.in_neighbors[1] in neighbors.keys():
-        in_congestion_level = (neighbors[movement.in_neighbors[1]].mov_congestion[movement.in_neighbors[0][0]] +
-                               neighbors[movement.in_neighbors[1]].mov_congestion[movement.in_neighbors[0][1]]) / 2
-        # print("in_congestion_level", in_congestion_level)
-    else:
-        in_congestion_level = 0.0
-    split_measuring_sim.input['in_congestion_level'] = in_congestion_level
-
-    # print("Out Neighbor: ", movement.out_neighbors[1])
-    if movement.out_neighbors[1] in neighbors.keys():
-        out_congestion_level = (neighbors[movement.out_neighbors[1]].mov_congestion[movement.out_neighbors[0][0]] +
-                                neighbors[movement.out_neighbors[1]].mov_congestion[movement.out_neighbors[0][1]]) / 2
-        # print("out_congestion_level: ", out_congestion_level)
-    else:
-        out_congestion_level = 0.0
-    split_measuring_sim.input['out_congestion_level'] = out_congestion_level
-
-    # Crunch the numbers
-    split_measuring_sim.compute()
-    with open("sup_%s.log" % intersection_id, "a") as f:
-        f.write(str(movement.congestionLevel) + "; " +
-                str(in_congestion_level) + "; " +
-                str(out_congestion_level) + "; " +
-                str(split_measuring_sim.output['split']) + "; ")
-    print("Split_", movement.id, " = ", split_measuring_sim.output['split'])
-    # print("my_congestion_level = ", movement.congestionLevel,
-    #       "; in_congestion_level = ", in_congestion_level,
-    #       "; out_congestion_level = ", out_congestion_level)
-    # split.view(sim=split_measuring_sim)
-
-    return split_measuring_sim.output['split']
-
-
-def config_mov_split(split_cal):
-    mean_green = 16
-    actual_green = min(mean_green + int(split_cal), 100)
-    return actual_green
-
-
-def config_pi_mov_split(movement, split_cal):
-    actual_green = movement.split + split_cal
-    if actual_green <= 0:
-        actual_green = 0.0
-    elif actual_green >= 25:
-        actual_green = 25.0
-    return actual_green
-
-
-def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, split, time_current, id):
-    mov_splits_changed = {}
-    for mov in mov_displays_change:
-        with open("sup_%s.log" % intersection_id, "a") as f:
-            f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
-        # TODO: Read the dtm log and write the info to the complete log
-        split_cal = split_measure(split_measuring_sim, movements[mov], neighbors, split)
-        actual_green = config_pi_mov_split(movements[mov], split_cal)
-        movements[mov].split = actual_green
-        mov_splits_changed[mov] = actual_green
-        print("tAct_" + str(movements[mov].id) + "_time = ", actual_green)
-        with open("sup_%s.log" % intersection_id, "a") as f:
-            f.write(str(actual_green) + "\n")
-    # Done: TODO: Send t_split to the TPN
-    split_msg = {
-        "id": id,
-        "type": "config",
-        "category": {
-            "value": ["split"]
-        },
-        "value": {
-            "value": mov_splits_changed
-        }
-    }
-    return split_msg
-
-
-def cycle_set(id):
-    cycle_msg = {
-        "id": id,
-        "type": "config",
-        "category": {
-            "value": ["cycle"]
-        },
-        "value": {
-            "value": ["Normal"]  # cycle name
-        }
-    }
-    return cycle_msg
 
 
 def manage_flow(msg_in, neighbors):
@@ -292,31 +198,116 @@ def send_state(my_topic, movements):
     return
 
 
+def split_measure(split_measuring_sim, movement, neighbors, split):
+    # print("Movement to measure Split: ", movement.id)
+    split_measuring_sim.input['my_congestion_level'] = movement.congestionLevel
+
+    # print("In Neighbor: ", movement.in_neighbors[1])
+    if movement.in_neighbors[1] in neighbors.keys():
+        in_congestion_level = (neighbors[movement.in_neighbors[1]].mov_congestion[movement.in_neighbors[0][0]] +
+                               neighbors[movement.in_neighbors[1]].mov_congestion[movement.in_neighbors[0][1]]) / 2
+        # print("in_congestion_level", in_congestion_level)
+    else:
+        in_congestion_level = 0.0
+    split_measuring_sim.input['in_congestion_level'] = in_congestion_level
+
+    # print("Out Neighbor: ", movement.out_neighbors[1])
+    if movement.out_neighbors[1] in neighbors.keys():
+        out_congestion_level = (neighbors[movement.out_neighbors[1]].mov_congestion[movement.out_neighbors[0][0]] +
+                                neighbors[movement.out_neighbors[1]].mov_congestion[movement.out_neighbors[0][1]]) / 2
+        # print("out_congestion_level: ", out_congestion_level)
+    else:
+        out_congestion_level = 0.0
+    split_measuring_sim.input['out_congestion_level'] = out_congestion_level
+
+    # Crunch the numbers
+    split_measuring_sim.compute()
+    with open("sup_%s.log" % intersection_id, "a") as f:
+        f.write(str(movement.congestionLevel) + "; " +
+                str(in_congestion_level) + "; " +
+                str(out_congestion_level) + "; " +
+                str(split_measuring_sim.output['split']) + "; ")
+    print("Split_", movement.id, " = ", split_measuring_sim.output['split'])
+    # print("my_congestion_level = ", movement.congestionLevel,
+    #       "; in_congestion_level = ", in_congestion_level,
+    #       "; out_congestion_level = ", out_congestion_level)
+    # split.view(sim=split_measuring_sim)
+
+    return split_measuring_sim.output['split']
+
+
+def config_pi_mov_split(movement, split_cal):
+    actual_green = movement.split + round(split_cal)
+    if actual_green <= 0:
+        actual_green = 0
+    elif actual_green >= 25:
+        actual_green = 25
+    return actual_green
+
+
+def config_mov_split(split_cal):
+    mean_green = 16
+    actual_green = min(mean_green + round(split_cal), 25)
+    return actual_green
+
+
+def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, split, time_current, id):
+    mov_splits_changed = {}
+    for mov in mov_displays_change:
+        with open("sup_%s.log" % intersection_id, "a") as f:
+            f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
+        # TODO: Read the dtm log and write the info to the complete log
+        split_cal = split_measure(split_measuring_sim, movements[mov], neighbors, split)
+        actual_green = config_pi_mov_split(movements[mov], split_cal)
+        movements[mov].split = actual_green
+        mov_splits_changed[mov] = actual_green
+        print("tAct_" + str(movements[mov].id) + "_time = ", actual_green)
+        with open("sup_%s.log" % intersection_id, "a") as f:
+            f.write(str(actual_green) + "\n")
+    # Done: TODO: Send t_split to the TPN
+    split_msg = {
+        "id": id,
+        "type": "config",
+        "category": {
+            "value": ["split"]
+        },
+        "value": {
+            "value": mov_splits_changed
+        }
+    }
+    return split_msg
+
+
+def congestion_command_set(mov_congestion_measure):
+    congestion_msg = {
+        "id": inter_info.id,
+        "type": "stateMeasure",
+        "category": {
+            "value": ["mov_congestion"]
+        },
+        "value": {
+            "value": mov_congestion_measure[0]  # list of movements involved
+        }
+    }
+    return congestion_msg
+
+
+def cycle_set(id):
+    cycle_msg = {
+        "id": id,
+        "type": "config",
+        "category": {
+            "value": ["cycle"]
+        },
+        "value": {
+            "value": ["Normal"]  # cycle name
+        }
+    }
+    return cycle_msg
+
+
 def run():
-    global msg_dic
-
-    tscm_topic_split = b"super/tscm/command"
-    tscm_topic_cycle = b"super/tscm/command"
-    dtm_topic_congestion = b"super/dtm/command"
-    dtm_topic_display = b"super/dtm/state"
-    pub_socket = pub_zmq_config("5558")
-    dtm_sub_socket = sub_zmq_config("5556", b"dtm/state")
-    tscm_sub_socket = sub_zmq_config("5557", b"tscm/state")
-    poller = poller_config([dtm_sub_socket, tscm_sub_socket])
-
-    # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
-
-    # Define my_topic
-    my_topic = inter_info.state_topic
-    # Subscribe to neighbors state topics
-    subscribe_neighbors(inter_info.neighbors_ids)
-
-    # Setup the split controller
-    split_measuring_sim, split = split_pi_model_conf()
-
-    # Reset Loop
-    # while True:
+    # Set or Reset of run variables
     accident_lanes = []
     movements = {}  # dictionary of movements
     neighbors = {}  # dictionary of neighbors
@@ -336,12 +327,12 @@ def run():
             neighbors[i] = intersections_classes.Neighbor(inter_info.neighbors_ids[i], i)
     print("Intersection Neighbors: ", neighbors)
 
-    # Beging the log
+    # Begging the run() log
     with open("sup_%s.log" % intersection_id, "w") as f:
         f.write("time; movement_id; my_congestion_level; in_congestion_level; out_congestion_level; split; act_time\n")
 
-    # Intersection ready tu start
-    print("Intersection '%s' READY:" % intersection_id)
+    # ----------------------------------------- SUPERVISOR ready tu start -----------------------------------------
+    print("SUPERVISOR '%s' READY:" % intersection_id)
     while not start_flag:
         pass  # Do nothing waiting for the start signal
 
@@ -349,10 +340,10 @@ def run():
     time_0 = time.perf_counter()
     time_current = 0.0
 
-    # Start the Intersection Petri Net
+    # -------- Start the SUPERVISOR --------
     print("\n\nStart the Intersection Petri Net:")
     while start_flag:
-        # Manage mqtt msgs received
+        # ---- Manage Neighbors mqtt msgs received
         if msg_dic:
             msg_mqtt = msg_dic.pop(0)
             msg_id = msg_mqtt['id']
@@ -363,62 +354,58 @@ def run():
                 elif msg_type == "AccidentObserved":
                     manage_accidents(msg_mqtt, inter_info.neighbors_ids, accident_lanes)
 
-        # TODO:
-        #  Done: If new Phase: Send cong_measure command to dtm with msg.attribute = [mov1, mov2]
-        #  Done: If Display change: Send Display state to DTM
-        #   Done: If new Red: Send new Cycle if there is one
-        #   Done: If new Green: Send mov split to TPN
+        # ---- Manage TSCM & DTM ZeroMQ msgs received
         poll = dict(poller.poll(20))
+        # -- Manage msgs received from the TSCM
         if tscm_sub_socket in poll and poll[tscm_sub_socket] == zmq.POLLIN:
             [top, contents] = tscm_sub_socket.recv_multipart()
             msg_zmq = json.loads(contents.decode())
+            # print(msg_zmq)
             msg_type = msg_zmq['type']
-            if b"tscm" in top and "state" in msg_type:  # Puede ser parte del ombre
-                print(msg_zmq)
-                # Measure congestion of correspondent Movement
-                if "phase" in msg_zmq['category']["value"]:  # Debe ser el nombre exacto
-                    print(time_current, "Measure congestion of the Movement of the next Phase -->",
-                          msg_zmq['state']["value"])
+            # Mange TSCM sates change
+            if b"tscm" in top and "state" in msg_type:
+                # Manage phase change: Measure congestion of the next phase Movements
+                if "phase" in msg_zmq['category']["value"]:  # Debe ser el nombre exacto (es una lista)
+                    print(time_current, "Measure congestion of the Movement of the next Phase -->", msg_zmq['state']["value"])
                     mov_congestion_measure = [phases_list[i] for i in range(len(msg_zmq["state"]["value"])) if
                                               msg_zmq["state"]["value"][i] != 0]  # list of list
-                    congestion_msg = {
-                        "id": inter_info.id,
-                        "type": "stateMeasure",
-                        "category": {
-                            "value": ["mov_congestion"]
-                        },
-                        "value": {
-                            "value": mov_congestion_measure[0]  # list of movements involved
-                        }
-                    }
-                    pub_socket.send_multipart([dtm_topic_congestion, json.dumps(congestion_msg).encode()])
+                    congestion_command_msg = congestion_command_set(mov_congestion_measure)
+                    pub_socket.send_multipart([dtm_topic_congestion, json.dumps(congestion_command_msg).encode()])
+                # Manage display change: Inform: display state --> DTM;  cycle, split --> TSCM / Split measure
                 if "display" in msg_zmq['category']["value"]:
                     pub_socket.send_multipart([dtm_topic_display, contents])  # Send Display State to DTM
                     msg_displays = list(msg_zmq["state"]["value"])  # Ej: ["r", "r", "r", "r", "r", "r", "r", "r"]
+                    # Extract the movements with display changes
                     mov_displays_change = {}  # dic -> {mov: "display"}. Ej: {2: "y", 7: "y"}
                     for mov in range(len(msg_displays)):
                         if mov in movements and movements[mov].light_state != msg_displays[mov]:
                             # print("The movement", mov, "is", movements[mov])
                             mov_displays_change[mov] = msg_displays[mov]
                             movements[mov].light_state = msg_displays[mov]
+
+                    # Configure and Send the cycle state to the TSCM
                     if "r" in mov_displays_change.values():
                         # TODO: Crear el msg de cycle_msg con la info de los movimientos
                         pass
                         # cycle_msg = cycle_set(msg_zmq["id"])
                         # pub_socket.send_multipart([tscm_topic_cycle, json.dumps(cycle_msg).encode()])
-                    # Measure split of correspondent Movement
+
+                    # Measure and send split of the Movements of the starting phase
                     elif "G" in mov_displays_change.values():
                         print("Calculate split of movements: ", mov_displays_change)
                         split_msg = split_set(mov_displays_change, split_measuring_sim, movements, neighbors, split,
                                               time_current, msg_zmq["id"])
                         pub_socket.send_multipart([tscm_topic_split, json.dumps(split_msg).encode()])
 
+        # -- Manage msgs received from the DTM
         if dtm_sub_socket in poll and poll[dtm_sub_socket] == zmq.POLLIN:
             [top, contents] = dtm_sub_socket.recv_multipart()
             msg_zmq = json.loads(contents.decode())
             print(msg_zmq)
             msg_type = msg_zmq['type']
+            # Mange TSCM sates change
             if b"dtm" in top and "state" in msg_type:
+                # Manage Movement congestion and send new state to Neighbors
                 if "mov_congestion" in msg_zmq['category']["value"]:
                     mov_congestion = msg_zmq['state']["value"]
                     print(time_current, "Congestion of movements :", mov_congestion, "arrived")
@@ -426,39 +413,38 @@ def run():
                         movements[int(mov)].congestionLevel = mov_congestion[mov]
                     # Send state to the Neighbors
                     send_state(my_topic, movements)
+                # Manage Movement accident and send new state to Neighbors
                 elif "mov_accident" in msg_zmq['category']["value"]:
                     mov_accident = msg_zmq['state']["value"]
                     for mov in range(len(mov_accident)):
                         movements[int(mov)].accident = mov_accident[mov]
+                    # Send state to the Neighbors
+                    send_state(my_topic, movements)
 
-        # Update time_current
+        # -- Update time_current
         if time.perf_counter() >= time_0 + time_current + 1:
             time_current += 1.0
-        # Wait for a second to transit
-        # time_current += 1.0
-        # while time.perf_counter() < time_0 + time_current:
-        #     pass
 
 
-def initialize():
-    # Define the global variable of command_received
-    global start_flag, msg_dic, intersection_id, client_intersection, pub_socket, dtm_sub_socket, tscm_sub_socket, \
-        poller
-    start_flag = False
-    msg_dic = []
-
-    with open("intersection/inter_id.txt", "r") as f:
-        intersection_id = f.read()
-    with open("intersection/broker_ip.txt", "r") as f:
-        mqtt_broker_ip = f.read()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
-    print("Intersection_ID: ", intersection_id)
-
-    client_intersection = mqtt_conf(mqtt_broker_ip)
-    client_intersection.loop_start()  # Necessary to maintain connection
-    pub_socket = pub_zmq_config("5558")
-    dtm_sub_socket = sub_zmq_config("5556", b"dtm/state")
-    tscm_sub_socket = sub_zmq_config("5557", b"tscm/state")
-    poller = poller_config([dtm_sub_socket, tscm_sub_socket])
+# def initialize():
+#     # Define the global variable of command_received
+#     global start_flag, msg_dic, intersection_id, client_intersection, pub_socket, dtm_sub_socket, tscm_sub_socket, \
+#         poller
+#     start_flag = False
+#     msg_dic = []
+#
+#     with open("intersection/inter_id.txt", "r") as f:
+#         intersection_id = f.read()
+#     with open("intersection/broker_ip.txt", "r") as f:
+#         mqtt_broker_ip = f.read()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
+#     print("Intersection_ID: ", intersection_id)
+#
+#     client_intersection = mqtt_conf(mqtt_broker_ip)
+#     client_intersection.loop_start()  # Necessary to maintain connection
+#     pub_socket = pub_zmq_config("5558")
+#     dtm_sub_socket = sub_zmq_config("5556", b"dtm/state")
+#     tscm_sub_socket = sub_zmq_config("5557", b"tscm/state")
+#     poller = poller_config([dtm_sub_socket, tscm_sub_socket])
 
 
 # if you have global variables, you must
@@ -474,8 +460,31 @@ if __name__ == '__main__':
         mqtt_broker_ip = f.read().rstrip()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
     print("Intersection_ID: ", intersection_id)
 
-    client_intersection = mqtt_conf(mqtt_broker_ip)
-    # client_intersection: mqtt.Client = mqtt_conf()
-    client_intersection.loop_start()  # Necessary to maintain connection
+    # Setup of the intersection
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
 
+    # Start mqtt connection
+    client_intersection = mqtt_conf(mqtt_broker_ip)
+    client_intersection.loop_start()  # Necessary to maintain connection
+    # Define my_topic
+    my_topic = inter_info.state_topic
+    # Subscribe to neighbors state topics
+    subscribe_neighbors(inter_info.neighbors_ids)
+
+    # Define ZeroMQ topics
+    tscm_topic_split = b"super/tscm/command"
+    tscm_topic_cycle = b"super/tscm/command"
+    dtm_topic_congestion = b"super/dtm/command"
+    dtm_topic_display = b"super/dtm/state"
+    # Configure ZeroMQ sockets
+    pub_socket = pub_zmq_config("5558")
+    dtm_sub_socket = sub_zmq_config("5556", b"dtm/state")
+    tscm_sub_socket = sub_zmq_config("5557", b"tscm/state")
+    poller = poller_config([dtm_sub_socket, tscm_sub_socket])
+
+    # Setup the split controller
+    split_measuring_sim, split = split_pi_model_conf()
+
+    # Reset Loop
+    # while True:
     run()

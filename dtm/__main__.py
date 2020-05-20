@@ -78,64 +78,6 @@ def poller_config(socket):
     return poller
 
 
-def manage_flow(msg_in, movements, moves_detectors, moves_green, time_green_changed):
-    # Function that saves the detectors and neighbor congestion info
-    detector_id = msg_in["id"][-3:]
-    mov_ids = []
-    # with open("tpn_state.txt") as f_state:
-    #     tpn_state = json.loads(f_state.read())
-    #
-    # moves_green = [int(i) for i in tpn_state.keys() if tpn_state[i] == "G"]
-    print("Detector '", detector_id, "' value changed in lane '", msg_in['laneId'], "'")
-    for mov in range(8):  # 8 movements
-        if detector_id in moves_detectors[mov]:
-            mov_ids.append(mov)
-    print("Moves affected: ", mov_ids)
-    for mov in mov_ids:
-        if (mov in moves_green) or (msg_in["dateObserved"] == time_green_changed):
-            movements[mov].set_jam_length_vehicle(detector_id, [msg_in["dateObserved"], msg_in["jamLengthVehicle"]])
-            movements[mov].set_mean_speed(detector_id, [msg_in["dateObserved"], msg_in["meanSpeed"]])
-            #print("Speed of: ", mov, " = ", msg_in["meanSpeed"])
-        movements[mov].set_occupancy(detector_id, [msg_in["dateObserved"], msg_in["occupancy"]])
-        movements[mov].set_vehicle_number(detector_id, [msg_in["dateObserved"], msg_in["vehicleNumber"]])
-
-    return
-
-
-def manage_accidents(msg_in, movements, accident_lanes):
-    print("Accident status changes on street " + msg_in['laneId'])
-    if msg_in["accidentOnLane"]:
-        accident_lanes.append(msg_in['id'])
-    else:
-        accident_lanes.remove(msg_in['id'])
-
-    acc_mov = []
-    if msg_in['id'][24] == "n":
-        acc_mov = [3, 6]
-    elif msg_in['id'][24] == "e":
-        acc_mov = [0, 5]
-    elif msg_in['id'][24] == "s":
-        acc_mov = [2, 7]
-    elif msg_in['id'][24] == "w":
-        acc_mov = [1, 4]
-
-    date = datetime.datetime.utcnow().isoformat()
-    for mov in acc_mov:
-        movements[mov].accident[0] = msg_in["accidentOnLane"]
-        movements[mov].accident[1] = date
-
-    accident_msg = {
-        "id": msg_in['id'],
-        "type": "AccidentObserved",
-        "laneId": msg_in['laneId'],
-        "location": msg_in['location'],
-        "dateObserved": datetime.datetime.utcnow().isoformat(),
-        "accidentOnLane": msg_in["accidentOnLane"],  # It has to be configured
-        "laneDirection": msg_in['laneDirection']
-    }
-    return accident_msg
-
-
 def congestion_model_conf(max_speed, max_vehicle_number):
     # Antecedent/Consequent and universe definition variables
     jamLengthVehicle = ctrl.Antecedent(np.arange(0, max_vehicle_number + 2, 1), 'jamLengthVehicle')
@@ -238,6 +180,64 @@ def congestion_model_conf2(max_speed, max_vehicle_number):
     return congestion_measuring_sim, congestionLevel
 
 
+def manage_flow(msg_in, movements, moves_detectors, moves_green, time_green_changed):
+    # Function that saves the detectors and neighbor congestion info
+    detector_id = msg_in["id"][-3:]
+    mov_ids = []
+    # with open("tpn_state.txt") as f_state:
+    #     tpn_state = json.loads(f_state.read())
+    #
+    # moves_green = [int(i) for i in tpn_state.keys() if tpn_state[i] == "G"]
+    print("Detector '", detector_id, "' value changed in lane '", msg_in['laneId'], "'")
+    for mov in range(8):  # 8 movements
+        if detector_id in moves_detectors[mov]:
+            mov_ids.append(mov)
+    print("Moves affected: ", mov_ids)
+    for mov in mov_ids:
+        if (mov in moves_green) or (msg_in["dateObserved"] == time_green_changed):
+            movements[mov].set_jam_length_vehicle(detector_id, [msg_in["dateObserved"], msg_in["jamLengthVehicle"]])
+            movements[mov].set_mean_speed(detector_id, [msg_in["dateObserved"], msg_in["meanSpeed"]])
+            #print("Speed of: ", mov, " = ", msg_in["meanSpeed"])
+        movements[mov].set_occupancy(detector_id, [msg_in["dateObserved"], msg_in["occupancy"]])
+        movements[mov].set_vehicle_number(detector_id, [msg_in["dateObserved"], msg_in["vehicleNumber"]])
+
+    return
+
+
+def manage_accidents(msg_in, movements, accident_lanes):
+    print("Accident status changes on street " + msg_in['laneId'])
+    if msg_in["accidentOnLane"]:
+        accident_lanes.append(msg_in['id'])
+    else:
+        accident_lanes.remove(msg_in['id'])
+
+    acc_mov = []
+    if msg_in['id'][24] == "n":
+        acc_mov = [3, 6]
+    elif msg_in['id'][24] == "e":
+        acc_mov = [0, 5]
+    elif msg_in['id'][24] == "s":
+        acc_mov = [2, 7]
+    elif msg_in['id'][24] == "w":
+        acc_mov = [1, 4]
+
+    date = datetime.datetime.utcnow().isoformat()
+    for mov in acc_mov:
+        movements[mov].accident[0] = msg_in["accidentOnLane"]
+        movements[mov].accident[1] = date
+
+    accident_msg = {
+        "id": msg_in['id'],
+        "type": "AccidentObserved",
+        "laneId": msg_in['laneId'],
+        "location": msg_in['location'],
+        "dateObserved": datetime.datetime.utcnow().isoformat(),
+        "accidentOnLane": msg_in["accidentOnLane"],  # It has to be configured
+        "laneDirection": msg_in['laneDirection']
+    }
+    return accident_msg
+
+
 def congestion_measure(congestion_measuring_sim, movement, time_current):
     congestion = 0.0
     mov_vehicle_num = movement.get_vehicle_number(time_current)
@@ -315,7 +315,7 @@ def congestion_msg_set(msg_in, mov_cong):
     return msg_sup
 
 
-def struct_accident_data_msg(msg_in, mov_acc):
+def accident_msg_set(msg_in, mov_acc):
     msg_sup = {
         "id": msg_in["id"],
         "type": "stateChange",
@@ -330,27 +330,7 @@ def struct_accident_data_msg(msg_in, mov_acc):
 
 
 def run():
-    global msg_dic
-
-    super_topic_congestion = b"dtm/state"
-    super_topic_accident = b"dtm/state"
-    pub_socket = pub_zmq_config("5556")
-    sub_socket = sub_zmq_config("5558")
-    poller = poller_config([sub_socket])
-    with open("dtm_%s.log" % intersection_id, "w") as f:
-        f.write("time; movement_id; jam; vehicle_number; occupancy; mean_speed; my_congestion_level\n")
-    with open("detect_%s.log" % intersection_id, "w") as f:
-        f.write("time; time_det; detect_id; cars_number; occupancy; jam; mean_speed\n")
-    with open("mg_%s.log" % intersection_id, "w") as f:
-        f.write("time; state\n")
-
-    # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
-
-    # Setup the congestion model
-    congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed,
-                                                                      inter_info.m_max_vehicle_number)
-    # Reset Loop
+    # Set or Reset of run variables
     accident_lanes = []
     movements = {}  # dictionary of movements
     moves_green = []
@@ -363,6 +343,15 @@ def run():
             break
     print("Intersection Movements: ", movements)
 
+    # Begging the run() log
+    with open("dtm_%s.log" % intersection_id, "w") as f:
+        f.write("time; movement_id; jam; vehicle_number; occupancy; mean_speed; my_congestion_level\n")
+    with open("detect_%s.log" % intersection_id, "w") as f:
+        f.write("time; time_det; detect_id; cars_number; occupancy; jam; mean_speed\n")
+    with open("mg_%s.log" % intersection_id, "w") as f:
+        f.write("time; state\n")
+
+    # ----------------------------------------- DTM ready tu start -----------------------------------------
     print("DTM '%s' READY:" % intersection_id)
     while not start_flag:
         pass  # Do nothing waiting for the start signal
@@ -372,10 +361,9 @@ def run():
     time_current = 0.0
     time_green_changed = -1
 
-    # Start the Intersection Petri Net
+    # -------- Start the DTM --------
     print("\n\nStart the Intersection Petri Net:")
     while start_flag:
-
         # # Add accident in B at t = 30
         # if time_current == 30:
         #     my_accident_change = True
@@ -401,42 +389,7 @@ def run():
         #         "laneDirection": "s-_wn_"
         #     })
 
-        # Manage msgs received
-        # Manage supervisor (zmq) msgs received
-        poll = dict(poller.poll(2))
-        if sub_socket in poll and poll[sub_socket] == zmq.POLLIN:
-            [top, contents] = sub_socket.recv_multipart()
-            msg_zmq = json.loads(contents.decode())
-            print(msg_zmq)
-            if b"command" in top:
-                if "mov_congestion" in msg_zmq["category"]["value"]:
-                    msg_movements = list(msg_zmq["value"]["value"])
-                    mov_cong = {}
-                    print(time_current, "*** Measure congestion of movements: ", msg_movements, " ***")
-                    for mov in msg_movements:
-                        if mov in movements:
-                            movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov], time_current)
-                            mov_cong[mov] = movements[mov].congestionLevel
-                    cong_data_msg = congestion_msg_set(msg_zmq, mov_cong)
-                    print(cong_data_msg)
-                    pub_socket.send_multipart([super_topic_congestion, json.dumps(cong_data_msg).encode()])
-            elif b"state" in top:
-                if "display" in msg_zmq["category"]["value"]:
-                    msg_display = list(msg_zmq["state"]["value"])
-                    if moves_green:
-                        time_green_changed = time_current
-                    else:
-                        time_green_changed = -1
-                    moves_green = []
-                    for mov in range(len(msg_display)):
-                        if msg_display[mov] == "G":
-                            moves_green.append(mov)
-                            movements[mov].reset_jam_length_vehicle()
-                            movements[mov].reset_mean_speed()
-                    with open("mg_%s.log" % intersection_id, "a") as f:
-                        f.write(str(time_current) + "; " + str(moves_green) + "\n")
-                    print("Moves Green : ", moves_green)
-
+        # ---- Manage SUMO-Detectors mqtt msgs received
         while msg_dic:
             msg_mqtt = msg_dic.pop(0)
             msg_id = msg_mqtt['id']
@@ -457,6 +410,45 @@ def run():
                     accident_msg = manage_accidents(msg_mqtt, movements, accident_lanes)
                     pub_socket.send_multipart([super_topic_accident, json.dump(accident_msg).encode()])
 
+        # ---- Manage supervisor ZeroMQ msgs received
+        poll = dict(poller.poll(2))
+        if sub_socket in poll and poll[sub_socket] == zmq.POLLIN:
+            [top, contents] = sub_socket.recv_multipart()
+            msg_zmq = json.loads(contents.decode())
+            print(msg_zmq)
+            # Manage supervisor COMMANDS
+            if b"command" in top:
+                # Manage Congestion measure command
+                if "mov_congestion" in msg_zmq["category"]["value"]:
+                    msg_movements = list(msg_zmq["value"]["value"])
+                    mov_cong = {}
+                    print(time_current, "*** Measure congestion of movements: ", msg_movements, " ***")
+                    for mov in msg_movements:
+                        if mov in movements:
+                            movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov], time_current)
+                            mov_cong[mov] = movements[mov].congestionLevel
+                    cong_data_msg = congestion_msg_set(msg_zmq, mov_cong)
+                    print(cong_data_msg)
+                    pub_socket.send_multipart([super_topic_congestion, json.dumps(cong_data_msg).encode()])
+
+            # Manage Display Change
+            elif b"state" in top:
+                if "display" in msg_zmq["category"]["value"]:
+                    msg_display = list(msg_zmq["state"]["value"])
+                    if moves_green:
+                        time_green_changed = time_current
+                    else:
+                        time_green_changed = -1
+                    moves_green = []
+                    for mov in range(len(msg_display)):
+                        if msg_display[mov] == "G":
+                            moves_green.append(mov)
+                            movements[mov].reset_jam_length_vehicle()
+                            movements[mov].reset_mean_speed()
+                    with open("mg_%s.log" % intersection_id, "a") as f:
+                        f.write(str(time_current) + "; " + str(moves_green) + "\n")
+                    print("Moves Green : ", moves_green)
+
         # Update time_current
         if time.perf_counter() >= time_0 + time_current + 1:
             time_current += 1.0
@@ -472,8 +464,24 @@ if __name__ == '__main__':
         mqtt_broker_ip = f.read().rstrip()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
     print("Intersection_ID: ", intersection_id)
 
+    # Setup of the intersection
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
+
+    # Start mqtt connection
     client_intersection = mqtt_conf(mqtt_broker_ip)
-    # client_intersection: mqtt.Client = mqtt_conf()
     client_intersection.loop_start()  # Necessary to maintain connection
 
+    # Define ZeroMQ topics
+    super_topic_congestion = b"dtm/state"
+    super_topic_accident = b"dtm/state"
+    # Configure ZeroMQ sockets
+    pub_socket = pub_zmq_config("5556")
+    sub_socket = sub_zmq_config("5558")
+    poller = poller_config([sub_socket])
+
+    # Setup the congestion model
+    congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed,
+                                                                      inter_info.m_max_vehicle_number)
+    # Reset Loop
+    # while True:
     run()
