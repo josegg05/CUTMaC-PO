@@ -208,6 +208,7 @@ def run():
     # Start the Intersection Petri Net
     print("\n\nStart the Intersection Petri Net:")
     while start_flag:
+        time.sleep(0.1)  # Wait SUMO to update and send all simulation msgs
         transitions_fire = []
         # Print the current time and delay
         print("Time:[%s] " % time_current, "delay:", delay)

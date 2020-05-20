@@ -78,7 +78,7 @@ def poller_config(socket):
     return poller
 
 
-def manage_flow(msg_in, movements, moves_detectors, moves_green):
+def manage_flow(msg_in, movements, moves_detectors, moves_green, time_green_changed):
     # Function that saves the detectors and neighbor congestion info
     detector_id = msg_in["id"][-3:]
     mov_ids = []
@@ -92,7 +92,7 @@ def manage_flow(msg_in, movements, moves_detectors, moves_green):
             mov_ids.append(mov)
     print("Moves affected: ", mov_ids)
     for mov in mov_ids:
-        if mov in moves_green:
+        if (mov in moves_green) or (msg_in["dateObserved"] == time_green_changed):
             movements[mov].set_jam_length_vehicle(detector_id, [msg_in["dateObserved"], msg_in["jamLengthVehicle"]])
             movements[mov].set_mean_speed(detector_id, [msg_in["dateObserved"], msg_in["meanSpeed"]])
             #print("Speed of: ", mov, " = ", msg_in["meanSpeed"])
@@ -370,6 +370,7 @@ def run():
     # Set Petri Net Time, delay and step variables initial values to start
     time_0 = time.perf_counter()
     time_current = 0.0
+    time_green_changed = -1
 
     # Start the Intersection Petri Net
     print("\n\nStart the Intersection Petri Net:")
@@ -422,6 +423,10 @@ def run():
             elif b"state" in top:
                 if "display" in msg_zmq["category"]["value"]:
                     msg_display = list(msg_zmq["state"]["value"])
+                    if moves_green:
+                        time_green_changed = time_current
+                    else:
+                        time_green_changed = -1
                     moves_green = []
                     for mov in range(len(msg_display)):
                         if msg_display[mov] == "G":
@@ -438,7 +443,7 @@ def run():
             msg_type = msg_mqtt['type']
             if "e2det" in msg_id:
                 if msg_type == "TrafficFlowObserved":
-                    manage_flow(msg_mqtt, movements, inter_info.m_detectors, moves_green)
+                    manage_flow(msg_mqtt, movements, inter_info.m_detectors, moves_green, time_green_changed)
                     with open("detect_%s.log" % intersection_id, "a") as f:
                         f.write(str(time_current) + "; " +
                                 str(msg_mqtt["dateObserved"]) + "; " +
