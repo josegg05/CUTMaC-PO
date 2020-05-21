@@ -180,7 +180,7 @@ def congestion_model_conf2(max_speed, max_vehicle_number):
     return congestion_measuring_sim, congestionLevel
 
 
-def manage_flow(msg_in, movements, moves_detectors, moves_green, time_green_changed):
+def manage_flow(msg_in, movements, moves_detectors, moves_green, time_green_changed, previous_moves_green):
     # Function that saves the detectors and neighbor congestion info
     detector_id = msg_in["id"][-3:]
     mov_ids = []
@@ -194,7 +194,7 @@ def manage_flow(msg_in, movements, moves_detectors, moves_green, time_green_chan
             mov_ids.append(mov)
     print("Moves affected: ", mov_ids)
     for mov in mov_ids:
-        if (mov in moves_green) or (msg_in["dateObserved"] == time_green_changed):
+        if (mov in moves_green) or (mov in previous_moves_green and msg_in["dateObserved"] == time_green_changed):
             movements[mov].set_jam_length_vehicle(detector_id, [msg_in["dateObserved"], msg_in["jamLengthVehicle"]])
             movements[mov].set_mean_speed(detector_id, [msg_in["dateObserved"], msg_in["meanSpeed"]])
             #print("Speed of: ", mov, " = ", msg_in["meanSpeed"])
@@ -334,6 +334,7 @@ def run():
     accident_lanes = []
     movements = {}  # dictionary of movements
     moves_green = []
+    previous_moves_green = []
 
     # Create intersection Movements
     for i in range(len(inter_info.movements)):
@@ -396,7 +397,7 @@ def run():
             msg_type = msg_mqtt['type']
             if "e2det" in msg_id:
                 if msg_type == "TrafficFlowObserved":
-                    manage_flow(msg_mqtt, movements, inter_info.m_detectors, moves_green, time_green_changed)
+                    manage_flow(msg_mqtt, movements, inter_info.m_detectors, moves_green, previous_moves_green, time_green_changed)
                     with open("detect_%s.log" % intersection_id, "a") as f:
                         f.write(str(time_current) + "; " +
                                 str(msg_mqtt["dateObserved"]) + "; " +
@@ -436,8 +437,10 @@ def run():
                 if "display" in msg_zmq["category"]["value"]:
                     msg_display = list(msg_zmq["state"]["value"])
                     if moves_green:
+                        previous_moves_green = moves_green
                         time_green_changed = time_current
                     else:
+                        previous_moves_green = []
                         time_green_changed = -1
                     moves_green = []
                     for mov in range(len(msg_display)):

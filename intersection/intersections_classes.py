@@ -59,7 +59,7 @@ class Movement:
         self.in_neighbors = []
         self.out_neighbors = []
         self.congestionLevel = 0
-        self.split = 0 #  16  # Same as "tAct_" in inter_tpn
+        self.split = 16  # Same as "tAct_" in inter_tpn
         self.accident = [0, ""]
         self.light_state = "r"
 
