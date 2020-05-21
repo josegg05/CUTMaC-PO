@@ -180,7 +180,7 @@ def congestion_model_conf2(max_speed, max_vehicle_number):
     return congestion_measuring_sim, congestionLevel
 
 
-def manage_flow(msg_in, movements, moves_detectors, moves_green, time_green_changed, previous_moves_green):
+def manage_flow(msg_in, movements, moves_detectors, moves_green, previous_moves_green, time_green_changed):
     # Function that saves the detectors and neighbor congestion info
     detector_id = msg_in["id"][-3:]
     mov_ids = []
@@ -194,7 +194,7 @@ def manage_flow(msg_in, movements, moves_detectors, moves_green, time_green_chan
             mov_ids.append(mov)
     print("Moves affected: ", mov_ids)
     for mov in mov_ids:
-        if (mov in moves_green) or (mov in previous_moves_green and msg_in["dateObserved"] == time_green_changed):
+        if (mov in moves_green) or ((mov in previous_moves_green) and (msg_in["dateObserved"] == time_green_changed)):
             movements[mov].set_jam_length_vehicle(detector_id, [msg_in["dateObserved"], msg_in["jamLengthVehicle"]])
             movements[mov].set_mean_speed(detector_id, [msg_in["dateObserved"], msg_in["meanSpeed"]])
             #print("Speed of: ", mov, " = ", msg_in["meanSpeed"])
@@ -437,7 +437,7 @@ def run():
                 if "display" in msg_zmq["category"]["value"]:
                     msg_display = list(msg_zmq["state"]["value"])
                     if moves_green:
-                        previous_moves_green = moves_green
+                        previous_moves_green = moves_green[:]
                         time_green_changed = time_current
                     else:
                         previous_moves_green = []
