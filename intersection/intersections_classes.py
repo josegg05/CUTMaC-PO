@@ -113,7 +113,7 @@ class Movement:
                     vehicle_number += self._detectors[det].vehicleNumber[0][1]
                 else:
                     vehicle_number += self._detectors[det].vehicleNumber[1][1]
-            #vehicle_number = vehicle_number / len(self._detectors)
+            vehicle_number = vehicle_number / len(self._detectors)
         else:
             vehicle_number = "NA"
         return vehicle_number
@@ -131,7 +131,7 @@ class Movement:
                     occupancy += self._detectors[det].occupancy[0][1]
                 else:
                     occupancy += self._detectors[det].occupancy[1][1]
-            #occupancy = occupancy / len(self._detectors)
+            occupancy = occupancy / len(self._detectors)
         else:
             occupancy = "NA"
         return occupancy

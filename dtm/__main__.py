@@ -194,8 +194,10 @@ def manage_flow(msg_in, movements, moves_detectors, moves_green, previous_moves_
             mov_ids.append(mov)
     print("Moves affected: ", mov_ids)
     for mov in mov_ids:
-        if (mov in moves_green) or ((mov in previous_moves_green) and (msg_in["dateObserved"] == time_green_changed)):
+        if ((mov in moves_green) and (msg_in["dateObserved"] != time_green_changed[0])) \
+                or ((mov in previous_moves_green) and (msg_in["dateObserved"] == time_green_changed[1])):
             movements[mov].set_jam_length_vehicle(detector_id, [msg_in["dateObserved"], msg_in["jamLengthVehicle"]])
+            # TODO: Change speed to 14 when the measure = -1
             movements[mov].set_mean_speed(detector_id, [msg_in["dateObserved"], msg_in["meanSpeed"]])
             #print("Speed of: ", mov, " = ", msg_in["meanSpeed"])
         movements[mov].set_occupancy(detector_id, [msg_in["dateObserved"], msg_in["occupancy"]])
@@ -360,7 +362,7 @@ def run():
     # Set Petri Net Time, delay and step variables initial values to start
     time_0 = time.perf_counter()
     time_current = 0.0
-    time_green_changed = -1
+    time_green_changed = [-1, -1]  # [change_to_green, change_to_NOT_green]
 
     # -------- Start the DTM --------
     print("\n\nStart the Intersection Petri Net:")
@@ -436,18 +438,22 @@ def run():
             elif b"state" in top:
                 if "display" in msg_zmq["category"]["value"]:
                     msg_display = list(msg_zmq["state"]["value"])
-                    if moves_green:
+                    if moves_green:  # Display is going to change to a NOT green light
                         previous_moves_green = moves_green[:]
-                        time_green_changed = time_current
+                        time_green_changed[1] = time_current
                     else:
                         previous_moves_green = []
-                        time_green_changed = -1
+                        time_green_changed[1] = -1
                     moves_green = []
                     for mov in range(len(msg_display)):
                         if msg_display[mov] == "G":
                             moves_green.append(mov)
                             movements[mov].reset_jam_length_vehicle()
                             movements[mov].reset_mean_speed()
+                    if moves_green:  # Display changed to green light
+                        time_green_changed[0] = time_current
+                    else:
+                        time_green_changed[0] = -1
                     with open("mg_%s.log" % intersection_id, "a") as f:
                         f.write(str(time_current) + "; " + str(moves_green) + "\n")
                     print("Moves Green : ", moves_green)
