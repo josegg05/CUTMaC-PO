@@ -466,7 +466,6 @@ def run():
 if __name__ == '__main__':
     # Define the Global Variables
     start_flag = False
-    msg_dic = []
     run_num = 0
     with open("intersection/inter_id.txt", "r") as f:
         intersection_id = f.read().rstrip()
@@ -494,5 +493,7 @@ if __name__ == '__main__':
                                                                       inter_info.m_max_vehicle_number)
     # Reset Loop
     while True:
+        msg_dic = []
         run()
         run_num += 1
+        time.sleep(30)

@@ -160,6 +160,11 @@ def run():
     cycle = 0  # Set initial Cycle
     moves_displays_state = ["r", "r", "r", "r", "r", "r", "r", "r"]  # Create intersection Movements displays
     phases_state = [0, 0, 0, 0, 0, 0, 0, 0]  # Set initial phases_state
+
+    # Create de SNAKE Petri Net
+    petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
+    init = petri_net_snake.get_marking()
+    print(init)
     # "petri_net_snake.set_marking(init)" Acts like n.reset(), because each transition has a place in its pre-set whose
     # marking is reset, just like for method reset
     petri_net_snake.set_marking(init)
@@ -257,7 +262,6 @@ def run():
 if __name__ == '__main__':
     # Define the Global Variables
     start_flag = False
-    msg_dic = []
     run_num = 0
     with open("intersection/inter_id.txt", "r") as f:
         intersection_id = f.read().rstrip()
@@ -283,12 +287,10 @@ if __name__ == '__main__':
     # Set the definition vectors of the Timed Petri Net
     petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.phases,
                                                                        inter_info.cycles, inter_info.cycles_names)
-    # Create de SNAKE Petri Net
-    petri_net_snake = net_snakes.net_snakes_create(petri_net_inter)
-    init = petri_net_snake.get_marking()
-    print(init)
 
     # Reset Loop
     while True:
+        msg_dic = []
         run()
         run_num += 1
+        time.sleep(30)
