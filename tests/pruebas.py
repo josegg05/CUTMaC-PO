@@ -411,3 +411,8 @@ print(lista)
 
 float_num = 0.5
 print(round(float_num))
+
+intersection_id = "0002"
+run_num = 0
+with open("log_files/detect_%s_%d.log" % (intersection_id, run_num), "w") as f:
+    f.write("time; time_det; detect_id; cars_number; occupancy; jam; mean_speed\n")

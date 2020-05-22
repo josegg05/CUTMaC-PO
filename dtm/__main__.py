@@ -255,7 +255,7 @@ def congestion_measure(congestion_measuring_sim, movement, time_current):
         congestion_measuring_sim.compute()
         congestion = congestion_measuring_sim.output['congestionLevel']
 
-    with open("dtm_%s.log" % intersection_id, "a") as f:
+    with open("log_files/dtm_%s_%d.log" % (intersection_id, run_num), "a") as f:
         f.write(str(time_current) + "; " +
                 str(movement.id) + "; " +
                 str(movement.get_jam_length_vehicle(time_current)) + "; " +
@@ -288,7 +288,7 @@ def congestion_measure2(congestion_measuring_sim, movement, time_current):
         congestion_measuring_sim.compute()
         congestion = congestion_measuring_sim.output['congestionLevel']
 
-    with open("dtm_%s.log" % intersection_id, "a") as f:
+    with open("log_files/dtm_%s_%d.log" % (intersection_id, run_num), "a") as f:
         f.write(str(time_current) + "; " +
                 str(movement.id) + "; " +
                 str(mov_vehicle_num) + "; " +
@@ -347,11 +347,11 @@ def run():
     print("Intersection Movements: ", movements)
 
     # Begging the run() log
-    with open("dtm_%s.log" % intersection_id, "w") as f:
+    with open("log_files/dtm_%s_%d.log" % (intersection_id, run_num), "w") as f:
         f.write("time; movement_id; jam; vehicle_number; occupancy; mean_speed; my_congestion_level\n")
-    with open("detect_%s.log" % intersection_id, "w") as f:
+    with open("log_files/detect_%s_%d.log" % (intersection_id, run_num), "w") as f:
         f.write("time; time_det; detect_id; cars_number; occupancy; jam; mean_speed\n")
-    with open("mg_%s.log" % intersection_id, "w") as f:
+    with open("log_files/mg_%s_%d.log" % (intersection_id, run_num), "w") as f:
         f.write("time; state\n")
 
     # ----------------------------------------- DTM ready tu start -----------------------------------------
@@ -400,7 +400,7 @@ def run():
             if "e2det" in msg_id:
                 if msg_type == "TrafficFlowObserved":
                     manage_flow(msg_mqtt, movements, inter_info.m_detectors, moves_green, previous_moves_green, time_green_changed)
-                    with open("detect_%s.log" % intersection_id, "a") as f:
+                    with open("log_files/detect_%s_%d.log" % (intersection_id, run_num), "a") as f:
                         f.write(str(time_current) + "; " +
                                 str(msg_mqtt["dateObserved"]) + "; " +
                                 str(msg_id) + "; " +
@@ -454,7 +454,7 @@ def run():
                         time_green_changed[0] = time_current
                     else:
                         time_green_changed[0] = -1
-                    with open("mg_%s.log" % intersection_id, "a") as f:
+                    with open("log_files/mg_%s_%d.log" % (intersection_id, run_num), "a") as f:
                         f.write(str(time_current) + "; " + str(moves_green) + "\n")
                     print("Moves Green : ", moves_green)
 
@@ -467,6 +467,7 @@ if __name__ == '__main__':
     # Define the Global Variables
     start_flag = False
     msg_dic = []
+    run_num = 0
     with open("intersection/inter_id.txt", "r") as f:
         intersection_id = f.read().rstrip()
     with open("intersection/broker_ip.txt", "r") as f:
@@ -492,5 +493,6 @@ if __name__ == '__main__':
     congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed,
                                                                       inter_info.m_max_vehicle_number)
     # Reset Loop
-    # while True:
-    run()
+    while True:
+        run()
+        run_num += 1

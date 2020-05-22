@@ -121,7 +121,7 @@ def set_tls_lights(transitions_fire, inter_info, mv_displays, cycle, time_curren
             "command": "setPhase",
             "data": "".join(inter_info.lights)
         }
-        with open("tls_%s.log" % intersection_id, "a") as f:
+        with open("log_files/tls_%s_%d.log" % (intersection_id, run_num), "a") as f:
             f.write(str(time_current) + "; " + str(inter_info.tls_id) + "; " + "".join(inter_info.lights) + "\n")
 
         display_state_msg = {
@@ -172,7 +172,7 @@ def run():
     print("Phases states are: ", phases_state)
 
     # Begging the run() log
-    with open("tls_%s.log" % intersection_id, "w") as f:
+    with open("log_files/tls_%s_%d.log" % (intersection_id, run_num), "w") as f:
         f.write("time; movement_id; state\n")
 
     # ----------------------------------------- TSCM ready tu start -----------------------------------------
@@ -258,6 +258,7 @@ if __name__ == '__main__':
     # Define the Global Variables
     start_flag = False
     msg_dic = []
+    run_num = 0
     with open("intersection/inter_id.txt", "r") as f:
         intersection_id = f.read().rstrip()
     with open("intersection/broker_ip.txt", "r") as f:
@@ -288,5 +289,6 @@ if __name__ == '__main__':
     print(init)
 
     # Reset Loop
-    # while True:
-    run()
+    while True:
+        run()
+        run_num += 1

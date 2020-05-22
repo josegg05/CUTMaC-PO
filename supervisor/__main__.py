@@ -222,7 +222,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
 
     # Crunch the numbers
     split_measuring_sim.compute()
-    with open("sup_%s.log" % intersection_id, "a") as f:
+    with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
         f.write(str(movement.congestionLevel) + "; " +
                 str(in_congestion_level) + "; " +
                 str(out_congestion_level) + "; " +
@@ -254,7 +254,7 @@ def config_mov_split(split_cal):
 def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, split, time_current, id):
     mov_splits_changed = {}
     for mov in mov_displays_change:
-        with open("sup_%s.log" % intersection_id, "a") as f:
+        with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
             f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
         # TODO: Read the dtm log and write the info to the complete log
         split_cal = split_measure(split_measuring_sim, movements[mov], neighbors, split)
@@ -262,7 +262,7 @@ def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, sp
         movements[mov].split = actual_green
         mov_splits_changed[mov] = actual_green
         print("tAct_" + str(movements[mov].id) + "_time = ", actual_green)
-        with open("sup_%s.log" % intersection_id, "a") as f:
+        with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
             f.write(str(actual_green) + "\n")
     # Done: TODO: Send t_split to the TPN
     split_msg = {
@@ -328,7 +328,7 @@ def run():
     print("Intersection Neighbors: ", neighbors)
 
     # Begging the run() log
-    with open("sup_%s.log" % intersection_id, "w") as f:
+    with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "w") as f:
         f.write("time; movement_id; my_congestion_level; in_congestion_level; out_congestion_level; split; act_time\n")
 
     # ----------------------------------------- SUPERVISOR ready tu start -----------------------------------------
@@ -454,6 +454,7 @@ if __name__ == '__main__':
     # Define Global Variables
     start_flag = False
     msg_dic = []
+    run_num = 0
     with open("intersection/inter_id.txt", "r") as f:
         intersection_id = f.read().rstrip()
     with open("intersection/broker_ip.txt", "r") as f:
@@ -486,5 +487,6 @@ if __name__ == '__main__':
     split_measuring_sim, split = split_pi_model_conf()
 
     # Reset Loop
-    # while True:
-    run()
+    while True:
+        run()
+        run_num += 1
