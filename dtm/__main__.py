@@ -494,10 +494,13 @@ if __name__ == '__main__':
     # Reset Loop
     while True:
         msg_dic = []
-        run()
-        run_num += 1
-        time.sleep(30)
+        # Empty the zmq pipe
         poll = dict(poller.poll(20))
         while sub_socket in poll and poll[sub_socket] == zmq.POLLIN:
             [top, contents] = sub_socket.recv_multipart()
             poll = dict(poller.poll(20))
+
+        run()
+        run_num += 1
+        time.sleep(30)
+
