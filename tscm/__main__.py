@@ -90,28 +90,27 @@ def set_phase_state(transition, phases_state, id):
     return phase_state_msg, phases_state
 
 
-def set_tls_lights(transitions_fire, inter_info, mv_displays, cycle, time_current):
+def set_tls_lights(transitions_fire, inter_info, ts_displays, moves_displays, cycle, time_current):
     l_change = False
-    moves_displays = mv_displays
     for transition in transitions_fire:
         if "tGreen" in transition:
             print("Voy a poner en GREEN el Movimiento %s" % transition[-1])
             l_change = True
             moves_displays[int(transition[-1])] = "G"
             for j in inter_info.m_lights[cycle][int(transition[-1])]:
-                inter_info.lights[j] = "G"
+                ts_displays[j] = "G"
         elif "tYel" in transition:
             print("Voy a poner en YELLOW el Movimiento %s" % transition[-1])
             l_change = True
             moves_displays[int(transition[-1])] = "y"
             for j in inter_info.m_lights[cycle][int(transition[-1])]:
-                inter_info.lights[j] = "y"
+                ts_displays[j] = "y"
         elif "tRed" in transition:
             print("Voy a poner en RED el Movimiento %s" % transition[-1])
             l_change = True
             moves_displays[int(transition[-1])] = "r"
             for j in inter_info.m_lights[cycle][int(transition[-1])]:
-                inter_info.lights[j] = "r"
+                ts_displays[j] = "r"
 
     # Set control msg to simulation
     if l_change:
@@ -119,10 +118,10 @@ def set_tls_lights(transitions_fire, inter_info, mv_displays, cycle, time_curren
             "tls_id": inter_info.tls_id,
             "type": "tlsControl",
             "command": "setPhase",
-            "data": "".join(inter_info.lights)
+            "data": "".join(ts_displays)
         }
         with open("log_files/tls_%s_%d.log" % (intersection_id, run_num), "a") as f:
-            f.write(str(time_current) + "; " + str(inter_info.tls_id) + "; " + "".join(inter_info.lights) + "\n")
+            f.write(str(time_current) + "; " + str(inter_info.tls_id) + "; " + "".join(ts_displays) + "\n")
 
         display_state_msg = {
             "id": inter_info.tls_id,
@@ -138,7 +137,7 @@ def set_tls_lights(transitions_fire, inter_info, mv_displays, cycle, time_curren
         control_msg = {}
         display_state_msg = {}
 
-    return moves_displays, display_state_msg, control_msg
+    return ts_displays, moves_displays, display_state_msg, control_msg
 
 
 def config_mov_split(petri_net_snake, mov_splits):
@@ -159,6 +158,7 @@ def run():
     # Set or Reset of run variables
     cycle = 0  # Set initial Cycle
     moves_displays_state = ["r", "r", "r", "r", "r", "r", "r", "r"]  # Create intersection Movements displays
+    ts_displays_state = inter_info.lights[:]
     phases_state = [0, 0, 0, 0, 0, 0, 0, 0]  # Set initial phases_state
 
     # Create de SNAKE Petri Net
@@ -224,10 +224,12 @@ def run():
                 pub_socket.send_multipart([super_topic_phase, json.dumps(phase_state_msg).encode()])
 
         # ---- Set the TS displays
-        moves_displays_state, display_state_msg, control_msg = set_tls_lights(transitions_fire, inter_info,
-                                                                              moves_displays_state.copy(),
-                                                                              cycle,
-                                                                              time_current)
+        ts_displays_state, moves_displays_state, display_state_msg, control_msg = set_tls_lights(transitions_fire,
+                                                                                                 inter_info,
+                                                                                                 ts_displays_state[:],
+                                                                                                 moves_displays_state[:],
+                                                                                                 cycle,
+                                                                                                 time_current)
         # ---- Inform Display State Change
         if control_msg:
             client_intersection.publish(inter_info.tls_id, json.dumps(control_msg))
@@ -294,3 +296,7 @@ if __name__ == '__main__':
         run()
         run_num += 1
         time.sleep(30)
+        poll = dict(poller.poll(20))
+        while sub_socket in poll and poll[sub_socket] == zmq.POLLIN:
+            [top, contents] = sub_socket.recv_multipart()
+            poll = dict(poller.poll(20))

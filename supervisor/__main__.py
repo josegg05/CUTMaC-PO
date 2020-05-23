@@ -491,3 +491,11 @@ if __name__ == '__main__':
         run()
         run_num += 1
         time.sleep(30)
+        # Empty the zmq
+        poll = dict(poller.poll(20))
+        while tscm_sub_socket in poll and poll[tscm_sub_socket] == zmq.POLLIN:
+            [top, contents] = tscm_sub_socket.recv_multipart()
+            poll = dict(poller.poll(20))
+        while dtm_sub_socket in poll and poll[dtm_sub_socket] == zmq.POLLIN:
+            [top, contents] = dtm_sub_socket.recv_multipart()
+            poll = dict(poller.poll(20))
