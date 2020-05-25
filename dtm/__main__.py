@@ -428,7 +428,7 @@ def run():
                     print(time_current, "*** Measure congestion of movements: ", msg_movements, " ***")
                     for mov in msg_movements:
                         if mov in movements:
-                            movements[mov].congestionLevel = congestion_measure(congestion_measuring_sim, movements[mov], time_current)
+                            movements[mov].congestionLevel = congestion_measure2(congestion_measuring_sim, movements[mov], time_current)
                             mov_cong[mov] = movements[mov].congestionLevel
                     cong_data_msg = congestion_msg_set(msg_zmq, mov_cong)
                     print(cong_data_msg)
@@ -489,7 +489,7 @@ if __name__ == '__main__':
     poller = poller_config([sub_socket])
 
     # Setup the congestion model
-    congestion_measuring_sim, congestionLevel = congestion_model_conf(inter_info.m_max_speed,
+    congestion_measuring_sim, congestionLevel = congestion_model_conf2(inter_info.m_max_speed,
                                                                       inter_info.m_max_vehicle_number)
     # Reset Loop
     while True:
