@@ -96,10 +96,10 @@ def set_five_quant_label(level):
 
 
 def split_pi_model_conf():
-    my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')  # Antes 101
-    in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')  # Antes 101
-    out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')  # Antes 101
-    split = ctrl.Consequent(np.arange(-4, 5, 1), 'split')
+    my_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'my_congestion_level')  # Antes 101
+    in_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'in_congestion_level')  # Antes 101
+    out_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'out_congestion_level')  # Antes 101
+    split = ctrl.Consequent(np.arange(-2, 3, 1), 'split')
 
     # Membership Functions definition
     my_congestion_level.automf(5, 'quant')
