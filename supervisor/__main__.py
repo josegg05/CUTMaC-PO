@@ -251,7 +251,7 @@ def config_mov_split(split_cal):
     return actual_green
 
 
-def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, split, time_current, id):
+def split_set(mov_displays_change, movements, neighbors, split, time_current):
     mov_splits_changed = {}
     for mov in mov_displays_change:
         with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
@@ -264,21 +264,16 @@ def split_set(mov_displays_change, split_measuring_sim, movements, neighbors, sp
         print("tAct_" + str(movements[mov].id) + "_time = ", actual_green)
         with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
             f.write(str(actual_green) + "\n")
-    # Done: TODO: Send t_split to the TPN
-    split_msg = {
-        "id": id,
-        "type": "config",
-        "category": {
-            "value": ["split"]
-        },
-        "value": {
-            "value": mov_splits_changed
-        }
-    }
-    return split_msg
+
+    return mov_splits_changed
 
 
-def congestion_command_set(mov_congestion_measure):
+def congestion_command_set(mov_congestion_measure, movements):
+    mov_cong_measure_real = []
+    # Extract the phantom movement
+    for mov in mov_congestion_measure[0]:
+        if mov in movements:
+            mov_cong_measure_real.append(mov)
     congestion_msg = {
         "id": inter_info.id,
         "type": "stateMeasure",
@@ -286,7 +281,7 @@ def congestion_command_set(mov_congestion_measure):
             "value": ["mov_congestion"]
         },
         "value": {
-            "value": mov_congestion_measure[0]  # list of movements involved
+            "value": mov_cong_measure_real  # list of movements involved
         }
     }
     return congestion_msg
@@ -306,20 +301,49 @@ def cycle_set(id):
     return cycle_msg
 
 
+def displays_change_msg_set(mov_displays_change, msg_zmq):
+    displays_change_msg = {
+        "id": msg_zmq["id"],
+        "type": msg_zmq["type"],
+        "category": msg_zmq["category"],
+        "state": {
+            "value": mov_displays_change  # list of movements involved
+        }
+    }
+    return displays_change_msg
+
+
+def split_msg_set(mov_splits_changed, id):
+    split_msg = {
+        "id": id,
+        "type": "config",
+        "category": {
+            "value": ["split"]
+        },
+        "value": {
+            "value": mov_splits_changed
+        }
+    }
+    return split_msg
+
+
 def run():
     # Set or Reset of run variables
     accident_lanes = []
     movements = {}  # dictionary of movements
+    mov_phantom_displays = {}  # dictionary of phantom movements displays
     neighbors = {}  # dictionary of neighbors
     phases_list = [[0, 4], [0, 5], [1, 4], [1, 5], [2, 6], [2, 7], [3, 6], [3, 7]]
 
     # Create intersection Movements
-    for i in range(len(inter_info.movements)):
-        if (i == 0) or (inter_info.movements[i] >= inter_info.movements[i - 1]):
-            movements[inter_info.movements[i]] = intersections_classes.Movement(inter_info.movements[i], inter_info)
-        else:
-            break
+    for i in inter_info.movements:
+        movements[i] = intersections_classes.Movement(i, inter_info)
     print("Intersection Movements: ", movements)
+
+    # Create the intersection Phantom movements displays
+    for i in inter_info.mov_phantom:
+        mov_phantom_displays[i] = "r"
+    print("Intersection Movements: ", mov_phantom_displays)
 
     # Create intersection neighbors
     for i in inter_info.neighbors_ids:
@@ -369,20 +393,25 @@ def run():
                     print(time_current, "Measure congestion of the Movement of the next Phase -->", msg_zmq['state']["value"])
                     mov_congestion_measure = [phases_list[i] for i in range(len(msg_zmq["state"]["value"])) if
                                               msg_zmq["state"]["value"][i] != 0]  # list of list
-                    congestion_command_msg = congestion_command_set(mov_congestion_measure)
+                    congestion_command_msg = congestion_command_set(mov_congestion_measure, movements)
                     pub_socket.send_multipart([dtm_topic_congestion, json.dumps(congestion_command_msg).encode()])
                 # Manage display change: Inform: display state --> DTM;  cycle, split --> TSCM / Split measure
                 if "display" in msg_zmq['category']["value"]:
-                    pub_socket.send_multipart([dtm_topic_display, contents])  # Send Display State to DTM
                     msg_displays = list(msg_zmq["state"]["value"])  # Ej: ["r", "r", "r", "r", "r", "r", "r", "r"]
                     # Extract the movements with display changes
                     mov_displays_change = {}  # dic -> {mov: "display"}. Ej: {2: "y", 7: "y"}
+                    mov_phantom_displays_change = {}
                     for mov in range(len(msg_displays)):
                         if mov in movements and movements[mov].light_state != msg_displays[mov]:
                             # print("The movement", mov, "is", movements[mov])
                             mov_displays_change[mov] = msg_displays[mov]
                             movements[mov].light_state = msg_displays[mov]
-
+                        elif mov in mov_phantom_displays and mov_phantom_displays[mov] != msg_displays[mov]:
+                            mov_phantom_displays_change[mov] = msg_displays[mov]
+                            mov_phantom_displays[mov] = msg_displays[mov]
+                    # Send Display Changed to DTM
+                    displays_change_msg = displays_change_msg_set(mov_displays_change, msg_zmq)
+                    pub_socket.send_multipart([dtm_topic_display, json.dumps(displays_change_msg).encode()])
                     # Configure and Send the cycle state to the TSCM
                     if "r" in mov_displays_change.values():
                         # TODO: Crear el msg de cycle_msg con la info de los movimientos
@@ -393,8 +422,11 @@ def run():
                     # Measure and send split of the Movements of the starting phase
                     elif "G" in mov_displays_change.values():
                         print("Calculate split of movements: ", mov_displays_change)
-                        split_msg = split_set(mov_displays_change, split_measuring_sim, movements, neighbors, split,
-                                              time_current, msg_zmq["id"])
+                        mov_splits_changed = split_set(mov_displays_change, movements, neighbors, split, time_current)
+                        # Set split = 0 to phantom movements
+                        for mov in mov_phantom_displays_change:
+                            mov_splits_changed[mov] = 0
+                        split_msg = split_msg_set(mov_splits_changed, msg_zmq["id"])
                         pub_socket.send_multipart([tscm_topic_split, json.dumps(split_msg).encode()])
 
         # -- Manage msgs received from the DTM
@@ -403,11 +435,11 @@ def run():
             msg_zmq = json.loads(contents.decode())
             print(msg_zmq)
             msg_type = msg_zmq['type']
-            # Mange TSCM sates change
+            # Mange DTM sates change
             if b"dtm" in top and "state" in msg_type:
                 # Manage Movement congestion and send new state to Neighbors
                 if "mov_congestion" in msg_zmq['category']["value"]:
-                    mov_congestion = msg_zmq['state']["value"]
+                    mov_congestion = msg_zmq['state']["value"]  #
                     print(time_current, "Congestion of movements :", mov_congestion, "arrived")
                     for mov in mov_congestion:
                         movements[int(mov)].congestionLevel = mov_congestion[mov]

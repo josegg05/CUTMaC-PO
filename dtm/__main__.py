@@ -339,11 +339,8 @@ def run():
     previous_moves_green = []
 
     # Create intersection Movements
-    for i in range(len(inter_info.movements)):
-        if (i == 0) or (inter_info.movements[i] > inter_info.movements[i - 1]):
-            movements[inter_info.movements[i]] = intersections_classes.Movement(inter_info.movements[i], inter_info)
-        else:
-            break
+    for i in inter_info.movements:
+        movements[i] = intersections_classes.Movement(i, inter_info)
     print("Intersection Movements: ", movements)
 
     # Begging the run() log
@@ -427,7 +424,7 @@ def run():
                     mov_cong = {}
                     print(time_current, "*** Measure congestion of movements: ", msg_movements, " ***")
                     for mov in msg_movements:
-                        if mov in movements:
+                        if mov in movements:  # Está de  más pues ya lo verificó el supervisor antes de enviar el msg
                             movements[mov].congestionLevel = congestion_measure2(congestion_measuring_sim, movements[mov], time_current)
                             mov_cong[mov] = movements[mov].congestionLevel
                     cong_data_msg = congestion_msg_set(msg_zmq, mov_cong)
@@ -437,7 +434,7 @@ def run():
             # Manage Display Change
             elif b"state" in top:
                 if "display" in msg_zmq["category"]["value"]:
-                    msg_display = list(msg_zmq["state"]["value"])
+                    msg_display = dict(msg_zmq["state"]["value"])  # dic -> {mov: "display"}. Ej: {2: "y", 7: "y"}
                     if moves_green:  # Display is going to change to a NOT green light
                         previous_moves_green = moves_green[:]
                         time_green_changed[1] = time_current
@@ -445,7 +442,7 @@ def run():
                         previous_moves_green = []
                         time_green_changed[1] = -1
                     moves_green = []
-                    for mov in range(len(msg_display)):
+                    for mov in msg_display:
                         if msg_display[mov] == "G":
                             moves_green.append(mov)
                             movements[mov].reset_jam_length_vehicle()
