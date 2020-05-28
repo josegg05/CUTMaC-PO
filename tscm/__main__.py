@@ -287,8 +287,9 @@ if __name__ == '__main__':
     poller = poller_config([sub_socket])
 
     # Set the definition vectors of the Timed Petri Net
-    petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.phases,
-                                                                       inter_info.cycles, inter_info.cycles_names)
+    petri_net_inter, place_id, transition_id = inter_tpn_v2.net_create(inter_info.movements, inter_info.mov_phantom,
+                                                                       inter_info.phases, inter_info.cycles,
+                                                                       inter_info.cycles_names)
 
     # Reset Loop
     while True:

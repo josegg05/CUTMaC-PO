@@ -7,10 +7,11 @@ class PetriNetInfo:
         self.transitions = [["name", "color", "x_pos", "y_pos", "min_time ", "max_time", "arcs_in", "arcs_out", "id"]]
 
 
-def net_create(movements, phases, cycles, cycles_names):
+def net_create(movs, movs_phantom, phases, cycles, cycles_names):
     p_id = 1
     t_id = 1
     petri_net = PetriNetInfo()
+    movements = movs + movs_phantom
 
     p_names_sem = ['GG_', 'DG_', 'GR_', 'mG_', 'DY_', 'EG_', 'M_', 'SM_', 'RG_', 'RR_']#, 'FOS_']
     p_color_sem = [0, 3, 0, 0, 4, 0, 0, 0, 0, 5]#, 0]<
