@@ -443,10 +443,11 @@ def run():
                         time_green_changed[1] = -1
                     moves_green = []
                     for mov in msg_display:
+                        mov_int = int(mov)
                         if msg_display[mov] == "G":
-                            moves_green.append(mov)
-                            movements[mov].reset_jam_length_vehicle()
-                            movements[mov].reset_mean_speed()
+                            moves_green.append(mov_int)
+                            movements[mov_int].reset_jam_length_vehicle()
+                            movements[mov_int].reset_mean_speed()
                     if moves_green:  # Display changed to green light
                         time_green_changed[0] = time_current
                     else:
