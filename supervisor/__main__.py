@@ -208,7 +208,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
                                neighbors[movement.in_neighbors[1]].mov_congestion[movement.in_neighbors[0][1]]) / 2
         # print("in_congestion_level", in_congestion_level)
     else:
-        in_congestion_level = 50.0
+        in_congestion_level = 40.0
     split_measuring_sim.input['in_congestion_level'] = in_congestion_level
 
     # print("Out Neighbor: ", movement.out_neighbors[1])
@@ -217,7 +217,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
                                 neighbors[movement.out_neighbors[1]].mov_congestion[movement.out_neighbors[0][1]]) / 2
         # print("out_congestion_level: ", out_congestion_level)
     else:
-        out_congestion_level = 50.0
+        out_congestion_level = 40.0
     split_measuring_sim.input['out_congestion_level'] = out_congestion_level
 
     # Crunch the numbers
@@ -493,7 +493,7 @@ if __name__ == '__main__':
     print("Intersection_ID: ", intersection_id)
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
 
     # Start mqtt connection
     client_intersection = mqtt_conf(mqtt_broker_ip)
