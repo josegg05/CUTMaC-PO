@@ -96,9 +96,9 @@ def set_five_quant_label(level):
 
 
 def split_pi_model_conf():
-    my_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'my_congestion_level')  # Antes 101
-    in_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'in_congestion_level')  # Antes 101
-    out_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'out_congestion_level')  # Antes 101
+    my_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'my_congestion_level')  # Antes 101
+    in_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'in_congestion_level')  # Antes 101
+    out_congestion_level = ctrl.Antecedent(np.arange(0, 101, 1), 'out_congestion_level')  # Antes 101
     split = ctrl.Consequent(np.arange(-2, 3, 1), 'split')
 
     # Membership Functions definition
@@ -208,7 +208,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
                                neighbors[movement.in_neighbors[1]].mov_congestion[movement.in_neighbors[0][1]]) / 2
         # print("in_congestion_level", in_congestion_level)
     else:
-        in_congestion_level = 40.0
+        in_congestion_level = 50.0
     split_measuring_sim.input['in_congestion_level'] = in_congestion_level
 
     # print("Out Neighbor: ", movement.out_neighbors[1])
@@ -217,7 +217,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
                                 neighbors[movement.out_neighbors[1]].mov_congestion[movement.out_neighbors[0][1]]) / 2
         # print("out_congestion_level: ", out_congestion_level)
     else:
-        out_congestion_level = 40.0
+        out_congestion_level = 50.0
     split_measuring_sim.input['out_congestion_level'] = out_congestion_level
 
     # Crunch the numbers
