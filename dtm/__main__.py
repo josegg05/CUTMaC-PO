@@ -280,13 +280,22 @@ def congestion_measure2(congestion_measuring_sim, movement, time_current):
     mov_speed = movement.get_mean_speed(time_current)
     if mov_speed < 0:
         mov_speed = 14  # MAX_SPEED
-    #if mov_vehicle_num != 0:
-    congestion_measuring_sim.input['vehicleNumber'] = mov_vehicle_num
-    congestion_measuring_sim.input['occupancy'] = movement.get_occupancy(time_current)
-    congestion_measuring_sim.input['meanSpeed'] = mov_speed
-    # Crunch the numbers
-    congestion_measuring_sim.compute()
-    congestion = congestion_measuring_sim.output['congestionLevel']
+    if mov_vehicle_num != 0:
+        congestion_measuring_sim.input['vehicleNumber'] = mov_vehicle_num
+        congestion_measuring_sim.input['occupancy'] = movement.get_occupancy(time_current)
+        congestion_measuring_sim.input['meanSpeed'] = mov_speed
+        # Crunch the numbers
+        congestion_measuring_sim.compute()
+        congestion = congestion_measuring_sim.output['congestionLevel']
+    # quitar para quedar como la version anterior -----------------------------
+    else:
+        congestion_measuring_sim.input['vehicleNumber'] = 0
+        congestion_measuring_sim.input['occupancy'] = 0
+        congestion_measuring_sim.input['meanSpeed'] = 14
+        # Crunch the numbers
+        congestion_measuring_sim.compute()
+        congestion = congestion_measuring_sim.output['congestionLevel']
+    # ------------------------------------------------------------------------
 
     with open("log_files/dtm_%s_%d.log" % (intersection_id, run_num), "a") as f:
         f.write(str(time_current) + "; " +
