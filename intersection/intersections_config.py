@@ -486,7 +486,7 @@ INTER_CONFIG_OSM = {
             "W": ""
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 5,
+        "m_max_vehicle_number": 7,  # 50meter * 1.5 cars/ 10 meter = 7.5car ~ 7car
         # Configuration variables for SUMO application
         "m_lights": [[[], [7], [6], [], [8], [0, 1], [], [2, 3, 4, 5]],
                      [[], [7], [6], [], [8], [0, 1], [], [2, 3, 4, 5]],
@@ -516,7 +516,7 @@ INTER_CONFIG_OSM = {
             "W": ""
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 8,
+        "m_max_vehicle_number": 6,
         # Configuration variables for SUMO application
         "m_lights": [[[1], [2, 3], [], [4, 5, 6], [], [0], [7], []],
                      [[1], [2, 3], [], [4, 5, 6], [], [0], [7], []],
@@ -545,7 +545,7 @@ INTER_CONFIG_OSM = {
             "W": ""
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 5,
+        "m_max_vehicle_number": 4,
         # Configuration variables for SUMO application
         "m_lights": [[[2, 3], [], [], [4, 5, 6], [], [0, 1], [], []],
                      [[2, 3], [], [], [4], [], [0, 1], [], []],
@@ -572,7 +572,7 @@ INTER_CONFIG_OSM = {
             "W": "0004"
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 5,
+        "m_max_vehicle_number": 4,
         # Configuration variables for SUMO application
         "m_lights": [[[], [], [8, 9], [], [], [0, 1, 2, 3, 4], [], [5, 6, 7]],
                      [[], [], [8, 9], [], [], [0, 1, 2, 3, 4], [], [5, 6, 7]],
@@ -602,7 +602,7 @@ INTER_CONFIG_OSM = {
             "W": "0005"
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 5,
+        "m_max_vehicle_number": 6,
         # Configuration variables for SUMO application
         "m_lights": [[[5], [], [7], [0, 1], [], [2, 3, 4], [], [6]],
                      [[5], [], [7], [0, 1], [], [2, 3, 4], [], [6]],
@@ -657,7 +657,7 @@ INTER_CONFIG_OSM = {
             "W": "0007"
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 8,
+        "m_max_vehicle_number": 7,
         # Configuration variables for SUMO application
         "m_lights": [[[2], [], [], [3, 4, 5, 6], [], [0, 1], [], []],
                      [[2], [], [], [3, 4], [], [0, 1], [], []],
@@ -668,7 +668,7 @@ INTER_CONFIG_OSM = {
     "0009": {
         "state_topic": "intersection/0009/state",
         "tls_id": "intersection/0009/tls",
-        "movements": [1, 4, 7, ],
+        "movements": [1, 4, 7],
         "mov_phantom": [0, 2, 5],
         "phases": [[1, 4], [2, 7], [0, 4], [1, 5]],
         "cycles": [[1, 0, 0, 0],
@@ -684,7 +684,7 @@ INTER_CONFIG_OSM = {
             "W": ""
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 8,
+        "m_max_vehicle_number": 7,
         # Configuration variables for SUMO application
         "m_lights": [[[], [5, 6], [], [], [7], [], [], [0, 1, 2, 3, 4]],
                      [[], [5, 6], [], [], [7], [], [], [0, 1, 2, 3, 4]],
@@ -695,7 +695,7 @@ INTER_CONFIG_OSM = {
     "0010": {
         "state_topic": "intersection/0010/state",
         "tls_id": "intersection/0010/tls",
-        "movements": [1, 4, 6, ],
+        "movements": [1, 4, 6],
         "mov_phantom": [0, 2, 5],
         "phases": [[1, 4], [2, 6], [0, 4], [1, 5]],
         "cycles": [[1, 0, 0, 0],
@@ -711,7 +711,7 @@ INTER_CONFIG_OSM = {
             "W": "0009"
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 8,
+        "m_max_vehicle_number": 7,
         # Configuration variables for SUMO application
         "m_lights": [[[], [1, 2], [], [], [3], [], [0], []],
                      [[], [1, 2], [], [], [3], [], [0], []],
@@ -722,7 +722,7 @@ INTER_CONFIG_OSM = {
     "0011": {
         "state_topic": "intersection/0011/state",
         "tls_id": "intersection/0011/tls",
-        "movements": [1, 4, 7, ],
+        "movements": [1, 4, 7],
         "mov_phantom": [0, 2, 5],
         "phases": [[1, 4], [2, 7], [0, 4], [1, 5]],
         "cycles": [[1, 0, 0, 0],
@@ -738,7 +738,7 @@ INTER_CONFIG_OSM = {
             "W": "0010"
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 6,
+        "m_max_vehicle_number": 7,
         # Configuration variables for SUMO application
         "m_lights": [[[], [2, 3, 4], [], [], [5], [], [], [0, 1]],
                      [[], [2, 3, 4], [], [], [5], [], [], [0, 1]],
@@ -749,7 +749,7 @@ INTER_CONFIG_OSM = {
     "0012": {
         "state_topic": "intersection/0012/state",
         "tls_id": "intersection/0012/tls",
-        "movements": [1, 3, 6, ],
+        "movements": [1, 3, 6],
         "mov_phantom": [2, 4, 7],
         "phases": [[1, 4], [3, 6], [2, 6], [3, 7]],
         "cycles": [[1, 0, 0, 0],
@@ -765,12 +765,12 @@ INTER_CONFIG_OSM = {
             "W": "0011"
         },
         "m_max_speed": 14,
-        "m_max_vehicle_number": 7,
+        "m_max_vehicle_number": 6,
         # Configuration variables for SUMO application
         "m_lights": [[[], [0, 1, 2], [], [3, 4], [], [], [5, 6], []],
                      [[], [0, 1, 2], [], [3, 4], [], [], [5, 6], []],
                      [[], [0], [], [3, 4], [], [], [5, 6], []]],
-        "m_detectors": [[], ["w01", "w02"], [], ["n01"], [], [], ["n02"], []],
+        "m_detectors": [[], ["w01", "w02"], [], ["n01", "n02"], [], [], ["n03", "n04"], []],
         "lights": list("rrrrrrrrr")
     }
 }
