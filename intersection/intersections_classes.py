@@ -52,7 +52,7 @@ class Detector:
 
 
 class Movement:
-    def __init__(self, mov_id, intersection):
+    def __init__(self, mov_id, intersection, right=False):
         self.id = mov_id
         self.phases = []
         self.m_lights = []  # Lights associated with every movement
@@ -74,33 +74,62 @@ class Movement:
         for i in self.detectors_name:
             self._detectors[i] = Detector(i)
 
-        if self.id == 0:
-            self.in_neighbors = [[2, 5], "E"]
-            self.out_neighbors = [[3, 6], "S"]
-        elif self.id == 1:
-            self.in_neighbors = [[1, 6], "W"]
-            self.out_neighbors = [[1, 4], "E"]
-        elif self.id == 2:
-            self.in_neighbors = [[4, 7], "S"]
-            self.out_neighbors = [[0, 5], "W"]
-        elif self.id == 3:
-            self.in_neighbors = [[0, 3], "N"]
-            self.out_neighbors = [[3, 6], "S"]
-        elif self.id == 4:
-            self.in_neighbors = [[1, 6], "W"]
-            self.out_neighbors = [[2, 7], "N"]
-        elif self.id == 5:
-            self.in_neighbors = [[2, 5], "E"]
-            self.out_neighbors = [[0, 5], "W"]
-        elif self.id == 6:
-            self.in_neighbors = [[0, 3], "N"]
-            self.out_neighbors = [[1, 4], "E"]
-        elif self.id == 7:
-            self.in_neighbors = [[4, 7], "S"]
-            self.out_neighbors = [[2, 7], "N"]
+        if right:
+            if self.id == 0:
+                self.in_neighbors = [[2, 5, 3], "E"]
+                self.out_neighbors = [[3, 6], "S"]
+            elif self.id == 1:
+                self.in_neighbors = [[1, 6, 7], "W"]
+                self.out_neighbors = [[1, 4], "E", [3, 6], "S"]
+            elif self.id == 2:
+                self.in_neighbors = [[4, 7, 5], "S"]
+                self.out_neighbors = [[0, 5], "W"]
+            elif self.id == 3:
+                self.in_neighbors = [[0, 3, 1], "N"]
+                self.out_neighbors = [[3, 6], "S", [0, 5], "W"]
+            elif self.id == 4:
+                self.in_neighbors = [[1, 6, 7], "W"]
+                self.out_neighbors = [[2, 7], "N"]
+            elif self.id == 5:
+                self.in_neighbors = [[2, 5, 3], "E"]
+                self.out_neighbors = [[0, 5], "W", [2, 7], "N"]
+            elif self.id == 6:
+                self.in_neighbors = [[0, 3, 1], "N"]
+                self.out_neighbors = [[1, 4], "E"]
+            elif self.id == 7:
+                self.in_neighbors = [[4, 7, 5], "S"]
+                self.out_neighbors = [[2, 7], "N", [1, 4], "E"]
+            else:
+                self.in_neighbors = ["ERROR"]
+                self.out_neighbors = ["ERROR"]
         else:
-            self.in_neighbors = ["ERROR"]
-            self.out_neighbors = ["ERROR"]
+            if self.id == 0:
+                self.in_neighbors = [[2, 5], "E"]
+                self.out_neighbors = [[3, 6], "S"]
+            elif self.id == 1:
+                self.in_neighbors = [[1, 6], "W"]
+                self.out_neighbors = [[1, 4], "E"]
+            elif self.id == 2:
+                self.in_neighbors = [[4, 7], "S"]
+                self.out_neighbors = [[0, 5], "W"]
+            elif self.id == 3:
+                self.in_neighbors = [[0, 3], "N"]
+                self.out_neighbors = [[3, 6], "S"]
+            elif self.id == 4:
+                self.in_neighbors = [[1, 6], "W"]
+                self.out_neighbors = [[2, 7], "N"]
+            elif self.id == 5:
+                self.in_neighbors = [[2, 5], "E"]
+                self.out_neighbors = [[0, 5], "W"]
+            elif self.id == 6:
+                self.in_neighbors = [[0, 3], "N"]
+                self.out_neighbors = [[1, 4], "E"]
+            elif self.id == 7:
+                self.in_neighbors = [[4, 7], "S"]
+                self.out_neighbors = [[2, 7], "N"]
+            else:
+                self.in_neighbors = ["ERROR"]
+                self.out_neighbors = ["ERROR"]
 
     def get_vehicle_number(self, time, detector="ALL"):
         vehicle_number = 0

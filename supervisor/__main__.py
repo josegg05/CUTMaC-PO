@@ -187,7 +187,7 @@ def send_state(my_topic, movements):
         if mov in movements:
             mov_congestion.append(movements[mov].congestionLevel)
         else:
-            mov_congestion.append(0)
+            mov_congestion.append(-1)  # Coloco congestion negativa a los movimientos que no poseo
     msg = {
         "id": my_topic,
         "type": "TrafficFlowObserved",
@@ -220,6 +220,58 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
         out_congestion_level = 40.0
     split_measuring_sim.input['out_congestion_level'] = out_congestion_level
 
+    # Crunch the numbers
+    split_measuring_sim.compute()
+    with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
+        f.write(str(movement.congestionLevel) + "; " +
+                str(in_congestion_level) + "; " +
+                str(out_congestion_level) + "; " +
+                str(split_measuring_sim.output['split']) + "; ")
+    print("Split_", movement.id, " = ", split_measuring_sim.output['split'])
+    # print("my_congestion_level = ", movement.congestionLevel,
+    #       "; in_congestion_level = ", in_congestion_level,
+    #       "; out_congestion_level = ", out_congestion_level)
+    # split.view(sim=split_measuring_sim)
+
+    return split_measuring_sim.output['split']
+
+
+def split_measure_2(split_measuring_sim, movement, neighbors, split):
+    # print("Movement to measure Split: ", movement.id)
+    split_measuring_sim.input['my_congestion_level'] = movement.congestionLevel
+
+    in_congestion_level = 40.0
+    if movement.in_neighbors[1] in neighbors.keys():
+        in_congestion_level = 0.0
+        for mov in movement.in_neighbors[0]:
+            in_cong = neighbors[movement.in_neighbors[1]].mov_congestion[mov]
+            if in_cong < 0:
+                in_cong = 0.0
+            in_congestion_level += in_cong
+        in_congestion_level = in_congestion_level/len(movement.in_neighbors[0])
+
+    out_congestion_level = 40.0
+    if movement.in_neighbors[1] in neighbors.keys():
+        out_congestion_level = 0.0
+        for mov in movement.out_neighbors[0]:
+            out_cong = neighbors[movement.out_neighbors[1]].mov_congestion[mov]
+            if out_cong < 0:
+                out_cong = 80
+            out_congestion_level += out_cong
+        # TODO: Estoy excluyendo el valor de out_congestion_level a la derecha si el neighbor no está en neighbors.keys
+                # Esto puede estar mal
+        if len(movement.out_neighbors) > 2 and movement.in_neighbors[-1] in neighbors.keys():
+            for mov in movement.out_neighbors[2]:
+                out_cong = neighbors[movement.out_neighbors[-1]].mov_congestion[mov]
+                if out_cong < 0:
+                    out_cong = 80  # Este número es el máx de congestión, pero puede estar mal
+                out_congestion_level += out_cong
+            out_congestion_level = out_congestion_level / (len(movement.out_neighbors[0]) + len(movement.out_neighbors[2]))
+        else:
+            out_congestion_level = out_congestion_level/len(movement.out_neighbors[0])
+
+    split_measuring_sim.input['in_congestion_level'] = in_congestion_level
+    split_measuring_sim.input['out_congestion_level'] = out_congestion_level
     # Crunch the numbers
     split_measuring_sim.compute()
     with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
@@ -337,7 +389,7 @@ def run():
 
     # Create intersection Movements
     for i in inter_info.movements:
-        movements[i] = intersections_classes.Movement(i, inter_info)
+        movements[i] = intersections_classes.Movement(i, inter_info, True)
     print("Intersection Movements: ", movements)
 
     # Create the intersection Phantom movements displays

@@ -417,3 +417,25 @@ run_num = 0
 with open("log_files/detect_%s_%d.log" % (intersection_id, run_num), "w") as f:
     f.write("time; time_det; detect_id; cars_number; occupancy; jam; mean_speed\n")
 
+
+
+magic_list = [[0, 1], "S", [2, 3], "E"]
+normal_list = [[4, 5], "N"]
+neigh = ["S", "E", "N"
+         ]
+test_list = magic_list[:]
+if len(test_list) > 2 and test_list[3] in neigh:
+    print("Lo calculo")
+else:
+    print("No lo calculo")
+
+test_list = normal_list[:]
+if len(test_list) > 2 and test_list[3] in neigh:
+    print("Lo calculo")
+else:
+    print("No lo calculo")
+
+
+
+
+
