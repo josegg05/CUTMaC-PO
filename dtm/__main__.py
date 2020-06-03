@@ -481,7 +481,7 @@ if __name__ == '__main__':
     print("Intersection_ID: ", intersection_id)
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
 
     # Start mqtt connection
     client_intersection = mqtt_conf(mqtt_broker_ip)

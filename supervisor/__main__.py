@@ -251,7 +251,7 @@ def split_measure_2(split_measuring_sim, movement, neighbors, split):
         in_congestion_level = in_congestion_level/len(movement.in_neighbors[0])
 
     out_congestion_level = 40.0
-    if movement.in_neighbors[1] in neighbors.keys():
+    if movement.out_neighbors[1] in neighbors.keys():
         out_congestion_level = 0.0
         for mov in movement.out_neighbors[0]:
             out_cong = neighbors[movement.out_neighbors[1]].mov_congestion[mov]
@@ -260,7 +260,7 @@ def split_measure_2(split_measuring_sim, movement, neighbors, split):
             out_congestion_level += out_cong
         # TODO: Estoy excluyendo el valor de out_congestion_level a la derecha si el neighbor no está en neighbors.keys
                 # Esto puede estar mal
-        if len(movement.out_neighbors) > 2 and movement.in_neighbors[-1] in neighbors.keys():
+        if (len(movement.out_neighbors) > 2) and (movement.out_neighbors[-1] in neighbors.keys()):
             for mov in movement.out_neighbors[2]:
                 out_cong = neighbors[movement.out_neighbors[-1]].mov_congestion[mov]
                 if out_cong < 0:
@@ -309,7 +309,7 @@ def split_set(mov_displays_change, movements, neighbors, split, time_current):
         with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
             f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
         # TODO: Read the dtm log and write the info to the complete log
-        split_cal = split_measure(split_measuring_sim, movements[mov], neighbors, split)
+        split_cal = split_measure_2(split_measuring_sim, movements[mov], neighbors, split)
         actual_green = config_pi_mov_split(movements[mov], split_cal)
         movements[mov].split = actual_green
         mov_splits_changed[mov] = actual_green
@@ -545,7 +545,7 @@ if __name__ == '__main__':
     print("Intersection_ID: ", intersection_id)
 
     # Setup of the intersection
-    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
+    inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OSM)
 
     # Start mqtt connection
     client_intersection = mqtt_conf(mqtt_broker_ip)
