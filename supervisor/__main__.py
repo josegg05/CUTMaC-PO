@@ -288,6 +288,64 @@ def split_measure_2(split_measuring_sim, movement, neighbors, split):
     return split_measuring_sim.output['split']
 
 
+def split_measure_3(split_measuring_sim, movement, neighbors, split):
+    # print("Movement to measure Split: ", movement.id)
+    split_measuring_sim.input['my_congestion_level'] = movement.congestionLevel
+
+    in_congestion_level = 40.0
+    if movement.in_neighbors[1] in neighbors.keys():
+        in_congestion_level = 0.0
+        for mov in movement.in_neighbors[0]:
+            in_cong = neighbors[movement.in_neighbors[1]].mov_congestion[mov]
+            if in_cong < 0:
+                in_cong = 0.0
+            in_congestion_level += in_cong
+        in_congestion_level = in_congestion_level / len(movement.in_neighbors[0])
+
+    # Caculate out_congestion_level for "left" and "straight + right" movement
+    if movement.out_neighbors[1] in neighbors.keys():
+        out_congestion_level = 0.0
+        for mov in movement.out_neighbors[0]:
+            out_cong = neighbors[movement.out_neighbors[1]].mov_congestion[mov]
+            if out_cong < 0:
+                out_cong = 80
+            out_congestion_level += out_cong
+        out_congestion_level = out_congestion_level / len(movement.out_neighbors[0])
+    else:
+        out_congestion_level = 40.0
+
+    # It's a "straight + right" movement
+    if len(movement.out_neighbors) > 2:
+        if movement.out_neighbors[-1] in neighbors.keys():
+            out_congestion_level_2 = 0.0
+            for mov in movement.out_neighbors[2]:
+                out_cong = neighbors[movement.out_neighbors[-1]].mov_congestion[mov]
+                if out_cong < 0:
+                    out_cong = 80  # Este número es el máx de congestión, pero puede estar mal
+                out_congestion_level_2 += out_cong
+            out_congestion_level_2 = out_congestion_level_2 / len(movement.out_neighbors[2])
+        else:
+            out_congestion_level_2 = 40.0
+        out_congestion_level = out_congestion_level + out_congestion_level_2 / 2
+
+    split_measuring_sim.input['in_congestion_level'] = in_congestion_level
+    split_measuring_sim.input['out_congestion_level'] = out_congestion_level
+    # Crunch the numbers
+    split_measuring_sim.compute()
+    with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
+        f.write(str(movement.congestionLevel) + "; " +
+                str(in_congestion_level) + "; " +
+                str(out_congestion_level) + "; " +
+                str(split_measuring_sim.output['split']) + "; ")
+    print("Split_", movement.id, " = ", split_measuring_sim.output['split'])
+    # print("my_congestion_level = ", movement.congestionLevel,
+    #       "; in_congestion_level = ", in_congestion_level,
+    #       "; out_congestion_level = ", out_congestion_level)
+    # split.view(sim=split_measuring_sim)
+
+    return split_measuring_sim.output['split']
+
+
 def config_pi_mov_split(movement, split_cal):
     actual_green = movement.split + round(split_cal)
     if actual_green <= 0:
@@ -309,7 +367,7 @@ def split_set(mov_displays_change, movements, neighbors, split, time_current):
         with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
             f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
         # TODO: Read the dtm log and write the info to the complete log
-        split_cal = split_measure_2(split_measuring_sim, movements[mov], neighbors, split)
+        split_cal = split_measure_3(split_measuring_sim, movements[mov], neighbors, split)
         actual_green = config_pi_mov_split(movements[mov], split_cal)
         movements[mov].split = actual_green
         mov_splits_changed[mov] = actual_green
