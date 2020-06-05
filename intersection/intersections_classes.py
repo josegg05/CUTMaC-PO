@@ -39,7 +39,20 @@ class Neighbor:
         self.id = neighbor_id
         self.direction = neighbor_dir
         self.mov_accident = [False, False, False, False, False, False, False, False]
-        self.mov_congestion = [40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0]  # [50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0]
+        self.mov_congestion = [[0, [40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0]],
+                               [0, [40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0]]]  # [50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0]
+
+    def get_congestion(self, time):
+        if self.mov_congestion[0][0] < time:
+            congestion = self.mov_congestion[0][1]
+        else:
+            congestion = self.mov_congestion[1][1]
+        return congestion
+
+    def set_congestion(self, congestion):
+        self.mov_congestion.insert(0, congestion)
+        self.mov_congestion.pop(-1)
+        return
 
 
 class Detector:

@@ -135,7 +135,7 @@ def split_pi_model_conf():
     return split_measuring_sim, split
 
 
-def manage_flow(msg_in, neighbors):
+def manage_flow(msg_in, neighbors, time_current):
     # Function that saves the detectors and neighbor congestion info
     detector_id = msg_in["id"][-3:]
     msg_id = msg_in["id"]
@@ -144,8 +144,7 @@ def manage_flow(msg_in, neighbors):
     print("Flow status changes on neighbor " + msg_id)
     for i in neighbors:
         if neighbors[i].id == msg_id[13:17]:
-            neighbors[i].mov_congestion = msg_in["mov_congestion"]
-
+            neighbors[i].set_congestion([time_current, msg_in["mov_congestion"]])
     return
 
 
@@ -236,7 +235,7 @@ def split_measure(split_measuring_sim, movement, neighbors, split):
     return split_measuring_sim.output['split']
 
 
-def split_measure_2(split_measuring_sim, movement, neighbors, split):
+def split_measure_2(split_measuring_sim, movement, neighbors, split, time_current):
     # print("Movement to measure Split: ", movement.id)
     split_measuring_sim.input['my_congestion_level'] = movement.congestionLevel
 
@@ -244,7 +243,7 @@ def split_measure_2(split_measuring_sim, movement, neighbors, split):
     if movement.in_neighbors[1] in neighbors.keys():
         in_congestion_level = 0.0
         for mov in movement.in_neighbors[0]:
-            in_cong = neighbors[movement.in_neighbors[1]].mov_congestion[mov]
+            in_cong = (neighbors[movement.in_neighbors[1]].get_congestion(time_current))[mov]
             if in_cong < 0:
                 in_cong = 0.0
             in_congestion_level += in_cong
@@ -254,7 +253,7 @@ def split_measure_2(split_measuring_sim, movement, neighbors, split):
     if movement.out_neighbors[1] in neighbors.keys():
         out_congestion_level = 0.0
         for mov in movement.out_neighbors[0]:
-            out_cong = neighbors[movement.out_neighbors[1]].mov_congestion[mov]
+            out_cong = (neighbors[movement.out_neighbors[1]].get_congestion(time_current))[mov]
             if out_cong < 0:
                 out_cong = 80
             out_congestion_level += out_cong
@@ -262,7 +261,7 @@ def split_measure_2(split_measuring_sim, movement, neighbors, split):
                 # Esto puede estar mal
         if (len(movement.out_neighbors) > 2) and (movement.out_neighbors[-1] in neighbors.keys()):
             for mov in movement.out_neighbors[2]:
-                out_cong = neighbors[movement.out_neighbors[-1]].mov_congestion[mov]
+                out_cong = (neighbors[movement.out_neighbors[-1]].get_congestion(time_current))[mov]
                 if out_cong < 0:
                     out_cong = 80  # Este número es el máx de congestión, pero puede estar mal
                 out_congestion_level += out_cong
@@ -288,7 +287,7 @@ def split_measure_2(split_measuring_sim, movement, neighbors, split):
     return split_measuring_sim.output['split']
 
 
-def split_measure_3(split_measuring_sim, movement, neighbors, split):
+def split_measure_3(split_measuring_sim, movement, neighbors, split, time_current):
     # print("Movement to measure Split: ", movement.id)
     split_measuring_sim.input['my_congestion_level'] = movement.congestionLevel
 
@@ -296,7 +295,7 @@ def split_measure_3(split_measuring_sim, movement, neighbors, split):
     if movement.in_neighbors[1] in neighbors.keys():
         in_congestion_level = 0.0
         for mov in movement.in_neighbors[0]:
-            in_cong = neighbors[movement.in_neighbors[1]].mov_congestion[mov]
+            in_cong = (neighbors[movement.in_neighbors[1]].get_congestion(time_current))[mov]
             if in_cong < 0:
                 in_cong = 0.0
             in_congestion_level += in_cong
@@ -306,7 +305,7 @@ def split_measure_3(split_measuring_sim, movement, neighbors, split):
     if movement.out_neighbors[1] in neighbors.keys():
         out_congestion_level = 0.0
         for mov in movement.out_neighbors[0]:
-            out_cong = neighbors[movement.out_neighbors[1]].mov_congestion[mov]
+            out_cong = (neighbors[movement.out_neighbors[1]].get_congestion(time_current))[mov]
             if out_cong < 0:
                 out_cong = 80
             out_congestion_level += out_cong
@@ -319,7 +318,7 @@ def split_measure_3(split_measuring_sim, movement, neighbors, split):
         if movement.out_neighbors[-1] in neighbors.keys():
             out_congestion_level_2 = 0.0
             for mov in movement.out_neighbors[2]:
-                out_cong = neighbors[movement.out_neighbors[-1]].mov_congestion[mov]
+                out_cong = (neighbors[movement.out_neighbors[-1]].get_congestion(time_current))[mov]
                 if out_cong < 0:
                     out_cong = 80  # Este número es el máx de congestión, pero puede estar mal
                 out_congestion_level_2 += out_cong
@@ -367,7 +366,7 @@ def split_set(mov_displays_change, movements, neighbors, split, time_current):
         with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
             f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
         # TODO: Read the dtm log and write the info to the complete log
-        split_cal = split_measure_3(split_measuring_sim, movements[mov], neighbors, split)
+        split_cal = split_measure_3(split_measuring_sim, movements[mov], neighbors, split, time_current)
         actual_green = config_pi_mov_split(movements[mov], split_cal)
         movements[mov].split = actual_green
         mov_splits_changed[mov] = actual_green
@@ -484,7 +483,7 @@ def run():
             msg_type = msg_mqtt['type']
             if ("state" in msg_id):
                 if msg_type == "TrafficFlowObserved":
-                    manage_flow(msg_mqtt, neighbors)
+                    manage_flow(msg_mqtt, neighbors, time_current)
                 elif msg_type == "AccidentObserved":
                     manage_accidents(msg_mqtt, inter_info.neighbors_ids, accident_lanes)
 
