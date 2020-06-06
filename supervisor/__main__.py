@@ -366,7 +366,7 @@ def split_set(mov_displays_change, movements, neighbors, split, time_current):
         with open("log_files/sup_%s_%d.log" % (intersection_id, run_num), "a") as f:
             f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
         # TODO: Read the dtm log and write the info to the complete log
-        split_cal = split_measure_3(split_measuring_sim, movements[mov], neighbors, split, time_current)
+        split_cal = split_measure_2(split_measuring_sim, movements[mov], neighbors, split, time_current)
         actual_green = config_pi_mov_split(movements[mov], split_cal)
         movements[mov].split = actual_green
         mov_splits_changed[mov] = actual_green
