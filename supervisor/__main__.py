@@ -394,7 +394,7 @@ def config_pi_mov_split(movement, split_cal):
     return actual_green
 
 
-def config_mov_split(split_cal):
+def config_mov_split(movement, split_cal):
     mean_green = 11
     actual_green = min(mean_green + round(split_cal), 22)
     return actual_green
