@@ -95,6 +95,46 @@ def set_five_quant_label(level):
     return label
 
 
+def split_model_conf():
+    my_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'my_congestion_level')  # Antes 101
+    in_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'in_congestion_level')  # Antes 101
+    out_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'out_congestion_level')  # Antes 101
+    split = ctrl.Consequent(np.arange(-11, 11, 1), 'split')
+
+    # Membership Functions definition
+    my_congestion_level.automf(5, 'quant')
+    in_congestion_level.automf(5, 'quant')
+    out_congestion_level.automf(5, 'quant')
+    split.automf(5, 'quant')
+
+    # Graph the Membership Functions
+    # my_congestion_level.view()
+    # in_congestion_level.view()
+    # out_congestion_level.view()
+    # split.view()
+
+    # Define the Expert Rules
+    split_values_vector = [1, 1, 2, 2, 3, 4, 4, 5, 5]
+    rules = []
+    for my_cong in range(5):
+        for in_cong in range(5):
+            for out_cong in range(5):
+                my_label = set_five_quant_label(my_cong + 1)
+                in_label = set_five_quant_label(in_cong + 1)
+                out_label = set_five_quant_label(5 - out_cong)
+                split_label = set_five_quant_label(split_values_vector[in_cong + out_cong] - 2 + my_cong)
+                rules.append(ctrl.Rule(my_congestion_level[my_label] &
+                                       in_congestion_level[in_label] &
+                                       out_congestion_level[out_label],
+                                       split[split_label]))
+
+    # print(rules)
+    split_model = ctrl.ControlSystem(rules)
+    split_measuring_sim = ctrl.ControlSystemSimulation(split_model)
+
+    return split_measuring_sim, split
+
+
 def split_pi_model_conf():
     my_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'my_congestion_level')  # Antes 101
     in_congestion_level = ctrl.Antecedent(np.arange(0, 81, 1), 'in_congestion_level')  # Antes 101
@@ -349,14 +389,14 @@ def config_pi_mov_split(movement, split_cal):
     actual_green = movement.split + round(split_cal)
     if actual_green <= 0:
         actual_green = 0
-    elif actual_green >= 25:
-        actual_green = 25
+    elif actual_green >= 22:  # --> Split time = 22 + min = 22 + 4 = 26seg
+        actual_green = 22
     return actual_green
 
 
 def config_mov_split(split_cal):
-    mean_green = 16
-    actual_green = min(mean_green + round(split_cal), 25)
+    mean_green = 11
+    actual_green = min(mean_green + round(split_cal), 22)
     return actual_green
 
 
@@ -367,7 +407,7 @@ def split_set(mov_displays_change, movements, neighbors, split, time_current):
             f.write(str(time_current) + "; " + str(movements[mov].id) + "; ")
         # TODO: Read the dtm log and write the info to the complete log
         split_cal = split_measure_2(split_measuring_sim, movements[mov], neighbors, split, time_current)
-        actual_green = config_pi_mov_split(movements[mov], split_cal)
+        actual_green = config_mov_split(movements[mov], split_cal)
         movements[mov].split = actual_green
         mov_splits_changed[mov] = actual_green
         print("tAct_" + str(movements[mov].id) + "_time = ", actual_green)
@@ -624,7 +664,7 @@ if __name__ == '__main__':
     poller = poller_config([dtm_sub_socket, tscm_sub_socket])
 
     # Setup the split controller
-    split_measuring_sim, split = split_pi_model_conf()
+    split_measuring_sim, split = split_model_conf()
 
     # Reset Loop
     while True:

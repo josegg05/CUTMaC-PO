@@ -274,13 +274,13 @@ def congestion_measure(congestion_measuring_sim, movement, time_current):
     return congestion
 
 
-def congestion_measure2(congestion_measuring_sim, movement, time_current):
+def congestion_measure_2(congestion_measuring_sim, movement, time_current):
     congestion = 0.0
     mov_vehicle_num = movement.get_vehicle_number(time_current)
     mov_speed = movement.get_mean_speed(time_current)
     if mov_speed < 0:
         mov_speed = 14  # MAX_SPEED
-    if mov_vehicle_num != 0:
+    if mov_vehicle_num > 2:  # != 0:  # > 2 is used because the min speed is 4seg, and the cars can flow in that time
         congestion_measuring_sim.input['vehicleNumber'] = mov_vehicle_num
         congestion_measuring_sim.input['occupancy'] = movement.get_occupancy(time_current)
         congestion_measuring_sim.input['meanSpeed'] = mov_speed
@@ -434,7 +434,7 @@ def run():
                     print(time_current, "*** Measure congestion of movements: ", msg_movements, " ***")
                     for mov in msg_movements:
                         if mov in movements:  # Está de  más pues ya lo verificó el supervisor antes de enviar el msg
-                            movements[mov].congestionLevel = congestion_measure2(congestion_measuring_sim, movements[mov], time_current)
+                            movements[mov].congestionLevel = congestion_measure_2(congestion_measuring_sim, movements[mov], time_current)
                             mov_cong[mov] = movements[mov].congestionLevel
                     cong_data_msg = congestion_msg_set(msg_zmq, mov_cong)
                     print(cong_data_msg)
