@@ -271,6 +271,7 @@ if __name__ == '__main__':
         mqtt_broker_ip = f.read().rstrip()  # PC Office: "192.168.0.196"; PC Lab: "192.168.5.95"; PC Home: "192.168.1.86"
     print("Intersection_ID: ", intersection_id)
 
+    # intersection_id = input("Give me an ID:")
     # Setup of the intersection
     inter_info = intersections_classes.Intersection(intersection_id, intersections_config.INTER_CONFIG_OPT)
 
